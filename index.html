@@ -7,14 +7,15 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #0a0a0c; /* ✨ 더 깊어진 블랙 홀 무드 */
+            /* ✨ 배경색: 눈부시게 깨끗한 화이트 */
+            background: #ffffff; 
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .prism-wrapper {
+        .white-wrapper {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -23,120 +24,127 @@
             align-items: center;
         }
 
-        /* 🎬 메인 비주얼 구역 */
-        .visual-area {
+        /* 🎬 비주얼 섹션 */
+        .visual-frame {
             position: absolute;
-            right: -2%;
-            width: 900px;
+            right: 0;
+            bottom: 0;
+            width: 850px;
             z-index: 2;
             
-            /* ✨ 강력한 마스크: 사진을 배경 속으로 증발시킴 */
-            -webkit-mask-image: radial-gradient(circle at bottom right, black 20%, transparent 85%);
-            mask-image: radial-gradient(circle at bottom right, black 20%, transparent 85%);
+            /* ✨ 밝은 배경용 마스크: 사진 하단과 왼쪽을 화이트 속으로 녹임 */
+            -webkit-mask-image: radial-gradient(circle at bottom right, black 30%, transparent 90%);
+            mask-image: radial-gradient(circle at bottom right, black 30%, transparent 90%);
         }
 
         .main-img {
             width: 100%;
             height: auto;
-            opacity: 0.85;
-            filter: contrast(1.1) brightness(1.1);
-            /* ✨ 효과 1: 물결치듯 아주 미세하게 일렁이는 효과 */
-            animation: waterRipple 6s infinite ease-in-out;
+            opacity: 0.95;
+            filter: contrast(1.05) saturate(1.1) brightness(1.02);
+            /* ✨ 효과 1: 아주 천천히 좌우로 부드럽게 흔들리는 스웨이(Sway) 효과 */
+            animation: softSway 12s infinite alternate ease-in-out;
         }
 
-        /* ✨ 효과 2: 사진 위로 쏟아지는 유리 파편 빛 (Prism Fragments) */
-        .prism-shards {
+        /* ✨ 효과 2: 사진 위로 지나가는 투명한 유리 반사광 (Glossy Reflection) */
+        .glossy-shine {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: 
-                linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.2) 45%, transparent 50%),
-                linear-gradient(45deg, transparent 48%, rgba(142,168,201,0.15) 50%, transparent 52%);
+            background: linear-gradient(
+                135deg,
+                transparent 45%,
+                rgba(255, 255, 255, 0.6) 50%,
+                transparent 55%
+            );
             z-index: 3;
-            mix-blend-mode: screen;
-            animation: shardFlow 4s infinite linear;
+            mix-blend-mode: overlay;
+            animation: shineMove 4s infinite linear;
         }
 
-        @keyframes waterRipple {
-            0%, 100% { transform: scale(1.02) skew(0deg); }
-            50% { transform: scale(1.05) skew(1deg); }
+        /* ✨ 효과 3: 화면 전체에 떠다니는 아주 작은 화이트 파티클 */
+        .white-particles {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(142, 168, 201, 0.2) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+            animation: particleFloat 10s infinite linear;
         }
 
-        @keyframes shardFlow {
-            from { background-position: -500px -500px; }
-            to { background-position: 500px 500px; }
+        @keyframes softSway {
+            from { transform: rotate(-1deg) scale(1); }
+            to { transform: rotate(1deg) scale(1.03); }
         }
 
-        /* ✍️ 타이포그래피: 사진과 겹치는 압도적인 텍스트 */
-        .text-stack {
+        @keyframes shineMove {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100%); }
+        }
+
+        @keyframes particleFloat {
+            from { background-position: 0 0; }
+            to { background-position: 40px 80px; }
+        }
+
+        /* ✍️ 타이포그래피: 밝은 배경에 어울리는 세련된 그레이 톤 */
+        .text-stage {
             position: relative;
             z-index: 10;
-            margin-left: 6%;
+            margin-left: 7%;
         }
 
-        .huge-bg-text {
-            font-size: 15rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -15px; line-height: 0.75;
+        .huge-hollow {
+            font-size: 12rem; font-weight: 900; 
+            /* ✨ 테두리만 있는 글자 (Hollow Text)로 시원하게 */
+            color: transparent;
+            -webkit-text-stroke: 1px #e2e8f0;
+            letter-spacing: -5px; line-height: 0.85;
             text-transform: uppercase; margin: 0;
-            opacity: 0.04;
-            /* ✨ 효과 3: 배경 글자가 숨쉬듯 서서히 깜빡임 */
-            animation: textPulse 4s infinite alternate;
         }
 
-        .hero-title {
-            position: absolute;
-            top: 55%; left: 0;
-            transform: translateY(-50%);
-        }
-
-        .actor-name-large {
-            font-size: 4.5rem; font-weight: 100; color: #8ea8c9;
-            letter-spacing: 30px; text-transform: uppercase;
-            text-shadow: 0 0 50px rgba(142, 168, 201, 0.5);
+        .actor-label-pure {
+            font-size: 4rem; font-weight: 100; color: #475569;
+            letter-spacing: 25px; text-transform: uppercase;
+            margin-top: -30px;
         }
         
-        @keyframes textPulse {
-            from { opacity: 0.02; letter-spacing: -15px; }
-            to { opacity: 0.06; letter-spacing: -5px; }
-        }
-
-        .enter-btn-prism { 
+        .enter-btn-white { 
             display: inline-flex;
-            text-decoration: none; width: 340px; height: 65px; 
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(142, 168, 201, 0.05);
-            backdrop-filter: blur(5px);
+            text-decoration: none; width: 280px; height: 60px; 
+            border: 1px solid #475569; 
+            background: transparent;
             align-items: center; justify-content: center; 
-            font-weight: 800; color: #ffffff; letter-spacing: 10px;
-            margin-top: 100px; transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            font-weight: 700; color: #475569; letter-spacing: 8px;
+            margin-top: 80px; transition: 0.5s;
         }
         
-        .enter-btn-prism:hover { 
-            background: #ffffff; color: #0a0a0c; 
-            box-shadow: 0 0 60px rgba(142, 168, 201, 0.4);
+        .enter-btn-white:hover { 
+            background: #475569; color: #ffffff; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
             transform: translateY(-5px);
         }
 
         @media (max-width: 1200px) {
-            .huge-bg-text { font-size: 8rem; }
-            .actor-name-large { font-size: 2.5rem; letter-spacing: 12px; }
-            .visual-area { width: 550px; }
+            .huge-hollow { font-size: 6rem; }
+            .actor-label-pure { font-size: 2.2rem; letter-spacing: 12px; }
+            .visual-frame { width: 550px; }
         }
     </style>
 </head>
 <body>
+    <div class="white-particles"></div>
     
-    <div class="prism-wrapper">
-        <div class="text-stack">
-            <h1 class="huge-bg-text">BEYOND<br>VISION</h1>
-            <div class="hero-title">
-                <h2 class="actor-name-large">HAN JI WOO</h2>
-                <a href="menu.html" class="enter-btn-prism">DISCOVER MORE</a>
-            </div>
+    <div class="white-wrapper">
+        <div class="text-stage">
+            <h1 class="huge-hollow">ETERNAL<br>MUSE</h1>
+            <h2 class="actor-label-pure">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-white">ENTER GALLERY</a>
         </div>
 
-        <div class="visual-area">
-            <div class="prism-shards"></div>
+        <div class="visual-frame">
+            <div class="glossy-shine"></div>
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
