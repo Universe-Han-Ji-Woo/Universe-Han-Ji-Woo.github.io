@@ -7,134 +7,75 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #000; 
+            /* ✨ 배경색: 깊고 오묘한 다크 에메랄드 */
+            background: #0a1a1a; 
             min-height: 100vh;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 전체 화면 글리치 오버레이 */
-        body::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, transparent, rgba(255,255,255,0.05) 1px, transparent 2px);
-            pointer-events: none; z-index: 100;
-        }
-
-        .dual-stage {
+        .liquid-j-container {
             position: relative;
-            width: 100%; max-width: 1600px;
+            width: 100%;
+            max-width: 1600px;
             height: 100vh;
-            display: flex; align-items: center;
+            display: flex;
+            align-items: center;
         }
 
-        /* 🎬 듀얼 사진 컨테이너 */
-        .photo-flicker-box {
+        /* 🎬 비주얼 마스크: 글자 'J' 모양 안에만 사진 표시 */
+        .j-mask-visual {
             position: absolute;
-            right: 0; width: 850px; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 5;
+            left: 10%;
+            width: 600px;
+            height: 80vh;
+            z-index: 2;
+            
+            /* ✨ 효과 1: 글자 'J' 모양으로 사진을 자름 (Masking) */
+            -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB4PSI1MCIgeT0iNzAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZ들GUiIGZ들bD0iY들YWNrIj5KPC90ZXh0Pjwvc3ZnPg==');
+            mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB4PSI1MCIgeT0iNzAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZ들GUiIGZ들bD0iY들YWNrIj5KPC90ZXh0Pjwvc3ZnPg==');
+            -webkit-mask-size: contain; mask-size: contain;
+            -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            -webkit-mask-position: center; mask-position: center;
+            
+            overflow: hidden;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.2));
         }
 
         .main-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+            filter: contrast(1.2) saturate(1.1) brightness(1.1);
+            /* ✨ 효과 2: 사진이 아주 천천히 흔들리는 효과 */
+            animation: softSwayJ 15s infinite alternate ease-in-out;
+        }
+
+        /* ✨ 효과 3: 'J' 모양 위에 맺혀 흐르는 리퀴드 글래스 (Liquid Glass) */
+        .liquid-drops {
             position: absolute;
-            width: 100%; height: auto;
-            opacity: 0;
-            filter: contrast(1.3) brightness(1.2);
-            -webkit-mask-image: radial-gradient(circle, black 50%, transparent 95%);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 20%);
+            background-size: 80px 80px;
+            z-index: 3;
+            opacity: 0.4;
+            mix-blend-mode: screen;
+            animation: dropFlow 10s infinite linear;
         }
 
-        /* ✨ 효과 1: 두 장의 사진이 미친듯이 교차됨 */
-        .img-a { animation: flickerA 4s infinite step-end; }
-        .img-b { animation: flickerB 4s infinite step-end; }
-
-        @keyframes flickerA {
-            0%, 45%, 55%, 100% { opacity: 1; transform: scale(1) translateX(0); }
-            50% { opacity: 0; transform: scale(1.1) translateX(10px); }
+        @keyframes softSwayJ {
+            from { transform: scale(1) rotate(-1deg); }
+            to { transform: scale(1.05) rotate(1deg); }
         }
 
-        @keyframes flickerB {
-            0%, 45%, 55%, 100% { opacity: 0; transform: scale(0.9) translateX(-10px); }
-            50% { opacity: 0.8; transform: scale(1) translateX(0); }
+        @keyframes dropFlow {
+            from { background-position: 0 0; }
+            to { background-position: 40px 100%; }
         }
 
-        /* ✨ 효과 2: 사진 위로 쏟아지는 프리즘 광선 */
-        .prism-light {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, transparent, rgba(255,0,255,0.1), rgba(0,255,255,0.1), transparent);
-            z-index: 10; animation: prismMove 3s infinite linear;
-        }
-
-        @keyframes prismMove {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* ✍️ 타이포그래피: 좌측 거대 텍스트 */
-        .text-zone {
-            position: relative;
-            z-index: 50; margin-left: 5%;
-        }
-
-        .huge-glitch-txt {
-            font-size: 14rem; font-weight: 900; color: #fff;
-            letter-spacing: -12px; line-height: 0.8;
-            text-transform: uppercase;
-            text-shadow: 4px 4px #ff00ff, -4px -4px #00ffff;
-            animation: textGlitch 0.2s infinite alternate;
-        }
-
-        @keyframes textGlitch {
-            from { transform: skew(1deg); }
-            to { transform: skew(-1deg); }
-        }
-
-        .actor-name-sub {
-            font-size: 4rem; font-weight: 100; color: #8ea8c9;
-            letter-spacing: 20px; text-transform: uppercase;
-            margin-top: 20px;
-        }
-        
-        .enter-btn-30 { 
-            display: inline-flex;
-            text-decoration: none; width: 350px; height: 75px; 
-            border: 2px solid #fff; 
-            background: transparent;
-            align-items: center; justify-content: center; 
-            font-weight: 900; color: #fff; letter-spacing: 12px;
-            margin-top: 80px; transition: 0.3s;
-            clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
-        }
-        
-        .enter-btn-30:hover { 
-            background: #fff; color: #000;
-            box-shadow: 0 0 50px rgba(255,255,255,0.5);
-        }
-
-        @media (max-width: 1200px) {
-            .huge-glitch-txt { font-size: 7rem; }
-            .photo-flicker-box { width: 100%; opacity: 0.4; }
-        }
-    </style>
-</head>
-<body>
-    
-    <div class="dual-stage">
-        <div class="text-zone">
-            <h1 class="huge-glitch-txt">DUAL<br>VISION</h1>
-            <h2 class="actor-name-sub">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-30">ENTER NOW</a>
-        </div>
-
-        <div class="photo-flicker-box">
-            <div class="prism-light"></div>
-            <img src="jiwoo_profile.png" alt="사진1" class="main-img img-a">
-            <img src="jiwoo_profile2.png" alt="사진2" class="main-img img-b">
-        </div>
-    </div>
-
-</body>
-</html>
+        /* ✍️ 타이포그래피: 우측에 압도적으로 배치 */
+        .text-overlay-side {
+            position: relative
