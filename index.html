@@ -7,15 +7,15 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경색: 차가우면서도 깊이 있는 다크 그레이 무드 */
-            background: #2c2e33; 
+            /* ✨ 배경색: 오묘하고 깊이 있는 뮤트 그린 (배우의 분위기를 신비롭게 함) */
+            background: #3d4341; 
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .layout-wrapper {
+        .art-wrapper {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -24,107 +24,93 @@
             align-items: center;
         }
 
-        /* 🎬 사진: 우측에 아주 크게, 그리고 몽환적으로 */
-        .visual-photo {
+        /* 🎬 사진: 우측 상단에서 아래로 쏟아지는 듯한 배치 */
+        .visual-frame {
             position: absolute;
             right: 0;
-            bottom: -10%;
-            width: 900px; /* 압도적인 크기 */
+            top: -5%;
+            width: 800px; 
             z-index: 1;
             
-            /* ✨ 사진의 왼쪽과 위쪽을 배경색 속으로 녹여버리는 고난도 그라데이션 */
-            -webkit-mask-image: radial-gradient(
-                circle at bottom right, 
-                black 20%, 
-                rgba(0,0,0,0.4) 55%, 
-                transparent 90%
+            /* ✨ 핵심: 왼쪽과 아래쪽 경계선을 배경색(#3d4341)으로 길게 녹임 */
+            -webkit-mask-image: linear-gradient(
+                to bottom left, 
+                black 10%, 
+                rgba(0,0,0,0.5) 40%, 
+                transparent 85%
             );
-            mask-image: radial-gradient(
-                circle at bottom right, 
-                black 20%, 
-                rgba(0,0,0,0.4) 55%, 
-                transparent 90%
+            mask-image: linear-gradient(
+                to bottom left, 
+                black 10%, 
+                rgba(0,0,0,0.5) 40%, 
+                transparent 85%
             );
         }
 
         .main-img {
             width: 100%;
             height: auto;
-            filter: grayscale(0.2) contrast(1.1) brightness(0.9);
-            opacity: 0.85;
+            filter: contrast(1.05) brightness(1.05) saturate(0.85);
+            opacity: 0.8;
         }
 
-        /* ✍️ 타이포그래피: 쫌좀님 취향을 반영한 거대 텍스트 배치 */
-        .text-overlay-wrap {
+        /* ✍️ 타이포그래피: 좌측에 큼지막한 수직 텍스트 배치 */
+        .side-text-box {
             position: relative;
             z-index: 10;
-            margin-left: 5%;
-            pointer-events: none;
+            margin-left: 80px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .large-title {
-            font-size: 11rem; /* 화면을 압도하는 크기 */
-            font-weight: 900;
-            color: #ffffff;
-            letter-spacing: -8px;
-            line-height: 0.85;
+        .vertical-line {
+            width: 2px; height: 100px; background: #8ea8c9; margin-bottom: 30px;
+        }
+
+        .huge-text {
+            font-size: 8rem; font-weight: 900; color: #ffffff;
+            letter-spacing: -2px; line-height: 0.8;
             text-transform: uppercase;
-            opacity: 0.1; /* 배경과 녹아드는 은은함 */
             margin: 0;
+            opacity: 0.9;
         }
 
-        .front-title {
-            position: absolute;
-            top: 50%; left: 10px;
-            transform: translateY(-50%);
-        }
-
-        .actor-name-main {
-            font-size: 4.5rem; font-weight: 100; color: #8ea8c9;
-            letter-spacing: 30px; text-transform: uppercase;
-            white-space: nowrap;
+        .sub-brand-name {
+            font-size: 1.2rem; font-weight: 200; color: #8ea8c9;
+            letter-spacing: 12px; margin-top: 40px; text-transform: uppercase;
         }
         
-        .enter-link { 
+        .enter-btn-minimal { 
             display: inline-flex;
-            text-decoration: none; width: 300px; height: 1px; 
-            background: #8ea8c9; 
-            margin-top: 100px;
-            position: relative;
-            pointer-events: auto;
-            transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            text-decoration: none; width: 220px; height: 60px; 
+            border: 1px solid rgba(255,255,255,0.3);
+            background: transparent;
+            align-items: center; justify-content: center; 
+            font-weight: 600; color: #ffffff; letter-spacing: 5px;
+            margin-top: 60px; transition: 0.4s;
+        }
+        .enter-btn-minimal:hover { 
+            background: #ffffff; color: #3d4341; border: 1px solid #ffffff;
         }
 
-        .enter-link::before {
-            content: 'ENTER INTO THE UNIVERSE';
-            position: absolute;
-            top: -40px; left: 0;
-            color: #ffffff; font-size: 0.75rem; letter-spacing: 10px;
-            white-space: nowrap; opacity: 0.6;
-        }
-
-        .enter-link:hover { width: 450px; background: #ffffff; }
-
-        @media (max-width: 1200px) {
-            .large-title { font-size: 6rem; letter-spacing: -2px; }
-            .actor-name-main { font-size: 2.5rem; letter-spacing: 15px; }
-            .visual-photo { width: 600px; }
+        @media (max-width: 1024px) {
+            .huge-text { font-size: 4rem; }
+            .visual-frame { width: 500px; right: -10%; }
+            .side-text-box { margin-left: 40px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="layout-wrapper">
-        <div class="text-overlay-wrap">
-            <h1 class="large-title">JIWOO<br>ARCHIVE</h1>
-            
-            <div class="front-title">
-                <h2 class="actor-name-main">HAN JI WOO</h2>
-                <a href="menu.html" class="enter-link"></a>
-            </div>
+    <div class="art-wrapper">
+        <div class="side-text-box">
+            <div class="vertical-line"></div>
+            <h1 class="huge-text">BEYOND<br>THE<br>UNIVERSE</h1>
+            <span class="sub-brand-name">Actor Han Jiwoo</span>
+            <a href="menu.html" class="enter-btn-minimal">ENTER NOW</a>
         </div>
 
-        <div class="visual-photo">
+        <div class="visual-frame">
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
