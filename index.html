@@ -7,25 +7,31 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #050505; 
+            background: #ffffff; 
             min-height: 100vh;
             font-family: 'Arial Black', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 배경 그리드 효과: 디지털 아카이브 감성 */
+        /* 🎬 배경: 눈부신 오로라 효과 */
         body::before {
             content: "";
             position: absolute;
             width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background: linear-gradient(135deg, #ffffff, #f0f7ff, #ffffff);
+            background-size: 400% 400%;
             z-index: 0;
+            animation: gradientBG 15s infinite ease-in-out;
         }
 
-        .hyper-container {
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .pure-hyper-container {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -33,140 +39,124 @@
             display: flex; align-items: center;
         }
 
-        /* 🎬 메인 비주얼: 위치를 비정형적으로 배치 (우측 하단에서 튀어오름) */
-        .visual-overload {
+        /* 🎬 메인 비주얼: 중앙에 배치하고 크기를 키움 */
+        .visual-pure-overload {
             position: absolute;
-            right: 0%; bottom: -5%;
+            right: -2%;
+            bottom: -5%;
             width: 900px;
             z-index: 5;
-            /* ✨ 효과 1: 하이퍼 바운스 & 지직거림 */
-            animation: hyperBounce 4s infinite cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            /* ✨ 효과 1: 부드러운 하이퍼 바운스 & 지직거림 */
+            animation: gentleHyperBounce 4s infinite cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .main-img {
             width: 100%;
             height: auto;
             display: block;
-            filter: contrast(1.3) brightness(1.2);
-            /* ✨ 효과 2: 사진의 색상이 순간적으로 반전되는 글리치 */
-            animation: colorShift 2s infinite step-end;
-            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+            opacity: 0.9;
+            filter: contrast(1.05) brightness(1.1) saturate(1.2); /* 색감을 더 청량하게 */
+            /* ✨ 효과 2: 사진의 색상이 순간적으로 무지갯빛으로 반전되는 글리치 */
+            animation: prismShift 2s infinite step-end;
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
         }
 
-        /* ✨ 효과 3: 사진 위로 쏟아지는 디지털 노이즈 스캔라인 */
-        .digital-noise {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, transparent, rgba(255,255,255,0.05) 1px, transparent 2px);
-            z-index: 10;
-            pointer-events: none;
-            animation: noiseMove 0.2s infinite;
-        }
-
-        /* ✨ 효과 4: 무지갯빛 프리즘 입자 (무작위로 흐름) */
-        .prism-particles::after {
+        /* ✨ 효과 3: 사진 위로 쏟아지는 '다이아몬드 비(Diamond Rain)' 파티클 */
+        .visual-pure-overload::after {
             content: '';
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            filter: hue-rotate(90deg) invert(1);
-            opacity: 0.2;
-            z-index: 15;
-            animation: particleSpin 10s infinite linear;
+            background: linear-gradient(to bottom, transparent, rgba(142, 168, 201, 0.2), transparent);
+            background-size: 100% 20px;
+            z-index: 10;
+            animation: rainMove 2s infinite linear;
         }
 
-        @keyframes hyperBounce {
+        @keyframes gentleHyperBounce {
             0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
             25% { transform: translateY(-20px) rotate(-1deg) scale(1.05); }
             75% { transform: translateY(10px) rotate(1deg) scale(0.98); }
         }
 
-        @keyframes colorShift {
-            0%, 100% { filter: contrast(1.3) brightness(1.2) hue-rotate(0deg); }
-            95% { filter: contrast(1.3) brightness(1.5) hue-rotate(180deg); }
+        @keyframes prismShift {
+            0%, 100% { filter: contrast(1.05) brightness(1.1) hue-rotate(0deg); }
+            95% { filter: contrast(1.05) brightness(1.3) hue-rotate(180deg); }
             98% { filter: contrast(2) invert(1); }
         }
 
-        @keyframes noiseMove {
-            from { transform: translateY(0); }
-            to { transform: translateY(2px); }
-        }
-
-        @keyframes particleSpin {
-            from { transform: rotate(0deg) scale(1); }
-            to { transform: rotate(360deg) scale(1.5); }
+        @keyframes rainMove {
+            from { background-position: 0 0; }
+            to { background-position: 0 100%; }
         }
 
         /* ✍️ 타이포그래피: 좌측에 꽉 차게 배치 + 글리치 텍스트 */
-        .text-chaos-box {
+        .text-chaos-island {
             position: relative;
             z-index: 20;
             margin-left: 5%;
         }
 
-        .huge-chaos-title {
+        .huge-chaos-title-pure {
             font-size: 16rem; font-weight: 900; color: #ffffff;
             letter-spacing: -15px; line-height: 0.75;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 5: 텍스트 쉐도우 글리치 (빨강, 파랑 잔상) */
-            text-shadow: 5px 5px #ff00ff, -5px -5px #00ffff;
-            animation: shadowGlitch 0.5s infinite;
+            /* ✨ 효과 4: 텍스트 쉐도우 글리치 (민트, 블루 잔상) */
+            text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15);
+            animation: shadowPulse 0.5s infinite;
         }
 
-        @keyframes shadowGlitch {
-            0% { text-shadow: 5px 5px #ff00ff, -5px -5px #00ffff; }
-            50% { text-shadow: -5px 5px #ff00ff, 5px -5px #00ffff; }
-            100% { text-shadow: 5px -5px #ff00ff, -5px 5px #00ffff; }
+        @keyframes shadowPulse {
+            0% { text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15); }
+            50% { text-shadow: -10px 10px 0px rgba(142, 168, 201, 0.15); }
+            100% { text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15); }
         }
 
-        .sub-tag-neon {
-            font-size: 5rem; font-weight: 100; color: #ffffff;
+        .sub-tag-pure {
+            font-size: 5rem; font-weight: 100; color: #8ea8c9;
             letter-spacing: 20px; text-transform: uppercase;
             margin-top: -30px;
             display: inline-block;
-            border-left: 15px solid #8ea8c9;
+            border-left: 15px solid #ffffff;
             padding-left: 20px;
+            text-shadow: 0 0 30px rgba(142, 168, 201, 0.3);
         }
         
-        .enter-btn-hyper { 
+        .enter-btn-hyper-pure { 
             display: flex;
             text-decoration: none; width: 400px; height: 80px; 
-            background: #ffffff; color: #000;
+            background: #ffffff; color: #8ea8c9;
             align-items: center; justify-content: center; 
             font-weight: 900; font-size: 1.5rem; letter-spacing: 15px;
             margin-top: 80px; transition: 0.2s;
             clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+            box-shadow: 0 15px 35px rgba(142, 168, 201, 0.2);
         }
         
-        .enter-btn-hyper:hover { 
-            background: #ff00ff; color: #ffffff;
+        .enter-btn-hyper-pure:hover { 
+            background: #8ea8c9; color: #ffffff;
             transform: scale(1.1) skew(-5deg);
-            box-shadow: -10px 10px 0px #00ffff;
+            box-shadow: 0 20px 50px rgba(142, 168, 201, 0.4);
         }
 
         @media (max-width: 1200px) {
-            .huge-chaos-title { font-size: 8rem; letter-spacing: -5px; }
-            .sub-tag-neon { font-size: 2.5rem; letter-spacing: 10px; }
-            .visual-overload { width: 100%; opacity: 0.4; bottom: 0; }
+            .huge-chaos-title-pure { font-size: 8rem; letter-spacing: -5px; }
+            .sub-tag-pure { font-size: 2.5rem; letter-spacing: 10px; }
+            .visual-pure-overload { width: 100%; opacity: 0.3; bottom: 0; right: 0; }
         }
     </style>
 </head>
 <body>
     
-    <div class="hyper-container">
-        <div class="prism-particles"></div>
-        
-        <div class="text-chaos-box">
-            <h1 class="huge-chaos-title">ULTRA<br>CORE</h1>
-            <h2 class="sub-tag-neon">HAN JI WOO</h2>
+    <div class="pure-hyper-container">
+        <div class="text-chaos-island">
+            <h1 class="huge-chaos-title-pure">ULTRA<br>PURE</h1>
+            <h2 class="sub-tag-pure">HAN JI WOO</h2>
             <br>
-            <a href="menu.html" class="enter-btn-hyper">ENTER NOW</a>
+            <a href="menu.html" class="enter-btn-hyper-pure">ENTER NOW</a>
         </div>
 
-        <div class="visual-overload">
-            <div class="digital-noise"></div>
+        <div class="visual-pure-overload">
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
