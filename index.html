@@ -7,14 +7,14 @@
     <style>
         body { 
             margin: 0; padding: 0; background: #ffffff; 
-            height: 100vh; font-family: 'Arial Black', sans-serif;
+            height: 100vh; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* ✨ 배경 효과 */
+        /* ✨ 배경: 은은한 리퀴드 후광 */
         .liquid-bg {
             position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(142, 168, 201, 0.12) 0%, #ffffff 85%);
+            background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%);
             z-index: 1;
         }
 
@@ -23,21 +23,22 @@
             display: flex; flex-direction: column; align-items: center; z-index: 10;
         }
 
-        /* 🎬 상단: 타이포 구역 */
+        /* 🎬 1. 상단: 타이포 (PC에서는 거대하게, 모바일선 적당하게) */
         .header-text {
-            flex: 0 0 auto; width: 100%; padding-top: 6vh;
+            flex: 0 0 auto; width: 100%; padding-top: 8vh;
             text-align: center; z-index: 30;
         }
         .univ-title {
-            font-size: 4.5rem; font-weight: 900; color: #1a1a1a;
-            line-height: 0.85; letter-spacing: -3px; text-transform: uppercase; margin: 0;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 3.8rem; font-weight: 900; color: #1a1a1a;
+            line-height: 0.9; letter-spacing: -2px; text-transform: uppercase; margin: 0;
         }
         .coming-soon-label {
-            font-size: 1.5rem; color: #8ea8c9; letter-spacing: 8px;
-            margin-top: 12px; text-transform: uppercase; font-weight: 900;
+            font-size: 1.2rem; color: #8ea8c9; letter-spacing: 5px;
+            margin-top: 10px; font-weight: 900;
         }
 
-        /* 🎬 중앙: 배우님 비주얼 (절대 사수) */
+        /* 🎬 2. 중앙: 배우님 (PC/모바일 공통 주인공) */
         .hero-photo-zone {
             flex: 1; width: 100%; display: flex; 
             justify-content: center; align-items: center;
@@ -46,60 +47,74 @@
         .main-img {
             height: 80%; width: auto; object-fit: contain;
             animation: softPulse 6s infinite alternate ease-in-out;
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
         }
 
-        /* 🎬 하단: 버튼 구역 */
+        /* 🎬 3. 하단: 회원가입 버튼 (바닥 고정) */
         .footer-btn-zone {
             flex: 0 0 auto; width: 100%; height: 12vh;
             display: flex; justify-content: center; align-items: center; z-index: 40;
         }
         .btn-stay {
-            cursor: pointer; border: none; width: 85%; height: 55px;
+            cursor: pointer; border: none; width: 80%; height: 55px;
             background: #1a1a1a; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; letter-spacing: 12px; font-size: 0.9rem;
-            border-radius: 5px; transition: 0.3s;
+            font-weight: 900; letter-spacing: 10px; font-size: 0.95rem;
+            border-radius: 5px; transition: 0.4s;
         }
 
-        /* 🛑 [핵심] 회원가입 팝업 모달 디자인 */
+        /* 🛑 회원가입 팝업 (어느 기기에서나 완벽) */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.4); 
-            backdrop-filter: blur(15px); /* 유리 질감 */
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px); 
             display: none; align-items: center; justify-content: center;
             z-index: 100; opacity: 0; transition: 0.3s;
         }
         .modal-overlay.active { display: flex; opacity: 1; }
 
         .signup-card {
-            width: 85%; max-width: 400px; padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.9);
+            width: 85%; max-width: 420px; padding: 40px 10px;
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(142, 168, 201, 0.3);
-            border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-radius: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.1);
             text-align: center; position: relative;
         }
-        .signup-card h3 { font-size: 2rem; margin-bottom: 25px; color: #1a1a1a; }
+        .signup-card h3 { font-size: 2rem; margin-bottom: 20px; color: #1a1a1a; letter-spacing: -1px; }
         .signup-input {
-            width: 90%; padding: 15px; margin-bottom: 15px;
-            border: 1px solid #ddd; border-radius: 8px; font-size: 1rem;
-            outline: none; transition: 0.3s;
+            width: 85%; padding: 15px; margin-bottom: 12px;
+            border: 1px solid #eee; border-radius: 10px; font-size: 1rem;
+            outline: none; transition: 0.3s; background: #fcfcfc;
         }
-        .signup-input:focus { border-color: #8ea8c9; box-shadow: 0 0 10px rgba(142, 168, 201, 0.2); }
+        .signup-input:focus { border-color: #8ea8c9; background: #fff; }
         .btn-submit {
-            width: 90%; padding: 15px; background: #1a1a1a; color: #fff;
-            border: none; border-radius: 8px; font-weight: 900;
-            font-size: 1rem; cursor: pointer; letter-spacing: 5px; margin-top: 10px;
+            width: 85%; padding: 18px; background: #1a1a1a; color: #fff;
+            border: none; border-radius: 10px; font-weight: 900;
+            font-size: 1.1rem; cursor: pointer; letter-spacing: 5px; margin-top: 15px;
         }
         .close-btn {
-            position: absolute; top: 15px; right: 20px; font-size: 1.5rem;
-            cursor: pointer; color: #999;
+            position: absolute; top: 15px; right: 25px; font-size: 2rem;
+            cursor: pointer; color: #ddd; line-height: 1;
         }
 
-        /* 💻 PC 설정 */
+        /* 💻 PC 레이아웃 (데스크탑 최적화) */
         @media (min-width: 1024px) {
+            .main-container { flex-direction: row; align-items: center; }
+            .header-text { flex: 1; text-align: left; padding-left: 8%; padding-top: 0; }
             .univ-title { font-size: 11rem; }
-            .btn-stay { width: 450px; height: 75px; }
+            .coming-soon-label { font-size: 2.5rem; letter-spacing: 20px; }
+            .hero-photo-zone { flex: 1.5; height: 100%; justify-content: flex-end; }
+            .main-img { height: 95%; -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%); }
+            
+            /* PC에서는 버튼이 상단 구역 아래에 위치 */
+            .footer-btn-zone {
+                position: absolute; bottom: 8vh; left: 8%; width: auto; height: auto;
+            }
+            .btn-stay { width: 380px; height: 75px; font-size: 1.2rem; }
+            .btn-stay:hover { width: 450px; background: #8ea8c9; }
+        }
+
+        @keyframes softPulse {
+            from { transform: scale(1); } to { transform: scale(1.04); }
         }
     </style>
 </head>
@@ -110,7 +125,9 @@
     <div class="main-container">
         <div class="header-text">
             <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
-            <h2 class="coming-soon-label">COMING SOON</h2>
+            <h2 class="coming-soon-label">오픈 준비 중</h2>
+            
+            <div class="pc-btn-holder"></div>
         </div>
 
         <div class="hero-photo-zone">
@@ -118,34 +135,35 @@
         </div>
 
         <div class="footer-btn-zone">
-            <button class="btn-stay" onclick="openSignup()">STAY TUNED</button>
+            <button class="btn-stay" onclick="openSignup()">회원가입 하기</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="signupModal">
         <div class="signup-card">
             <span class="close-btn" onclick="closeSignup()">×</span>
-            <h3>JOIN THE UNIVERSE</h3>
-            <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-20px; margin-bottom:30px;">FOR HAN JI WOO</p>
+            <h3>회원가입</h3>
+            <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">FOR HAN JI WOO</p>
             <form>
-                <input type="text" class="signup-input" placeholder="ID">
-                <input type="password" class="signup-input" placeholder="PASSWORD">
-                <input type="email" class="signup-input" placeholder="EMAIL">
-                <button type="button" class="btn-submit" onclick="location.href='welcome.html'">REGISTER</button>
+                <input type="text" class="signup-input" placeholder="아이디">
+                <input type="password" class="signup-input" placeholder="비밀번호">
+                <input type="text" class="signup-input" placeholder="닉네임">
+                <input type="email" class="signup-input" placeholder="이메일 주소">
+                <button type="button" class="btn-submit" onclick="location.href='welcome.html'">가입 완료</button>
             </form>
         </div>
     </div>
 
     <script>
         function openSignup() {
-            document.getElementById('signupModal').classList.add('active');
-            document.getElementById('signupModal').style.display = 'flex';
+            const modal = document.getElementById('signupModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
         }
         function closeSignup() {
-            document.getElementById('signupModal').classList.remove('active');
-            setTimeout(() => {
-                document.getElementById('signupModal').style.display = 'none';
-            }, 300);
+            const modal = document.getElementById('signupModal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
         }
     </script>
 
