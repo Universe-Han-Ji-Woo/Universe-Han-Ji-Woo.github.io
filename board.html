@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>QUEST BOOK</title>
+    <style>
+        body { margin: 0; background-color: #ebf1f6; font-family: 'Apple SD Gothic Neo', sans-serif; }
+        .nav-bar { display: flex; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .home-icon { font-size: 1.5rem; text-decoration: none; cursor: pointer; color: inherit; }
+        .board-container { width: 92%; max-width: 600px; margin: 10px auto; padding: 25px; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); box-sizing: border-box; }
+        .board-title { color: #a5b8d0; text-align: center; letter-spacing: 5px; font-size: 1.1rem; margin-bottom: 25px; font-weight: 300; }
+        .input-box { width: 100%; padding: 18px; border: 1px solid #f0f4f8; border-radius: 20px; font-size: 0.9rem; outline: none; background: #f9fbfc; box-sizing: border-box; color: #666; margin-bottom: 8px; resize: none; }
+        .pw-input { width: 100%; padding: 12px 18px; border: 1px solid #f0f4f8; border-radius: 15px; font-size: 0.8rem; outline: none; background: #f9fbfc; box-sizing: border-box; color: #666; margin-bottom: 12px; }
+        .submit-btn { width: 100%; background: #a5b8d0; color: white; border: none; padding: 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.85rem; letter-spacing: 2px; }
+        #post-list { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
+        .post-card { background: #fff; padding: 18px; border-radius: 20px; border: 1px solid #f4f7f9; }
+        .post-content { font-size: 0.85rem; color: #555; line-height: 1.6; margin: 0; white-space: pre-wrap; }
+        .post-info { font-size: 0.7rem; color: #cbd5e0; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { background: none; border: none; color: #ff9b9b; cursor: pointer; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <a href="main_gate.html" class="home-icon">🏠</a>
+    </div>
+    <div class="board-container">
+        <h2 class="board-title">QUEST BOOK</h2>
+        <textarea id="postInput" class="input-box" rows="3" placeholder="지우님께 따뜻한 한마디를 남겨주세요!"></textarea>
+        <input type="password" id="pwInput" class="pw-input" placeholder="비밀번호 4자리 (삭제 시 필요)">
+        <button id="saveBtn" class="submit-btn">작성 완료</button>
+        <div id="post-list"></div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDXz0NasgyMsWtlXriyqocMF1Tqe2FJXkg",
+        authDomain: "jiwoo-fan.firebaseapp.com",
+        projectId: "jiwoo-fan",
+        storageBucket: "jiwoo-fan.firebasestorage.app",
+        messagingSenderId: "70224934316",
+        appId: "1:70224934316:web:2ad83d9e1c55f20e7bf609"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const postsCol = collection(db, "posts");
+
+    document.getElementById('saveBtn').onclick = async () => {
+        const content = document.getElementById('postInput').value;
+        const pw = document.getElementById('pwInput').value;
+        if (!content.trim() || !pw.trim()) { alert("내용과 비밀번호를 입력해주세요."); return; }
+        await addDoc(postsCol, { text: content, password: pw, createdAt: serverTimestamp() });
+        document.getElementById('postInput').value = "";
+        document.getElementById('pwInput').value = "";
+    };
+
+    onSnapshot(query(postsCol, orderBy("createdAt", "desc")), (snapshot) => {
+        const list = document.getElementById('post-list');
+        list.innerHTML = "";
+        snapshot.forEach((p) => {
+            const data = p.data();
+            const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString('ko-KR', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : "방금 전";
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            card.innerHTML = `<p class="post-content">${data.text}</p><div class="post-info"><span>${date}</span><button class="del-btn" onclick="deleteWithPw('${p.id}', '${data.password}')">삭제</button></div>`;
+            list.appendChild(card);
+        });
+    });
+
+    window.deleteWithPw = async (id, correctPw) => {
+        const inputPw = prompt("비밀번호를 입력하세요.");
+        if (inputPw === correctPw) {
+            if(confirm("정말 삭제하시겠습니까?")) await deleteDoc(doc(db, "posts", id));
+        } else if (inputPw !== null) alert("비밀번호가 틀렸습니다.");
+    };
+</script>
+</body>
+</html>
