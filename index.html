@@ -7,132 +7,125 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경: 깨끗한 아이스 화이트에 미세한 그레인(먼지) 효과 */
-            background: #f4f7f9; 
+            /* ✨ 배경: 레트로 TV 스캔라인 효과 */
+            background: #000000; 
             min-height: 100vh;
             font-family: 'Arial Black', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 효과 1: 배경에 흐르는 디지털 데이터 (데이터 스트림) */
+        /* 🎬 전체 화면 글리치 오버레이 */
         body::after {
-            content: "0103 0718 1125 0311 ARCHIVE_SYSTEM_LOADING...";
-            position: absolute; top: 5%; left: 0; width: 100%;
-            font-size: 0.8rem; color: rgba(142, 168, 201, 0.3);
-            letter-spacing: 15px; text-align: center;
-            animation: dataScroll 10s infinite linear;
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, rgba(255,255,255,0.05) 1px, transparent 2px);
+            pointer-events: none; z-index: 100;
         }
 
-        @keyframes dataScroll {
-            from { transform: translateX(50%); }
-            to { transform: translateX(-50%); }
-        }
-
-        .archive-wrapper {
+        .glitch-stage {
             position: relative;
-            width: 100%;
-            max-width: 1600px;
+            width: 100%; max-width: 1600px;
             height: 100vh;
             display: flex; align-items: center;
         }
 
-        /* 🎬 비주얼: 중앙에 배치하되 '타겟 포커스' 프레임을 씌움 */
-        .photo-target-box {
+        /* 🎬 비주얼: 중앙 우측에 레트로 카세트 프레임 */
+        .photo-cassette-box {
             position: absolute;
-            right: 8%;
-            width: 800px;
+            right: -5%;
+            width: 850px;
             z-index: 5;
             padding: 20px;
-            /* ✨ 효과 2: 사진 모서리에 'ㄴ, ㄱ' 모양의 사이버틱한 프레임 */
-            border-right: 2px solid #8ea8c9;
-            border-bottom: 2px solid #8ea8c9;
+            background: rgba(255, 255, 255, 0.05);
+            /* ✨ 효과 1: 카세트 테이프 같은 둥근 사각형 프레임 */
+            border-radius: 50px;
+            border: 2px solid rgba(142, 168, 201, 0.3);
+            /* ✨ 효과 2: 사진 주위에 은은한 네온 글로우 */
+            box-shadow: 0 0 40px rgba(142, 168, 201, 0.3);
         }
 
         .main-img {
             width: 100%; height: auto; display: block;
-            filter: contrast(1.1) brightness(1.05);
-            /* ✨ 얼굴 보존: 사진은 선명하게, 아래쪽만 살짝 날림 */
-            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-            animation: focusPulse 4s infinite ease-in-out;
+            opacity: 0.95;
+            /* ✨ 효과 3: 사진 색상이 순간적으로 무지갯빛으로 반전되는 글리치 */
+            animation: prismShift 2s infinite step-end;
+            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 95%);
         }
 
-        @keyframes focusPulse {
-            0%, 100% { opacity: 0.9; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.01); }
+        @keyframes prismShift {
+            0%, 100% { filter: contrast(1.1) brightness(1.1) hue-rotate(0deg); }
+            95% { filter: contrast(1.1) brightness(1.3) hue-rotate(180deg); }
+            98% { filter: contrast(2) invert(1); }
         }
 
-        /* ✍️ 타이포그래피: 좌측에 수직으로 꽉 차게 */
-        .text-side-info {
+        /* ✍️ 타이포그래피: 좌측에 꽉 차게 배치 + 글리치 텍스트 */
+        .text-chaos-zone {
             position: relative;
             z-index: 10;
             margin-left: 5%;
         }
 
-        .vertical-number {
-            position: absolute;
-            top: -150px; left: -20px;
-            font-size: 20rem; color: rgba(142, 168, 201, 0.07);
-            z-index: -1;
-        }
-
-        .main-bold-txt {
-            font-size: 13rem; font-weight: 900; color: #1a1a1a;
-            letter-spacing: -10px; line-height: 0.8;
+        .huge-title-40 {
+            font-size: 16rem; font-weight: 900; color: #ffffff;
+            letter-spacing: -15px; line-height: 0.75;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 3: 텍스트에 미세한 가로줄 노이즈 삽입 */
-            background: linear-gradient(transparent 50%, rgba(142, 168, 201, 0.1) 50%);
-            background-size: 100% 4px;
+            /* ✨ 효과 4: 텍스트 쉐도우 글리치 (민트, 블루 잔상) */
+            text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15);
+            animation: shadowPulse 0.5s infinite;
         }
 
-        .sub-desc-label {
-            font-size: 4rem; font-weight: 900; color: #8ea8c9;
-            letter-spacing: 12px; text-transform: uppercase;
-            margin-top: 10px;
-            display: flex; align-items: center;
+        @keyframes shadowPulse {
+            0% { text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15); }
+            50% { text-shadow: -10px 10px 0px rgba(142, 168, 201, 0.15); }
+            100% { text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15); }
         }
 
-        .sub-desc-label::before {
-            content: ""; width: 80px; height: 10px; background: #1a1a1a; margin-right: 20px;
+        .sub-tag-40 {
+            font-size: 5rem; font-weight: 100; color: #8ea8c9;
+            letter-spacing: 20px; text-transform: uppercase;
+            margin-top: -30px;
+            display: inline-block;
+            border-left: 15px solid #ffffff;
+            padding-left: 20px;
+            text-shadow: 0 0 30px rgba(142, 168, 201, 0.3);
         }
         
-        .enter-btn-archive { 
+        .enter-btn-glitch { 
             display: flex;
-            text-decoration: none; width: 450px; height: 70px; 
-            background: #1a1a1a; color: #fff;
+            text-decoration: none; width: 400px; height: 80px; 
+            background: #ffffff; color: #8ea8c9;
             align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 1.2rem; letter-spacing: 10px;
-            margin-top: 100px; transition: 0.3s;
-            position: relative;
+            font-weight: 900; font-size: 1.5rem; letter-spacing: 15px;
+            margin-top: 80px; transition: 0.2s;
+            clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+            box-shadow: 0 15px 35px rgba(142, 168, 201, 0.2);
         }
         
-        .enter-btn-archive:hover { 
-            background: #8ea8c9;
-            transform: translateX(20px);
-        }
-
-        .enter-btn-archive::after {
-            content: ">>"; position: absolute; right: 30px;
+        .enter-btn-glitch:hover { 
+            background: #8ea8c9; color: #ffffff;
+            transform: scale(1.1) skew(-5deg);
+            box-shadow: 0 20px 50px rgba(142, 168, 201, 0.4);
         }
 
         @media (max-width: 1200px) {
-            .main-bold-txt { font-size: 7rem; }
-            .sub-desc-label { font-size: 2rem; }
-            .photo-target-box { width: 100%; opacity: 0.4; }
+            .huge-title-40 { font-size: 8rem; }
+            .photo-cassette-box { width: 100%; opacity: 0.4; }
         }
     </style>
 </head>
 <body>
     
-    <div class="archive-wrapper">
-        <div class="text-side-info">
-            <span class="vertical-number">02</span>
-            <h1 class="main-bold-txt">SYSTEM<br>CORE</h1>
-            <h2 class="sub-desc-label">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-archive">BOOT ARCHIVE</a>
+    <div class="glitch-stage">
+        <div class="text-chaos-zone">
+            <h1 class="huge-title-40">RETRO<br>VIBE</h1>
+            <h2 class="sub-tag-40">HAN JI WOO</h2>
+            <br>
+            <a href="menu.html" class="enter-btn-glitch">ENTER NOW</a>
         </div>
 
-        <div class="photo-target-box">
+        <div class="photo-cassette-box">
             <img src="jiwoo_profile2.png" alt="한지우" class="main-img">
         </div>
     </div>
