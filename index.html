@@ -52,9 +52,11 @@
             .main-container { flex-direction: row; }
             .header-text { flex: 1; text-align: left; padding-left: 8%; padding-top: 0; }
             .univ-title { font-size: 11rem; }
+            .coming-soon-label { font-size: 2.5rem; letter-spacing: 20px; }
             .hero-photo-zone { flex: 1.5; justify-content: flex-end; }
-            .footer-btn-zone { position: absolute; bottom: 8vh; left: 8%; width: auto; }
-            .btn-stay { width: 380px; height: 75px; }
+            .main-img { height: 95%; }
+            .footer-btn-zone { position: absolute; bottom: 8vh; left: 8%; width: auto; height: auto; }
+            .btn-stay { width: 380px; height: 75px; font-size: 1.2rem; }
         }
 
         @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.04); } }
@@ -86,9 +88,9 @@
             <div id="loginSection">
                 <h3>LOGIN</h3>
                 <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">WELCOME BACK</p>
-                <input type="email" class="auth-input" placeholder="이메일 주소">
-                <input type="password" class="auth-input" placeholder="비밀번호">
-                <button type="button" class="btn-submit" onclick="closeAuth()">로그인</button>
+                <input type="email" class="auth-input" id="loginEmail" placeholder="이메일 주소">
+                <input type="password" class="auth-input" id="loginPw" placeholder="비밀번호">
+                <button type="button" class="btn-submit" onclick="handleLogin()">로그인</button>
                 <div class="switch-box">
                     아직 회원이 아니신가요? <span class="switch-link" onclick="toggleAuth('signup')">회원가입하기</span>
                 </div>
@@ -97,10 +99,10 @@
             <div id="signupSection" style="display: none;">
                 <h3>JOIN US</h3>
                 <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">FOR HAN JI WOO</p>
-                <input type="email" class="auth-input" placeholder="이메일 주소">
-                <input type="password" class="auth-input" placeholder="비밀번호">
-                <input type="text" class="auth-input" placeholder="사용할 닉네임">
-                <button type="button" class="btn-submit" onclick="closeAuth()">회원가입</button>
+                <input type="email" class="auth-input" id="signupEmail" placeholder="이메일 주소">
+                <input type="password" class="auth-input" id="signupPw" placeholder="비밀번호">
+                <input type="text" class="auth-input" id="signupNick" placeholder="사용할 닉네임">
+                <button type="button" class="btn-submit" onclick="handleSignup()">회원가입</button>
                 <div class="switch-box">
                     이미 계정이 있으신가요? <span class="switch-link" onclick="toggleAuth('login')">로그인하기</span>
                 </div>
@@ -109,6 +111,7 @@
     </div>
 
     <script>
+        // 팝업 열기/닫기/전환
         function openAuth(type) {
             const modal = document.getElementById('authModal');
             toggleAuth(type);
@@ -131,6 +134,48 @@
             } else {
                 loginSide.style.display = 'none';
                 signupSide.style.display = 'block';
+            }
+        }
+
+        // 🛑 회원가입 실제 동작
+        function handleSignup() {
+            const email = document.getElementById('signupEmail').value;
+            const pw = document.getElementById('signupPw').value;
+            const nick = document.getElementById('signupNick').value;
+
+            if(!email || !pw || !nick) {
+                alert("정보를 모두 입력해 주세요.");
+                return;
+            }
+
+            const userData = { email, pw, nick };
+            // 이메일을 열쇠(Key)로 해서 브라우저에 저장
+            localStorage.setItem(email, JSON.stringify(userData));
+            
+            // 가입 후 바로 로그인창으로 전환
+            toggleAuth('login');
+        }
+
+        // 🛑 로그인 실제 동작
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const pw = document.getElementById('loginPw').value;
+            
+            const storedData = localStorage.getItem(email);
+
+            if (storedData) {
+                const user = JSON.parse(storedData);
+                if (user.pw === pw) {
+                    // 로그인 상태 저장
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('userNick', user.nick);
+                    // 오글거리는 멘트 없이 조용히 팝업 닫기
+                    closeAuth();
+                } else {
+                    alert("비밀번호가 틀렸습니다.");
+                }
+            } else {
+                alert("가입되지 않은 이메일입니다.");
             }
         }
     </script>
