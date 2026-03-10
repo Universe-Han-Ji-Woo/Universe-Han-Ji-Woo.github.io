@@ -11,10 +11,10 @@
             overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* ✨ 효과: 배경 은은한 후광 */
+        /* ✨ 효과: 배경 은은한 리퀴드 후광 */
         .liquid-bg {
             position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(142, 168, 201, 0.1) 0%, #ffffff 80%);
+            background: radial-gradient(circle at 50% 50%, rgba(142, 168, 201, 0.12) 0%, #ffffff 85%);
             z-index: 1;
         }
 
@@ -23,60 +23,64 @@
             display: flex; flex-direction: column; align-items: center; z-index: 10;
         }
 
-        /* 🎬 1. 상단: 타이포그래피 (깔끔하게 상단 배치) */
+        /* 🎬 1. 상단: 팬페이지 타이틀 & 오픈 준비 중 (프레임 안 가독성) */
         .header-text {
-            flex: 0 0 auto; width: 100%; padding-top: 8vh;
+            flex: 0 0 auto; width: 100%; padding-top: 6vh;
             text-align: center; z-index: 30;
         }
-        .mega-txt {
-            font-size: 4rem; font-weight: 900; color: #1a1a1a;
-            line-height: 0.9; letter-spacing: -2px; text-transform: uppercase; margin: 0;
+        .univ-title {
+            font-size: 4.5rem; font-weight: 900; color: #1a1a1a;
+            line-height: 0.85; letter-spacing: -3px; text-transform: uppercase; margin: 0;
         }
-        .sub-txt {
-            font-size: 1.2rem; color: #8ea8c9; letter-spacing: 6px;
-            margin-top: 10px; text-transform: uppercase;
+        .coming-soon-label {
+            font-size: 1.5rem; color: #8ea8c9; letter-spacing: 8px;
+            margin-top: 12px; text-transform: uppercase; font-weight: 900;
+        }
+        .artist-name {
+            font-size: 0.9rem; color: #1a1a1a; letter-spacing: 12px;
+            margin-top: 15px; opacity: 0.5; text-transform: uppercase;
         }
 
-        /* 🎬 2. 중앙: 배우님 비주얼 (주인공 - 화면 꽉 차게) */
+        /* 🎬 2. 중앙: 배우님 비주얼 (주인공 - 절대 가림 없음) */
         .hero-photo-zone {
             flex: 1; width: 100%; display: flex; 
             justify-content: center; align-items: center;
             overflow: hidden; z-index: 20;
         }
         .main-img {
-            height: 85%; width: auto; /* 배우님 전신/상반신이 프레임에 꽉 차게 */
+            height: 80%; width: auto; 
             object-fit: contain;
             animation: softPulse 6s infinite alternate ease-in-out;
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+            /* 위아래 부드러운 안개 처리 */
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
         }
 
         @keyframes softPulse {
             from { transform: scale(1); filter: brightness(1); }
-            to { transform: scale(1.05); filter: brightness(1.08); }
+            to { transform: scale(1.03); filter: brightness(1.05); }
         }
 
-        /* 🎬 3. 최하단: 버튼 고정 (배우님 발밑 아래) */
+        /* 🎬 3. 최하단: 다음 페이지 이동 버튼 (바닥 고정) */
         .footer-btn-zone {
             flex: 0 0 auto; width: 100%; height: 12vh;
             display: flex; justify-content: center; align-items: center;
-            background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
-            z-index: 40; border-top: 1px solid rgba(0,0,0,0.05);
+            z-index: 40;
         }
         .btn-stay {
             text-decoration: none; width: 85%; height: 55px;
             background: #1a1a1a; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; letter-spacing: 10px; font-size: 1rem;
+            font-weight: 900; letter-spacing: 12px; font-size: 0.9rem;
             border-radius: 5px; transition: 0.3s;
         }
-        .btn-stay:active { background: #8ea8c9; transform: scale(0.98); }
+        .btn-stay:active { background: #8ea8c9; transform: scale(0.96); }
 
-        /* 💻 PC 레이아웃 (가로 화면) */
+        /* 💻 PC 레이아웃 (가로 화면 최적화) */
         @media (min-width: 1024px) {
-            .mega-txt { font-size: 10rem; letter-spacing: -5px; }
-            .sub-txt { font-size: 2.5rem; letter-spacing: 15px; }
-            .footer-btn-zone { background: transparent; border: none; height: 15vh; }
-            .btn-stay { width: 400px; height: 70px; font-size: 1.2rem; }
+            .univ-title { font-size: 11rem; letter-spacing: -6px; }
+            .coming-soon-label { font-size: 3rem; letter-spacing: 20px; }
+            .artist-name { font-size: 1.5rem; letter-spacing: 25px; }
+            .btn-stay { width: 450px; height: 75px; font-size: 1.2rem; }
             .main-img { height: 95%; }
         }
     </style>
@@ -87,12 +91,13 @@
 
     <div class="main-container">
         <div class="header-text">
-            <h1 class="mega-txt">UNIVERSE<br>ARCHIVE</h1>
-            <h2 class="sub-txt">HAN JI WOO</h2>
+            <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
+            <h2 class="coming-soon-label">COMING SOON</h2>
+            <div class="artist-name">HAN JI WOO</div>
         </div>
 
         <div class="hero-photo-zone">
-            <img src="jiwoo_profile2.png" alt="주인공 한지우" class="main-img">
+            <img src="jiwoo_profile2.png" alt="배우 한지우" class="main-img">
         </div>
 
         <div class="footer-btn-zone">
