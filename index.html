@@ -7,71 +7,89 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #eef2f6; /* 배경색 고정 */
+            background: #eef2f6; /* 대문 배경색 */
             min-height: 100vh; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
             font-family: 'Apple SD Gothic Neo', sans-serif;
         }
 
-        /* 🎬 이미지 경계선을 '삭제'하는 메인 컨테이너 */
-        .fade-wrapper {
+        /* 🎬 몽환적 분위기를 만드는 메인 스테이지 */
+        .fog-stage {
             position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin-top: 40px;
-            line-height: 0;
+            width: 500px; /* 블러가 충분히 퍼질 수 있는 광활한 공간 */
+            height: 500px;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-top: 20px;
         }
 
         .main-image {
-            width: 85%; /* 컨테이너보다 작게 설정해서 블러 공간 확보 */
-            height: auto;
-            /* 1. 이미지 자체의 모서리 각진 선을 부드럽게 뭉갭니다 */
-            filter: blur(0.5px); 
+            width: 300px; /* 사진은 작게 잡아서 가장자리 여백을 극대화 */
+            height: 300px;
+            object-fit: cover;
+            /* 1. 이미지 끝단을 1차적으로 아주 미세하게 날림 */
+            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 95%);
+            mask-image: radial-gradient(circle, black 40%, transparent 95%);
         }
 
-        /* ✨ 필살기: 5중 그라데이션 마스크 (상하좌우 경계선을 안개로 덮음) */
-        .fade-wrapper::after {
+        /* 🌫️ 핵심 필살기: 4방향 + 중앙 입체 안개 레이어 */
+        .fog-stage::before {
             content: '';
             position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            /* 중앙(지우 배우님 얼굴)은 투명하게 비우고, 
-               가장자리로 갈수록 배경색(#eef2f6)을 겹겹이 쌓아 
-               사진의 네모난 끝선을 아예 '지워' 버립니다.
-            */
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 5;
+            /* 배경색(#eef2f6) 그라데이션을 3차원으로 겹쳐서 경계선을 '삭제'합니다 */
             background: 
-                radial-gradient(circle at center, transparent 20%, #eef2f6 85%),
-                linear-gradient(to right, #eef2f6 0%, transparent 20%, transparent 80%, #eef2f6 100%),
-                linear-gradient(to bottom, #eef2f6 0%, transparent 20%, transparent 80%, #eef2f6 100%);
+                /* 중앙에서 밖으로 퍼지는 안개 */
+                radial-gradient(circle, transparent 20%, rgba(238, 242, 246, 0.4) 50%, #eef2f6 80%),
+                /* 상하좌우에서 안으로 밀고 들어오는 안개 */
+                linear-gradient(to right, #eef2f6 0%, transparent 30%, transparent 70%, #eef2f6 100%),
+                linear-gradient(to bottom, #eef2f6 0%, transparent 30%, transparent 70%, #eef2f6 100%);
             pointer-events: none;
         }
 
-        /* 타이틀 및 버튼 */
+        /* 2. 오버레이 안개: 사진 위에 한 겹 더 씌워 채도를 배경과 맞춤 */
+        .fog-stage::after {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            background: rgba(238, 242, 246, 0.1);
+            z-index: 4;
+            pointer-events: none;
+        }
+
         .main-title {
-            font-size: 2rem; font-weight: 200; color: #8ea8c9;
-            letter-spacing: 12px; margin-top: 30px;
+            font-size: 2.5rem; font-weight: 200; color: #8ea8c9;
+            letter-spacing: 15px; margin-top: -30px; /* 안개와 살짝 겹치게 */
             text-transform: uppercase; text-align: center;
+            z-index: 10;
         }
         
         .enter-btn { 
-            text-decoration: none; width: 220px; height: 70px; 
+            text-decoration: none; width: 220px; height: 75px; 
             background: white; border-radius: 50px; 
             display: flex; align-items: center; justify-content: center; 
             font-weight: 800; color: #8ea8c9; letter-spacing: 5px;
             box-shadow: 20px 20px 40px #d1d9e6, -20px -20px 40px #ffffff; 
-            margin-top: 40px; transition: 0.3s;
+            margin-top: 50px; transition: 0.4s; z-index: 10;
+        }
+        .enter-btn:hover { transform: scale(1.05); }
+
+        @media (max-width: 600px) {
+            .fog-stage { width: 350px; height: 350px; }
+            .main-image { width: 220px; height: 220px; }
+            .main-title { font-size: 1.6rem; letter-spacing: 8px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="fade-wrapper">
+    <div class="fog-stage">
         <img src="jiwoo_profile.png" alt="한지우" class="main-image">
     </div>
 
-    <h1 class="main-title">UNIVERSE<br><span style="font-size: 1rem; letter-spacing: 8px; font-weight: 600;">HAN JI WOO</span></h1>
+    <h1 class="main-title">UNIVERSE<br><span style="font-size: 1.1rem; letter-spacing: 10px; font-weight: 600;">HAN JI WOO</span></h1>
 
     <a href="menu.html" class="enter-btn">ENTER</a>
 
