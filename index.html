@@ -7,14 +7,15 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #121416; /* ✨ 묵직한 블랙 차콜 */
+            /* ✨ 배경색: 깊고 신비로운 차콜 바이올렛 (파티클이 가장 돋보임) */
+            background: #191b22; 
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .motion-wrapper {
+        .cosmic-wrapper {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -23,17 +24,33 @@
             align-items: center;
         }
 
-        /* 🎬 사진 컨테이너: 사진 위로 빛 효과를 얹기 위한 장치 */
-        .photo-container {
+        /* 🎬 사진 컨테이너: 오로라와 파티클 효과를 위한 무대 */
+        .stage-visual {
             position: absolute;
-            right: -5%;
+            right: 0;
             bottom: -5%;
-            width: 850px;
+            width: 850px; 
             z-index: 1;
-            overflow: hidden; /* 사진이 커질 때 프레임 유지 */
             
+            /* ✨ 사진의 왼쪽과 위쪽을 배경색(#191b22)으로 부드럽게 녹임 */
             -webkit-mask-image: radial-gradient(circle at bottom right, black 20%, transparent 85%);
             mask-image: radial-gradient(circle at bottom right, black 20%, transparent 85%);
+        }
+
+        /* ✨ 효과 1: 사진 뒤에서 은은하게 색이 변하며 흐르는 오로라 라이트 */
+        .stage-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(
+                circle, 
+                rgba(142, 168, 201, 0.1) 0%, 
+                rgba(100, 149, 237, 0.05) 40%, 
+                transparent 70%
+            );
+            z-index: 0;
+            animation: auroraFlow 15s infinite alternate;
         }
 
         .main-img {
@@ -42,64 +59,58 @@
             display: block;
             opacity: 0.8;
             filter: contrast(1.1) brightness(1.1);
-            /* ✨ 효과 1: 아주 천천히 커지는 무드 (Ken Burns) */
-            animation: slowZoom 20s infinite alternate;
+            position: relative;
+            z-index: 1; /* 오로라보다 위에, 파티클보다 아래 */
         }
 
-        /* ✨ 효과 2: 사진 위를 지나가는 은은한 빛줄기 (홈마들 필살기) */
-        .photo-container::after {
+        /* ✨ 효과 2: 사진 위를 눈부시게 감싸는 반짝이는 입자들 (파티클 오버레이) */
+        .stage-visual::after {
             content: '';
             position: absolute;
-            top: -100%; left: -100%;
-            width: 200%; height: 200%;
-            background: linear-gradient(
-                135deg, 
-                transparent 45%, 
-                rgba(255, 255, 255, 0.1) 50%, 
-                transparent 55%
-            );
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(white 1px, transparent 1px),
+                radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
             z-index: 2;
-            animation: lightSweep 6s infinite;
+            opacity: 0.15;
+            animation: particleDrift 8s infinite linear;
         }
 
-        @keyframes slowZoom {
-            from { transform: scale(1); }
-            to { transform: scale(1.1); }
+        @keyframes auroraFlow {
+            from { transform: translateX(-10%) translateY(-10%) rotate(0deg); }
+            to { transform: translateX(10%) translateY(10%) rotate(5deg); }
         }
 
-        @keyframes lightSweep {
-            from { transform: translateX(-20%) translateY(-20%); }
-            to { transform: translateX(20%) translateY(20%); }
+        @keyframes particleDrift {
+            from { background-position: 0 0, 25px 25px; }
+            to { background-position: -50px -100px, -25px -75px; }
         }
 
-        /* ✍️ 타이포그래피: 좌측에 큼지막하게 배치 */
-        .text-side {
+        /* ✍️ 타이포그래피: 좌측에 큼지막하고 우아하게 */
+        .text-overlay-box {
             position: relative;
             z-index: 10;
             margin-left: 7%;
         }
 
-        .main-logo {
-            font-size: 10rem; font-weight: 900; color: #ffffff;
+        .huge-brand {
+            font-size: 11rem; font-weight: 900; color: #ffffff;
             letter-spacing: -5px; line-height: 0.85;
             text-transform: uppercase; margin: 0;
-            opacity: 0.15;
-            animation: fadeInText 2s ease-out;
+            opacity: 0.1; /* 배경에 녹아드는 은은한 거대 글자 */
         }
 
-        .sub-name {
+        .sub-brand-visual {
             font-size: 4rem; font-weight: 100; color: #8ea8c9;
             letter-spacing: 20px; text-transform: uppercase;
-            margin-top: -30px;
+            margin-top: -30px; margin-left: 5px;
             text-shadow: 0 0 30px rgba(142, 168, 201, 0.3);
         }
-
-        @keyframes fadeInText {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 0.15; transform: translateX(0); }
-        }
         
-        .enter-btn-motion { 
+        .enter-btn-glitch { 
             display: inline-flex;
             text-decoration: none; width: 280px; height: 60px; 
             border: 1px solid rgba(255,255,255,0.2);
@@ -107,31 +118,32 @@
             align-items: center; justify-content: center; 
             font-weight: 700; color: #ffffff; letter-spacing: 6px;
             margin-top: 70px; transition: 0.5s;
-            overflow: hidden; position: relative;
+            position: relative;
+            overflow: hidden;
         }
         
-        .enter-btn-motion:hover { 
-            background: #ffffff; color: #121416; 
+        .enter-btn-glitch:hover { 
+            background: #ffffff; color: #191b22; 
             box-shadow: 0 0 50px rgba(255,255,255,0.2);
         }
 
         @media (max-width: 1200px) {
-            .main-logo { font-size: 6rem; }
-            .sub-name { font-size: 2.5rem; letter-spacing: 12px; }
-            .photo-container { width: 550px; }
+            .huge-brand { font-size: 6rem; }
+            .sub-brand-visual { font-size: 2.5rem; letter-spacing: 12px; margin-top: -20px; }
+            .stage-visual { width: 550px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="motion-wrapper">
-        <div class="text-side">
-            <h1 class="main-logo">VISION<br>MUSE</h1>
-            <h2 class="sub-name">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-motion">ENTER PROJECT</a>
+    <div class="cosmic-wrapper">
+        <div class="text-overlay-box">
+            <h1 class="huge-brand">UNIV<br>ERSE</h1>
+            <h2 class="sub-brand-visual">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-glitch">ENTER PROJECT</a>
         </div>
 
-        <div class="photo-container">
+        <div class="stage-visual">
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
