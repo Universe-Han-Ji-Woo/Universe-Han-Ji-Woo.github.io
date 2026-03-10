@@ -7,14 +7,15 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #111214; /* ✨ 흑연보다 깊은 딥 블랙 */
+            /* ✨ 배경색: 깊고 푸른 미드나잇 네이비 */
+            background: #0d1117; 
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .hologram-wrapper {
+        .spectrum-container {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -23,123 +24,78 @@
             align-items: center;
         }
 
-        /* 🎬 메인 비주얼 구역 */
-        .visual-zone {
+        /* 🎬 비주얼 스테이지 */
+        .visual-stage {
             position: absolute;
-            right: 0;
-            width: 900px;
-            height: 100%;
+            right: -5%;
+            width: 950px;
             z-index: 1;
-            display: flex;
-            align-items: center;
             
-            -webkit-mask-image: linear-gradient(to left, black 40%, transparent 95%);
-            mask-image: linear-gradient(to left, black 40%, transparent 95%);
+            /* ✨ 마스크: 사진의 왼쪽과 상단을 부드러운 안개로 소멸 */
+            -webkit-mask-image: radial-gradient(circle at bottom right, black 30%, transparent 85%);
+            mask-image: radial-gradient(circle at bottom right, black 30%, transparent 85%);
         }
 
         .main-img {
             width: 100%;
             height: auto;
-            opacity: 0.75;
-            filter: contrast(1.2) brightness(1.1) saturate(1.1);
-            /* ✨ 효과 1: 아주 미세한 떨림과 크기 변화 */
-            animation: subtleVibrate 10s infinite alternate;
+            opacity: 0.8;
+            filter: contrast(1.1) brightness(1.2) saturate(1.2);
+            /* ✨ 효과 1: 아주 천천히 좌우로 흔들리는 팬(Pan) 효과 */
+            animation: slowPan 20s infinite alternate ease-in-out;
         }
 
-        /* ✨ 효과 2: 사진 위를 흐르는 디지털 홀로그램 노이즈 */
-        .hologram-overlay {
+        /* ✨ 효과 2: 사진 위를 가로지르는 강렬한 무지갯빛 광원 (Light Streak) */
+        .light-streak {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: linear-gradient(rgba(142, 168, 201, 0.1) 1px, transparent 1px);
-            background-size: 100% 3px;
+            background: linear-gradient(
+                110deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.2) 45%,
+                rgba(142, 168, 201, 0.3) 50%,
+                rgba(255, 255, 255, 0.2) 55%,
+                transparent 70%
+            );
             z-index: 2;
-            pointer-events: none;
-            opacity: 0.3;
-            animation: scanLine 4s infinite linear;
+            mix-blend-mode: overlay;
+            animation: streakMove 5s infinite ease-in-out;
         }
 
-        @keyframes subtleVibrate {
-            0% { transform: scale(1) translateX(0); }
-            50% { transform: scale(1.03) translateX(10px); }
-            100% { transform: scale(1) translateX(0); }
+        @keyframes slowPan {
+            from { transform: translateX(-20px) scale(1); }
+            to { transform: translateX(20px) scale(1.05); }
         }
 
-        @keyframes scanLine {
-            from { background-position: 0 0; }
-            to { background-position: 0 100%; }
+        @keyframes streakMove {
+            0% { transform: translateX(-100%) skewX(-20deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) skewX(-20deg); opacity: 0; }
         }
 
-        /* ✍️ 타이포그래피: 사진의 경계를 가로지르는 배치 */
-        .text-overlay-stage {
+        /* ✍️ 타이포그래피: 좌측에 시원하게 큼지막하게 배치 */
+        .text-layer {
             position: relative;
             z-index: 10;
             margin-left: 6%;
         }
 
-        .glitch-title {
-            font-size: 13rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -12px; line-height: 0.8;
+        .huge-title {
+            font-size: 14rem; font-weight: 900; color: #ffffff;
+            letter-spacing: -10px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            opacity: 0.8;
-            /* ✨ 효과 3: 글자가 지직거리는 글리치 효과 */
-            animation: textGlitch 5s infinite;
+            opacity: 0.03; /* 배경처럼 깔리는 초대형 글자 */
         }
 
-        @keyframes textGlitch {
-            0%, 100% { transform: translate(0); text-shadow: none; }
-            92% { transform: translate(0); text-shadow: none; }
-            94% { transform: translate(-5px, 2px); text-shadow: 2px 0 red, -2px 0 cyan; }
-            96% { transform: translate(5px, -2px); text-shadow: -2px 0 red, 2px 0 cyan; }
-            98% { transform: translate(-2px, -1px); text-shadow: 2px 0 blue, -2px 0 yellow; }
+        .main-label {
+            position: absolute;
+            top: 50%; left: 0;
+            transform: translateY(-50%);
         }
 
-        .sub-identity {
-            font-size: 4rem; font-weight: 100; color: #8ea8c9;
-            letter-spacing: 25px; text-transform: uppercase;
-            margin-top: -20px;
-            text-shadow: 0 0 30px rgba(142, 168, 201, 0.4);
+        .actor-name {
+            font-size: 5rem; font-weight: 100; color: #ffffff;
+            letter-spacing: 30px; text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(255,255,255,0.3);
         }
-        
-        .enter-btn-hologram { 
-            display: inline-flex;
-            text-decoration: none; width: 320px; height: 60px; 
-            border: 1px solid #ffffff; 
-            background: transparent;
-            align-items: center; justify-content: center; 
-            font-weight: 800; color: #ffffff; letter-spacing: 8px;
-            margin-top: 80px; transition: 0.4s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .enter-btn-hologram:hover { 
-            background: #ffffff; color: #111214; 
-            box-shadow: 0 0 50px rgba(255,255,255,0.3);
-            letter-spacing: 12px;
-        }
-
-        @media (max-width: 1200px) {
-            .glitch-title { font-size: 7rem; letter-spacing: -5px; }
-            .sub-identity { font-size: 2.5rem; letter-spacing: 12px; }
-            .visual-zone { width: 600px; }
-        }
-    </style>
-</head>
-<body>
-    
-    <div class="hologram-wrapper">
-        <div class="text-overlay-stage">
-            <h1 class="glitch-title">UNIVERSE<br>LIMITLESS</h1>
-            <h2 class="sub-identity">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-hologram">ENTER NOW</a>
-        </div>
-
-        <div class="visual-zone">
-            <div class="hologram-overlay"></div>
-            <img src="jiwoo_profile.png" alt="한지우" class="main-img">
-        </div>
-    </div>
-
-</body>
-</html>
