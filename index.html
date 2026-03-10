@@ -7,42 +7,42 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경색: 오묘하고 깊이 있는 뮤트 그린 (배우의 분위기를 신비롭게 함) */
-            background: #3d4341; 
+            /* ✨ 배경색: 묵직하면서도 보랏빛이 살짝 감도는 다크 그레이 */
+            background: #242429; 
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .art-wrapper {
+        .layout-main {
             position: relative;
             width: 100%;
-            max-width: 1600px;
+            max-width: 1400px;
             height: 100vh;
             display: flex;
             align-items: center;
         }
 
-        /* 🎬 사진: 우측 상단에서 아래로 쏟아지는 듯한 배치 */
-        .visual-frame {
+        /* 🎬 사진: 우측 상단에서 몽환적으로 내려오는 배치 */
+        .photo-visual {
             position: absolute;
-            right: 0;
-            top: -5%;
-            width: 800px; 
+            right: -5%;
+            top: 0;
+            width: 800px;
             z-index: 1;
             
-            /* ✨ 핵심: 왼쪽과 아래쪽 경계선을 배경색(#3d4341)으로 길게 녹임 */
-            -webkit-mask-image: linear-gradient(
-                to bottom left, 
-                black 10%, 
-                rgba(0,0,0,0.5) 40%, 
+            /* ✨ 상단과 좌측을 배경색(#242429)으로 완전히 녹여버리는 마스크 */
+            -webkit-mask-image: radial-gradient(
+                circle at top right, 
+                black 15%, 
+                rgba(0,0,0,0.6) 45%, 
                 transparent 85%
             );
-            mask-image: linear-gradient(
-                to bottom left, 
-                black 10%, 
-                rgba(0,0,0,0.5) 40%, 
+            mask-image: radial-gradient(
+                circle at top right, 
+                black 15%, 
+                rgba(0,0,0,0.6) 45%, 
                 transparent 85%
             );
         }
@@ -50,67 +50,64 @@
         .main-img {
             width: 100%;
             height: auto;
-            filter: contrast(1.05) brightness(1.05) saturate(0.85);
+            /* 분위기를 더 깊게 만드는 대비 조정 */
+            filter: contrast(1.1) brightness(0.9) saturate(0.9);
             opacity: 0.8;
         }
 
-        /* ✍️ 타이포그래피: 좌측에 큼지막한 수직 텍스트 배치 */
-        .side-text-box {
+        /* ✍️ 타이포그래피: 좌측에 큼지막하게, 사진과 살짝 겹치게 */
+        .typo-section {
             position: relative;
-            z-index: 10;
+            z-index: 10; /* 사진보다 위에 배치 */
             margin-left: 80px;
-            display: flex;
-            flex-direction: column;
         }
 
-        .vertical-line {
-            width: 2px; height: 100px; background: #8ea8c9; margin-bottom: 30px;
+        .main-keyword {
+            font-size: 9rem; font-weight: 900; color: #ffffff;
+            letter-spacing: -5px; line-height: 0.8;
+            text-transform: uppercase; margin: 0;
+            /* 글자에 은은한 빛 번짐 효과 */
+            text-shadow: 0 0 30px rgba(255,255,255,0.1);
         }
 
-        .huge-text {
-            font-size: 8rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -2px; line-height: 0.8;
+        .sub-tagline {
+            font-size: 1.1rem; font-weight: 300; color: #8ea8c9;
+            letter-spacing: 15px; margin-top: 50px; display: block;
             text-transform: uppercase;
-            margin: 0;
-            opacity: 0.9;
-        }
-
-        .sub-brand-name {
-            font-size: 1.2rem; font-weight: 200; color: #8ea8c9;
-            letter-spacing: 12px; margin-top: 40px; text-transform: uppercase;
         }
         
-        .enter-btn-minimal { 
+        .enter-btn-glass { 
             display: inline-flex;
-            text-decoration: none; width: 220px; height: 60px; 
-            border: 1px solid rgba(255,255,255,0.3);
-            background: transparent;
+            text-decoration: none; width: 220px; height: 65px; 
+            background: rgba(142, 168, 201, 0.1);
+            border: 1px solid rgba(142, 168, 201, 0.3);
+            backdrop-filter: blur(10px); /* 반투명 유광 효과 */
             align-items: center; justify-content: center; 
             font-weight: 600; color: #ffffff; letter-spacing: 5px;
             margin-top: 60px; transition: 0.4s;
         }
-        .enter-btn-minimal:hover { 
-            background: #ffffff; color: #3d4341; border: 1px solid #ffffff;
+        .enter-btn-glass:hover { 
+            background: #8ea8c9; color: #242429;
+            box-shadow: 0 0 30px rgba(142, 168, 201, 0.4);
         }
 
-        @media (max-width: 1024px) {
-            .huge-text { font-size: 4rem; }
-            .visual-frame { width: 500px; right: -10%; }
-            .side-text-box { margin-left: 40px; }
+        @media (max-width: 1100px) {
+            .main-keyword { font-size: 5rem; }
+            .photo-visual { width: 500px; right: -15%; }
+            .typo-section { margin-left: 40px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="art-wrapper">
-        <div class="side-text-box">
-            <div class="vertical-line"></div>
-            <h1 class="huge-text">BEYOND<br>THE<br>UNIVERSE</h1>
-            <span class="sub-brand-name">Actor Han Jiwoo</span>
-            <a href="menu.html" class="enter-btn-minimal">ENTER NOW</a>
+    <div class="layout-main">
+        <div class="typo-section">
+            <h1 class="main-keyword">THE<br>ETERNAL<br>MUSE</h1>
+            <span class="sub-tagline">HAN JI WOO PROJECT</span>
+            <a href="menu.html" class="enter-btn-glass">ENTER SITE</a>
         </div>
 
-        <div class="visual-frame">
+        <div class="photo-visual">
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
