@@ -7,151 +7,133 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경: 지금까지 안 해본 청량함의 끝판왕, 에어리 블루 그라데이션 */
-            background: linear-gradient(135deg, #ffffff, #f0f7ff, #ffffff);
-            background-size: 400% 400%;
-            animation: gradientBG 15s infinite ease-in-out;
+            background: #ffffff; 
             min-height: 100vh;
-            font-family: 'Apple SD Gothic Neo', sans-serif;
+            font-family: 'Arial Black', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* 🎬 배경: 은은하게 반짝이는 펄 입자 */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, #f8fbff 0%, #ffffff 100%);
+            z-index: 0;
         }
 
-        .white-hyper-container {
+        .crystal-wrapper {
             position: relative;
             width: 100%;
             max-width: 1600px;
             height: 100vh;
-            display: flex;
-            align-items: center;
+            display: flex; align-items: center;
         }
 
-        /* 🎬 비주얼: 중앙 중앙에 배치하고 크기를 키움 */
-        .visual-white-overload {
+        /* 🎬 비주얼: 배우님 얼굴을 선명하게 지키는 대형 배치 */
+        .photo-crystal-box {
             position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
+            right: 0%;
+            width: 850px;
             z-index: 5;
-            /* ✨ 효과 1: 부드러운 하이퍼 바운스 & 지직거림 */
-            animation: gentleHyperBounce 4s infinite cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            
-            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 95%);
-            mask-image: radial-gradient(circle, black 40%, transparent 95%);
+            filter: drop-shadow(0 20px 50px rgba(142, 168, 201, 0.2));
         }
 
         .main-img {
-            width: 100%;
-            height: auto;
-            opacity: 0.9;
-            filter: contrast(1.05) brightness(1.1) saturate(1.2); /* 색감을 더 청량하게 */
-            /* ✨ 효과 2: 사진의 색상이 순간적으로 무지갯빛으로 반전되는 글리치 */
-            animation: prismShift 2s infinite step-end;
+            width: 100%; height: auto; display: block;
+            opacity: 0.95;
+            /* ✨ 얼굴 보존: 외곽만 안개 처리 */
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+            animation: crystalFloat 5s infinite alternate ease-in-out;
         }
 
-        /* ✨ 효과 3: 사진 위로 쏟아지는 '다이아몬드 비(Diamond Rain)' 파티클 */
-        .diamond-rain {
+        /* ✨ 효과 1: 사진 위를 흐르는 투명 유리창 (Glass Pane) */
+        .glass-pane {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(142, 168, 201, 0.2), transparent);
-            background-size: 100% 20px;
+            top: 0; left: 0; width: 200px; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
             z-index: 10;
-            animation: rainMove 2s infinite linear;
+            transform: skewX(-25deg);
+            animation: glassSweep 6s infinite ease-in-out;
         }
 
-        @keyframes gentleHyperBounce {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-            25% { transform: translate(-50%, -55%) scale(1.05) rotate(-1deg); }
-            75% { transform: translate(-50%, -45%) scale(0.98) rotate(1deg); }
+        @keyframes crystalFloat {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-15px) scale(1.02); }
         }
 
-        @keyframes prismShift {
-            0%, 100% { filter: contrast(1.05) brightness(1.1) hue-rotate(0deg); }
-            95% { filter: contrast(1.05) brightness(1.3) hue-rotate(180deg); }
-            98% { filter: contrast(2) invert(1); }
+        @keyframes glassSweep {
+            0% { left: -50%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { left: 150%; opacity: 0; }
         }
 
-        @keyframes rainMove {
-            from { background-position: 0 0; }
-            to { background-position: 0 100%; }
-        }
-
-        /* ✍️ 타이포그래피: 좌측에 꽉 차게 배치 + 글리치 텍스트 */
-        .text-chaos-stage {
+        /* ✍️ 타이포그래피: 사진과 겹쳐지는 입체적 배치 */
+        .text-stack {
             position: relative;
-            z-index: 20;
+            z-index: 6; /* 사진보다 살짝 위 */
             margin-left: 5%;
         }
 
-        .huge-chaos-title-white {
-            font-size: 16rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -15px; line-height: 0.75;
+        .huge-hollow {
+            font-size: 15rem; font-weight: 900; 
+            color: transparent;
+            -webkit-text-stroke: 2px #8ea8c9;
+            letter-spacing: -10px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 4: 텍스트 쉐도우 글리치 (민트, 블루 잔상) */
-            text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15);
-            animation: shadowPulse 0.5s infinite;
+            opacity: 0.3;
         }
 
-        @keyframes shadowPulse {
-            0% { text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15); }
-            50% { text-shadow: -10px 10px 0px rgba(142, 168, 201, 0.15); }
-            100% { text-shadow: 10px 10px 0px rgba(142, 168, 201, 0.15); }
-        }
-
-        .sub-tag-white {
-            font-size: 5rem; font-weight: 100; color: #8ea8c9;
+        .solid-title {
+            font-size: 6rem; font-weight: 900; color: #8ea8c9;
             letter-spacing: 20px; text-transform: uppercase;
-            margin-top: -30px;
-            display: inline-block;
-            border-left: 15px solid #ffffff;
-            padding-left: 20px;
-            text-shadow: 0 0 30px rgba(142, 168, 201, 0.3);
+            margin-top: -50px;
+            /* ✨ 효과 2: 글자 뒤에 은은한 블루 네온 광택 */
+            text-shadow: 0 0 20px rgba(142, 168, 201, 0.4);
         }
         
-        .enter-btn-hyper-white { 
-            display: flex;
-            text-decoration: none; width: 400px; height: 80px; 
-            background: #ffffff; color: #8ea8c9;
-            align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 1.5rem; letter-spacing: 15px;
-            margin-top: 80px; transition: 0.2s;
-            clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
-            box-shadow: 0 15px 35px rgba(142, 168, 201, 0.2);
+        /* 🎬 하단 버튼: 퓨어한 디자인 */
+        .enter-btn-pure { 
+            display: inline-flex;
+            text-decoration: none; width: 350px; height: 2px; 
+            background: #8ea8c9; 
+            margin-top: 100px;
+            position: relative;
+            transition: 0.5s ease;
         }
         
-        .enter-btn-hyper-white:hover { 
-            background: #8ea8c9; color: #ffffff;
-            transform: scale(1.1) skew(-5deg);
-            box-shadow: 0 20px 50px rgba(142, 168, 201, 0.4);
+        .enter-btn-pure::after {
+            content: 'VIEW THE CRYSTAL';
+            position: absolute; top: -40px; left: 0;
+            color: #8ea8c9; font-size: 0.9rem; letter-spacing: 12px;
+            font-weight: 900;
+        }
+
+        .enter-btn-pure:hover { 
+            height: 15px;
+            background: #8ea8c9;
+            box-shadow: 0 10px 30px rgba(142, 168, 201, 0.4);
         }
 
         @media (max-width: 1200px) {
-            .huge-chaos-title-white { font-size: 8rem; letter-spacing: -5px; }
-            .sub-tag-white { font-size: 2.5rem; letter-spacing: 10px; }
-            .visual-white-overload { width: 100%; opacity: 0.3; bottom: 0; left: 50%; transform: translate(-50%, -50%);}
+            .huge-hollow { font-size: 8rem; }
+            .solid-title { font-size: 3rem; letter-spacing: 10px; }
+            .photo-crystal-box { width: 100%; opacity: 0.3; }
         }
     </style>
 </head>
 <body>
     
-    <div class="white-hyper-container">
-        <div class="text-chaos-stage">
-            <h1 class="huge-chaos-title-white">ULTRA<br>PURE</h1>
-            <h2 class="sub-tag-white">HAN JI WOO</h2>
-            <br>
-            <a href="menu.html" class="enter-btn-hyper-white">ENTER NOW</a>
+    <div class="crystal-wrapper">
+        <div class="text-stack">
+            <h1 class="huge-hollow">PURE<br>VIBE</h1>
+            <h2 class="solid-title">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-pure"></a>
         </div>
 
-        <div class="visual-white-overload">
-            <div class="diamond-rain"></div>
+        <div class="photo-crystal-box">
+            <div class="glass-pane"></div>
             <img src="jiwoo_profile2.png" alt="한지우" class="main-img">
         </div>
     </div>
