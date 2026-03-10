@@ -7,125 +7,143 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #ffffff; 
+            background: #fcfcfc; 
             min-height: 100vh;
-            font-family: 'Arial Black', sans-serif;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 효과 1: 배경 전체를 흐르는 무한 루프 타이포그래피 (Marquee) */
-        .bg-marquee-container {
+        /* 🎬 효과 1: 화면을 떠다니는 투명 프리즘 조각 (Lens Flare) */
+        .prism-layer {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex; flex-direction: column;
-            justify-content: space-around;
-            opacity: 0.04; /* 아주 은은하게 */
-            pointer-events: none;
-            z-index: 1;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 20;
         }
 
-        .marquee-line {
-            font-size: 15rem; white-space: nowrap;
-            animation: marqueeMove 20s linear infinite;
-        }
-        .line-reverse { animation: marqueeMove 25s linear infinite reverse; }
-
-        @keyframes marqueeMove {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
+        .prism-shard {
+            position: absolute;
+            width: 300px; height: 300px;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(142, 168, 201, 0.1) 50%, rgba(255,255,255,0) 100%);
+            filter: blur(40px);
+            animation: drift 15s infinite linear;
         }
 
-        .kinetic-wrapper {
+        @keyframes drift {
+            0% { transform: translate(-10%, -10%) rotate(0deg); }
+            100% { transform: translate(110%, 110%) rotate(360deg); }
+        }
+
+        .lens-wrapper {
             position: relative;
             width: 100%; max-width: 1600px;
             height: 100vh;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center;
         }
 
-        /* 🎬 비주얼: 중앙에 가장 고화질로 배치 (효과 최소화) */
-        .photo-prime-box {
-            position: relative;
-            width: 750px;
-            z-index: 10;
-            filter: drop-shadow(0 30px 60px rgba(0,0,0,0.1));
+        /* 🎬 비주얼: 중앙 배치 (고화질 선명도 100% 유지) */
+        .photo-lens-box {
+            position: absolute;
+            right: 5%;
+            width: 800px;
+            z-index: 5;
+            filter: drop-shadow(0 20px 50px rgba(142, 168, 201, 0.15));
         }
 
         .main-img {
             width: 100%; height: auto; display: block;
-            /* ✨ 화질 우선: 필터나 마스크를 최소화하여 선명도 유지 */
-            border-radius: 10px;
-            animation: primeFloat 4s infinite alternate ease-in-out;
+            opacity: 0.98;
+            /* ✨ 얼굴 사수: 마스킹 없이 선명하게 유지 */
+            animation: slowZoom 8s infinite alternate ease-in-out;
         }
 
-        @keyframes primeFloat {
-            from { transform: translateY(0); }
-            to { transform: translateY(-15px); }
-        }
-
-        /* ✍️ 타이포그래피: 사진과 겹치는 레이어드 디자인 */
-        .front-text-overlay {
+        /* ✨ 효과 2: 사진 위를 스치는 무지갯빛 산란 (Rainbow Leak) */
+        .rainbow-leak {
             position: absolute;
-            bottom: 15%; left: 5%;
-            z-index: 20;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(105deg, transparent 30%, rgba(255, 105, 180, 0.05) 40%, rgba(142, 168, 201, 0.1) 50%, rgba(100, 255, 218, 0.05) 60%, transparent 70%);
+            z-index: 6;
+            animation: leakMove 6s infinite ease-in-out;
         }
 
-        .bold-main-title {
-            font-size: 14rem; font-weight: 900; color: #1a1a1a;
-            letter-spacing: -10px; line-height: 0.8;
+        @keyframes slowZoom {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
+        }
+
+        @keyframes leakMove {
+            0% { opacity: 0; transform: translateX(-50%); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(50%); }
+        }
+
+        /* ✍️ 타이포그래피: 좌측에 아주 얇고 세련되게 */
+        .text-lens-zone {
+            position: relative;
+            z-index: 10;
+            margin-left: 5%;
+        }
+
+        .hollow-main-txt {
+            font-size: 14rem; font-weight: 900; 
+            color: #1a1a1a;
+            letter-spacing: -8px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; /* 사진 위에서도 잘 보이게 외곽선 */
         }
 
-        .side-label {
-            position: absolute;
-            top: 20%; right: 5%;
-            writing-mode: vertical-rl; /* 세로 쓰기 */
-            font-size: 1.5rem; letter-spacing: 15px; color: #8ea8c9;
-            font-weight: 900; border-left: 2px solid #8ea8c9; padding-left: 10px;
+        .thin-sub-txt {
+            font-size: 5rem; font-weight: 100; color: #8ea8c9;
+            letter-spacing: 20px; text-transform: uppercase;
+            margin-top: 10px;
+            text-shadow: 0 0 15px rgba(142, 168, 201, 0.2);
         }
         
-        /* 🎬 버튼: 볼드하고 직관적인 디자인 */
-        .enter-btn-bold { 
+        /* 🎬 버튼: 프레임만 있는 미니멀 디자인 */
+        .enter-btn-lens { 
             display: inline-flex;
-            text-decoration: none; width: 400px; height: 80px; 
-            background: #1a1a1a; color: #fff;
+            text-decoration: none; width: 380px; height: 75px; 
+            border: 1px solid #1a1a1a;
+            background: transparent;
             align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 1.4rem; letter-spacing: 12px;
-            margin-top: 50px; transition: 0.4s;
-            border: 2px solid #1a1a1a;
+            font-weight: 900; color: #1a1a1a; letter-spacing: 12px;
+            margin-top: 80px; transition: 0.4s;
+            position: relative; overflow: hidden;
         }
         
-        .enter-btn-bold:hover { 
-            background: transparent; color: #1a1a1a;
-            transform: scale(1.05);
+        .enter-btn-lens::before {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(142, 168, 201, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .enter-btn-lens:hover::before { left: 100%; }
+        .enter-btn-lens:hover { 
+            background: #1a1a1a; color: #fff;
         }
 
         @media (max-width: 1200px) {
-            .bold-main-title { font-size: 7rem; }
-            .photo-prime-box { width: 90%; }
-            .side-label { display: none; }
+            .hollow-main-txt { font-size: 7rem; }
+            .photo-lens-box { width: 100%; opacity: 0.3; }
         }
     </style>
 </head>
 <body>
     
-    <div class="bg-marquee-container">
-        <div class="marquee-line">HAN JI WOO UNIVERSE HAN JI WOO UNIVERSE</div>
-        <div class="marquee-line line-reverse">JIWOO ARCHIVE 2026 JIWOO ARCHIVE 2026</div>
-        <div class="marquee-line">HAN JI WOO UNIVERSE HAN JI WOO UNIVERSE</div>
+    <div class="prism-layer">
+        <div class="prism-shard" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
+        <div class="prism-shard" style="top: 60%; left: 40%; animation-delay: -5s;"></div>
     </div>
 
-    <div class="kinetic-wrapper">
-        <div class="side-label">EST. 2026 / FAN PAGE</div>
-
-        <div class="front-text-overlay">
-            <h1 class="bold-main-title">TRUE<br>ICON</h1>
-            <a href="menu.html" class="enter-btn-bold">VIEW GALLERY</a>
+    <div class="lens-wrapper">
+        <div class="text-lens-zone">
+            <h1 class="hollow-main-txt">PURE<br>LIGHT</h1>
+            <h2 class="thin-sub-txt">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-lens">EXPLORE</a>
         </div>
 
-        <div class="photo-prime-box">
+        <div class="photo-lens-box">
+            <div class="rainbow-leak"></div>
             <img src="jiwoo_profile2.png" alt="한지우" class="main-img">
         </div>
     </div>
