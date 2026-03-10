@@ -12,14 +12,46 @@
             font-family: 'Apple SD Gothic Neo', sans-serif; overflow-x: hidden;
         }
 
-        /* 상단 대표 사진 (main.jpg) */
+        /* 3D 입체 원형 프로필 컨테이너 */
+        .profile-stage {
+            perspective: 1000px; /* 3D 효과를 위한 원근감 설정 */
+            margin-top: 60px;
+            margin-bottom: 40px;
+        }
+
+        .main-image-container {
+            width: 350px; /* 원의 크기 */
+            height: 350px;
+            border-radius: 50%; /* 완벽한 원형 */
+            overflow: hidden; /* 원 밖으로 나가는 사진 자르기 */
+            
+            /* 입체감을 주는 여러 겹의 그림자 (Neumorphism + Drop Shadow) */
+            box-shadow: 
+                /* 바깥쪽 부드러운 그림자 */
+                20px 20px 60px #d1d9e6, 
+                -20px -20px 60px #ffffff,
+                /* 안쪽으로 살짝 파인 듯한 입체감 */
+                inset 10px 10px 20px rgba(0,0,0,0.05),
+                inset -10px -10px 20px rgba(255,255,255,0.5);
+                
+            border: 15px solid #eef2f6; /* 배경과 같은 색의 두꺼운 테두리로 융합 효과 */
+            transition: transform 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 마우스 올렸을 때 살짝 기울어지는 3D 효과 */
+        .profile-stage:hover .main-image-container {
+            transform: rotateX(10deg) rotateY(10deg);
+        }
+
+        /* 실제 이미지 스타일 */
         .main-image {
-            max-width: 80%; 
+            width: 110%; /* 원을 꽉 채우기 위해 살짝 크게 */
             height: auto;
-            margin-top: 40px;
-            margin-bottom: 30px; 
-            border-radius: 30px; 
-            box-shadow: 0 0 100px 20px rgba(0, 0, 0, 0.05); 
+            transform: scale(1.1); /* 약간 확대해서 여백 없앰 */
+            object-fit: cover; /* 비율 유지하며 채움 */
         }
 
         /* 메인 타이틀 */
@@ -61,7 +93,12 @@
         @media (max-width: 768px) {
             body { justify-content: flex-start; } 
             
-            .main-image { max-width: 90%; margin-top: 30px; }
+            .main-image-container { 
+                width: 250px; /* 모바일에서는 원 크기를 줄임 */
+                height: 250px;
+                margin-top: 40px; 
+                border: 10px solid #eef2f6;
+            }
             
             .main-title { 
                 font-size: 1.4rem; 
@@ -83,7 +120,12 @@
     </style>
 </head>
 <body>
-    <img src="main.jpg" alt="한지우 대표 사진" class="main-image">
+    
+    <div class="profile-stage">
+        <div class="main-image-container">
+            <img src="jiwoo_profile.png" alt="한지우 입체 프로필 사진" class="main-image">
+        </div>
+    </div>
 
     <h1 class="main-title">UNIVERSE<br><span style="font-size: 1.2rem; letter-spacing: 8px;">HAN JI WOO</span></h1>
 
