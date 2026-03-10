@@ -7,138 +7,144 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경: 지금까지 안 해본 강렬한 움직이는 그라데이션 */
-            background: linear-gradient(135deg, #1a0b2e, #2e0b1a, #0b1a2e);
-            background-size: 400% 400%;
-            animation: gradientBG 15s infinite ease-in-out;
+            background: #0a0b10; 
             min-height: 100vh;
-            font-family: 'Impact', sans-serif;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .liquid-container {
+        .archive-wrapper {
             position: relative;
             width: 100%;
             max-width: 1600px;
             height: 100vh;
-            display: flex;
-            align-items: center;
+            display: flex; align-items: center;
         }
 
-        /* 🎬 비주얼: 중앙에 배치하고 크기를 키움 */
-        .photo-wrap {
+        /* 🎬 메인 비주얼: 사진 위치와 크기를 더 대담하게 */
+        .photo-master {
             position: absolute;
-            right: 5%;
-            width: 900px;
-            z-index: 2;
-            /* ✨ 효과 1: 사진이 액체처럼 일렁이는 듯한 왜곡 */
-            animation: liquidDistort 8s infinite ease-in-out;
-            
-            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 95%);
-            mask-image: radial-gradient(circle, black 40%, transparent 95%);
+            right: 2%;
+            width: 800px;
+            z-index: 5;
+            /* ✨ 효과 1: 유리 뒤에 있는 듯한 은은한 글로우 */
+            filter: drop-shadow(0 0 30px rgba(142, 168, 201, 0.2));
+            animation: mainFloat 5s infinite alternate ease-in-out;
         }
 
-        .main-img {
-            width: 100%;
-            height: auto;
-            opacity: 0.8;
-            filter: saturate(1.4) contrast(1.2); /* 색감을 더 쨍하게 */
+        /* ✨ 효과 2: 사진 뒤를 가로지르는 서브 사진 잔상 (Ghost Image) */
+        .photo-ghost {
+            position: absolute;
+            right: 15%;
+            width: 600px;
+            opacity: 0.1;
+            z-index: 1;
+            filter: grayscale(1) blur(5px);
+            animation: ghostMove 10s infinite linear;
         }
 
-        /* ✨ 효과 2: 사진 위로 쏟아지는 '네온 비(Neon Rain)' 파티클 */
-        .neon-rain {
+        .main-img { width: 100%; height: auto; display: block; }
+
+        /* ✨ 효과 3: 사진 위를 훑고 지나가는 투명 유리막 (Glass Scanner) */
+        .glass-scanner {
             position: absolute;
             top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(255, 0, 255, 0.1), transparent);
-            background-size: 100% 20px;
-            z-index: 3;
-            animation: rainMove 2s infinite linear;
-        }
-
-        @keyframes liquidDistort {
-            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: scale(1); }
-            50% { border-radius: 30% 60% 70% 30% / 50% 60% 30% 50%; transform: scale(1.05); }
-        }
-
-        @keyframes rainMove {
-            from { background-position: 0 0; }
-            to { background-position: 0 100%; }
-        }
-
-        /* ✍️ 타이포그래피: 좌측에 압도적 존재감 */
-        .text-side {
-            position: relative;
+            width: 150px; height: 100%;
+            background: linear-gradient(
+                to right, 
+                transparent, 
+                rgba(255, 255, 255, 0.15) 50%, 
+                transparent
+            );
             z-index: 10;
-            margin-left: 5%;
+            transform: skewX(-20deg);
+            animation: scanPass 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .giant-neon-text {
-            font-size: 16rem; font-weight: 900; 
-            color: transparent;
-            -webkit-text-stroke: 2px rgba(255, 255, 255, 0.3);
+        @keyframes mainFloat {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-20px) scale(1.02); }
+        }
+
+        @keyframes ghostMove {
+            from { transform: translateX(100px); opacity: 0; }
+            50% { opacity: 0.2; }
+            to { transform: translateX(-200px); opacity: 0; }
+        }
+
+        @keyframes scanPass {
+            0% { left: -20%; }
+            100% { left: 120%; }
+        }
+
+        /* ✍️ 타이포그래피: 사진의 레이어 사이에 끼워넣기 */
+        .text-layer-box {
+            position: relative;
+            z-index: 6; /* 사진보다는 위, 스캐너보다는 아래 */
+            margin-left: 8%;
+        }
+
+        .giant-outlined {
+            font-size: 13rem; font-weight: 900; 
+            color: #ffffff;
             letter-spacing: -10px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 3: 글자가 네온사인처럼 깜빡임 */
-            animation: neonFlicker 3s infinite;
+            /* ✨ 효과 4: 글자가 아주 미세하게 떨리며 노이즈 발생 */
+            text-shadow: 3px 0px 0px rgba(142, 168, 201, 0.5);
         }
 
-        @keyframes neonFlicker {
-            0%, 100% { opacity: 0.3; text-shadow: none; }
-            50% { opacity: 1; text-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff; }
-        }
-
-        .actor-name-tag {
-            font-size: 5rem; font-weight: 900; color: #ffffff;
-            letter-spacing: 15px; text-transform: uppercase;
-            margin-top: -40px;
-            background: linear-gradient(to right, #ff00ff, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .actor-highlight {
+            font-size: 4rem; font-weight: 100; color: #8ea8c9;
+            letter-spacing: 20px; text-transform: uppercase;
+            margin-top: -20px;
+            background: rgba(255,255,255,0.05);
+            display: inline-block;
+            padding: 5px 20px;
         }
         
-        .enter-btn-hyper { 
-            display: inline-flex;
-            text-decoration: none; width: 350px; height: 70px; 
+        .enter-btn-royal { 
+            display: flex;
+            text-decoration: none; width: 300px; height: 1px; 
             background: #ffffff;
-            color: #1a0b2e;
-            align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 1.2rem; letter-spacing: 10px;
-            margin-top: 80px; transition: 0.4s;
-            clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%); /* 힙한 사다리꼴 모양 */
+            margin-top: 100px;
+            position: relative;
+            transition: 0.5s;
         }
         
-        .enter-btn-hyper:hover { 
-            transform: scale(1.1) rotate(-3deg);
-            background: #ff00ff;
-            color: #ffffff;
+        .enter-btn-royal::after {
+            content: 'OPEN ARCHIVE';
+            position: absolute; top: -40px; left: 0;
+            color: #ffffff; font-size: 0.9rem; letter-spacing: 15px;
+        }
+
+        .enter-btn-royal:hover { 
+            height: 10px;
+            box-shadow: 0 0 30px #ffffff;
         }
 
         @media (max-width: 1200px) {
-            .giant-neon-text { font-size: 8rem; }
-            .actor-name-tag { font-size: 2.5rem; letter-spacing: 10px; }
-            .photo-wrap { width: 500px; }
+            .giant-outlined { font-size: 7rem; }
+            .actor-highlight { font-size: 2rem; letter-spacing: 10px; }
+            .photo-master { width: 500px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="liquid-container">
-        <div class="text-side">
-            <h1 class="giant-neon-text">ULTRA<br>VIBE</h1>
-            <h2 class="actor-name-tag">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-hyper">JOIN THE SHOW</a>
+    <div class="archive-wrapper">
+        <div class="text-layer-box">
+            <h1 class="giant-outlined">ROYAL<br>MUSE</h1>
+            <h2 class="actor-highlight">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-royal"></a>
         </div>
 
-        <div class="photo-wrap">
-            <div class="neon-rain"></div>
+        <div class="photo-ghost">
+            <img src="jiwoo_profile.png" alt="잔상" class="main-img">
+        </div>
+
+        <div class="photo-master">
+            <div class="glass-scanner"></div>
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
