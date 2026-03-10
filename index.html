@@ -7,118 +7,109 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #eef2f6; 
+            /* ✨ 배경색 변경: 훨씬 고급스럽고 눈이 편안한 뮤트 샌드 톤 */
+            background: #f2f0eb; 
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* 🎬 메인 비주얼 구역 */
-        .hero-section {
+        .container {
             position: relative;
             width: 100%;
-            height: 600px;
+            max-width: 1200px;
+            height: 90vh;
             display: flex;
-            justify-content: center;
             align-items: center;
         }
 
-        /* ✨ 사진: 중앙 하단에 배치, 크기를 키워 웅장하게 */
-        .photo-layer {
+        /* 🎬 사진: 왼쪽 하단에서 피어오르는 비대칭 배치 */
+        .photo-wrap {
             position: absolute;
-            bottom: 0;
-            width: 650px; /* 시원한 PC 크기 */
+            left: -30px; 
+            bottom: -20px;
+            width: 680px; /* 웅장한 크기 */
             z-index: 1;
             
-            /* 상단 경계선을 안개처럼 길게 늘어뜨려 소멸시킴 */
-            -webkit-mask-image: linear-gradient(
-                to bottom, 
-                transparent 0%, 
-                rgba(0,0,0,0.4) 15%, 
-                black 40%, 
-                black 100%
+            /* 상단과 우측 경계선을 배경색(#f2f0eb)과 완벽히 융합시키는 마스크 */
+            -webkit-mask-image: radial-gradient(
+                circle at bottom left, 
+                black 10%, 
+                rgba(0,0,0,0.6) 45%, 
+                transparent 85%
             );
-            mask-image: linear-gradient(
-                to bottom, 
-                transparent 0%, 
-                rgba(0,0,0,0.4) 15%, 
-                black 40%, 
-                black 100%
+            mask-image: radial-gradient(
+                circle at bottom left, 
+                black 10%, 
+                rgba(0,0,0,0.6) 45%, 
+                transparent 85%
             );
         }
 
         .main-image {
             width: 100%;
             height: auto;
-            filter: contrast(1.05) sepia(0.1) brightness(1.02);
-            opacity: 0.9; /* 배경과 살짝 섞이게 */
+            /* 배경색에 맞춰 톤을 살짝 누른 감성 필터 */
+            filter: contrast(1.01) brightness(1.02) saturate(0.9);
+            opacity: 0.95;
         }
 
-        /* ✍️ 타이포그래피: 사진의 경계선을 덮어버리는 커다란 글자 */
-        .text-layer {
-            position: relative;
-            z-index: 5;
-            text-align: center;
+        /* ✍️ 텍스트: 우측 상단에 세련되게 배치 */
+        .info-wrap {
+            position: absolute;
+            right: 100px;
+            top: 20%;
+            z-index: 10;
+            text-align: right;
         }
 
         .main-title {
-            font-size: 8rem; /* 압도적인 크기 */
-            font-weight: 900;
-            color: rgba(142, 168, 201, 0.15); /* 반투명하게 사진을 덮음 */
-            letter-spacing: -2px;
+            font-size: 5rem; font-weight: 100; color: #7a7672;
+            letter-spacing: 25px; line-height: 1.1;
+            text-transform: uppercase; margin: 0;
+        }
+
+        .sub-desc {
+            font-size: 0.9rem; font-weight: 400; color: #a19d98;
+            letter-spacing: 5px; margin-top: 30px; display: block;
             text-transform: uppercase;
-            line-height: 1;
-            user-select: none;
-        }
-
-        .sub-info {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            z-index: 10;
-        }
-
-        .actor-name {
-            font-size: 2.5rem; font-weight: 200; color: #8ea8c9;
-            letter-spacing: 20px; text-transform: uppercase;
-            text-shadow: 0 0 15px white;
         }
         
         .enter-btn { 
             display: inline-flex;
-            text-decoration: none; width: 200px; height: 65px; 
-            background: white; border-radius: 5px; /* 이번엔 직선적인 느낌 */
+            text-decoration: none; width: 220px; height: 60px; 
+            background: transparent;
+            border: 1px solid #7a7672; /* 깔끔한 라인 버튼 */
+            border-radius: 0px; /* 매거진 느낌의 직선 미학 */
             align-items: center; justify-content: center; 
-            font-weight: 800; color: #8ea8c9; letter-spacing: 5px;
-            box-shadow: 0 10px 30px rgba(142, 168, 201, 0.2);
-            margin-top: 40px; transition: 0.3s;
-            border: 1px solid #d1d9e6;
+            font-weight: 500; color: #7a7672; letter-spacing: 6px;
+            margin-top: 60px; transition: 0.4s;
         }
+        .enter-btn:hover { background: #7a7672; color: #f2f0eb; }
 
-        @media (max-width: 768px) {
-            .photo-layer { width: 400px; }
-            .main-title { font-size: 4rem; }
-            .actor-name { font-size: 1.5rem; letter-spacing: 10px; }
+        /* 📱 모바일 대응 */
+        @media (max-width: 900px) {
+            .container { flex-direction: column; justify-content: flex-end; }
+            .photo-wrap { position: relative; left: 0; bottom: 0; width: 110%; }
+            .info-wrap { position: relative; right: 0; top: 0; text-align: center; padding: 40px 0; }
+            .main-title { font-size: 2.8rem; letter-spacing: 12px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="hero-section">
-        <div class="text-layer">
-            <h1 class="main-title">UNIVERSE</h1>
-        </div>
-
-        <div class="photo-layer">
+    <div class="container">
+        <div class="photo-wrap">
             <img src="jiwoo_profile.png" alt="한지우" class="main-image">
         </div>
 
-        <div class="sub-info">
-            <h2 class="actor-name">HAN JI WOO</h2>
-            <center><a href="menu.html" class="enter-btn">ENTER</a></center>
+        <div class="info-wrap">
+            <h1 class="main-title">HAN<br>JIWOO</h1>
+            <span class="sub-desc">Archive: The First Universe</span>
+            <a href="menu.html" class="enter-btn">ENTER VIEW</a>
         </div>
     </div>
 
