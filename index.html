@@ -7,14 +7,14 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #0f0f10; /* ✨ 깊이감 있는 에스프레소 블랙 */
+            background: #16181d; /* ✨ 깊고 푸른빛이 감도는 다크 인디고 */
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .cinema-wrapper {
+        .ether-container {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -23,120 +23,125 @@
             align-items: center;
         }
 
-        /* 🎬 필름 스테이지: 노이즈와 빛 효과를 위한 메인 프레임 */
-        .film-stage {
+        /* 🎬 메인 비주얼 프레임 */
+        .visual-frame {
             position: absolute;
-            right: -2%;
-            bottom: -5%;
-            width: 850px;
+            right: -5%;
+            bottom: -2%;
+            width: 900px;
             z-index: 1;
             
-            /* ✨ 상단과 좌측을 어둠 속으로 녹여버리는 마스크 */
-            -webkit-mask-image: radial-gradient(circle at bottom right, black 30%, transparent 90%);
-            mask-image: radial-gradient(circle at bottom right, black 30%, transparent 90%);
+            /* ✨ 사진 전체를 몽환적인 원형 안개로 감싸 경계 소멸 */
+            -webkit-mask-image: radial-gradient(circle at center, black 10%, rgba(0,0,0,0.5) 50%, transparent 85%);
+            mask-image: radial-gradient(circle at center, black 10%, rgba(0,0,0,0.5) 50%, transparent 85%);
         }
 
         .main-img {
             width: 100%;
             height: auto;
             display: block;
-            opacity: 0.85;
-            filter: contrast(1.1) brightness(1.05) grayscale(0.1);
-            /* ✨ 효과 1: 아주 천천히 숨쉬는 듯한 줌 효과 */
-            animation: slowBreath 15s infinite alternate ease-in-out;
+            opacity: 0.8;
+            filter: contrast(1.1) brightness(1.1) saturate(1.2);
+            /* ✨ 효과 1: 아주 미세하게 일렁이는 효과 */
+            animation: etherealWave 8s infinite alternate ease-in-out;
         }
 
-        /* ✨ 효과 2: 필름 영화 특유의 빛 번짐(Light Leak) 효과 */
-        .film-stage::after {
-            content: '';
+        /* ✨ 효과 2: 사진 위를 스쳐가는 프리즘(무지갯빛) 광원 모션 */
+        .prism-light {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: linear-gradient(120deg, transparent 30%, rgba(255, 200, 150, 0.08) 50%, transparent 70%);
+            background: linear-gradient(
+                135deg,
+                transparent 40%,
+                rgba(142, 168, 201, 0.1) 45%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(142, 168, 201, 0.1) 55%,
+                transparent 60%
+            );
             z-index: 2;
-            pointer-events: none;
-            mix-blend-mode: screen;
-            animation: filmFlare 4s infinite alternate;
+            mix-blend-mode: color-dodge;
+            animation: prismScan 7s infinite linear;
         }
 
-        /* ✨ 효과 3: 지직거리는 노이즈 질감 (필름 감성) */
-        .grain-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png'); /* 노이즈 패턴 */
-            opacity: 0.05;
-            z-index: 3;
-            pointer-events: none;
+        @keyframes etherealWave {
+            from { transform: scale(1.02) rotate(-1deg); filter: hue-rotate(0deg); }
+            to { transform: scale(1.08) rotate(1deg); filter: hue-rotate(5deg); }
         }
 
-        @keyframes slowBreath {
-            from { transform: scale(1); }
-            to { transform: scale(1.05); }
+        @keyframes prismScan {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(20deg); }
         }
 
-        @keyframes filmFlare {
-            0% { opacity: 0; transform: translateX(-20%) scale(0.8); }
-            50% { opacity: 1; }
-            100% { opacity: 0; transform: translateX(20%) scale(1.2); }
-        }
-
-        /* ✍️ 타이포그래피: 좌측에 큼지막하게 배치 */
-        .text-group {
+        /* ✍️ 타이포그래피: 좌측에 압도적인 텍스트와 모션 */
+        .text-stage {
             position: relative;
             z-index: 10;
-            margin-left: 8%;
+            margin-left: 6%;
         }
 
-        .huge-title {
-            font-size: 11rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -8px; line-height: 0.8;
+        .floating-title {
+            font-size: 12rem; font-weight: 900; color: #ffffff;
+            letter-spacing: -10px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            opacity: 0.1;
+            opacity: 0.07;
+            /* ✨ 효과 3: 글자가 위아래로 둥둥 떠다님 */
+            animation: floatText 5s infinite alternate ease-in-out;
         }
 
-        .actor-title {
-            font-size: 4rem; font-weight: 100; color: #8ea8c9;
+        .main-actor-label {
+            font-size: 4.5rem; font-weight: 100; color: #8ea8c9;
             letter-spacing: 25px; text-transform: uppercase;
             margin-top: -30px;
-            text-shadow: 0 0 20px rgba(142, 168, 201, 0.4);
-        }
-        
-        .enter-btn-retro { 
-            display: inline-flex;
-            text-decoration: none; width: 260px; height: 60px; 
-            border: 1px solid rgba(255,255,255,0.3);
-            background: transparent;
-            align-items: center; justify-content: center; 
-            font-weight: 600; color: #ffffff; letter-spacing: 5px;
-            margin-top: 80px; transition: 0.4s;
-        }
-        
-        .enter-btn-retro:hover { 
-            background: #ffffff; color: #0f0f10; 
-            box-shadow: 0 0 40px rgba(255,255,255,0.15);
+            text-shadow: 0 0 40px rgba(142, 168, 201, 0.5);
         }
 
+        @keyframes floatText {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+        
+        .enter-btn-prism { 
+            display: inline-flex;
+            text-decoration: none; width: 300px; height: 1px; 
+            background: linear-gradient(to right, #8ea8c9, transparent); 
+            margin-top: 100px;
+            position: relative;
+            transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        
+        .enter-btn-prism::before {
+            content: 'ENTER THE ARCHIVE';
+            position: absolute; top: -35px; left: 0;
+            color: #ffffff; font-size: 0.8rem; letter-spacing: 12px;
+            transition: 0.4s;
+        }
+
+        .enter-btn-prism:hover { width: 500px; background: #ffffff; }
+        .enter-btn-prism:hover::before { letter-spacing: 18px; color: #8ea8c9; }
+
         @media (max-width: 1200px) {
-            .huge-title { font-size: 6rem; }
-            .actor-title { font-size: 2.2rem; letter-spacing: 12px; }
-            .film-stage { width: 550px; }
+            .floating-title { font-size: 6rem; }
+            .main-actor-label { font-size: 2.5rem; letter-spacing: 12px; }
+            .visual-frame { width: 600px; }
         }
     </style>
 </head>
 <body>
-    <div class="grain-overlay"></div>
     
-    <div class="cinema-wrapper">
-        <div class="text-group">
-            <h1 class="huge-title">MEMOIR<br>ARCHIVE</h1>
-            <h2 class="actor-title">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-retro">VIEW FULL STORY</a>
+    <div class="ether-container">
+        <div class="text-stage">
+            <h1 class="floating-title">ETHEREAL<br>MUSE</h1>
+            <h2 class="main-actor-label">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-prism"></a>
         </div>
 
-        <div class="film-stage">
+        <div class="visual-frame">
+            <div class="prism-light"></div>
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
+
 </body>
 </html>
