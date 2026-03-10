@@ -7,106 +7,60 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* 사진 속 연한 하늘색 배경과 똑같은 색으로 설정합니다 */
-            background: #eef2f6; 
+            background: #eef2f6; /* 배경색 유지 */
             min-height: 100vh; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
             font-family: 'Apple SD Gothic Neo', sans-serif; overflow-x: hidden;
         }
 
-        /* ✨ 테두리 블러(Soft Edge) 효과를 위한 마스크 컨테이너 */
+        /* ✨ 초강력 블러 마스크 효과 */
         .profile-stage {
             margin-top: 50px;
             margin-bottom: 30px;
             position: relative;
             display: inline-block;
             
-            /* 1. 핵심 기술: 이미지 가장자리를 부드럽게 깎아내는 마스크 효과 */
-            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-            mask-image: radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-            
-            /* 2. 혹시나 남을지 모를 선명한 경계선을 배경색으로 덮어버리는 투명 테두리 */
-            border: 20px solid transparent; 
+            /* 중심부(40%)는 선명하게, 
+               그 이후부터 서서히 흐려져서 85% 지점부터는 아예 투명하게 날려버립니다.
+            */
+            -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0) 85%);
+            mask-image: radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0) 85%);
         }
 
         .main-image-container {
-            width: 300px; /* 적절한 크기 설정 */
-            height: 300px;
+            width: 350px; /* 블러가 퍼질 공간을 위해 크기를 살짝 키움 */
+            height: 350px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* 마스크 밖으로 나가는 사진 자르기 */
-            border-radius: 20px; /* 모서리를 살짝 부드럽게 */
+            overflow: hidden;
         }
 
         .main-image {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 비율 유지하며 채움 */
-            /* 3. 얼굴은 건드리지 않고 테두리만 퍼지게 하기 위해, 컨테이너에서 마스크 처리함 */
+            object-fit: cover;
+            /* 이미지 자체에도 미세한 블러를 가장자리에만 줘서 
+               배경색(#eef2f6)과 더 찰떡같이 붙게 만듭니다. 
+            */
+            filter: drop-shadow(0 0 10px #eef2f6); 
         }
 
-        /* 메인 타이틀 */
         .main-title {
             font-size: 2.2rem; font-weight: 200; color: #8ea8c9;
             letter-spacing: 12px; margin-bottom: 30px;
-            text-transform: uppercase;
-            text-align: center;
+            text-transform: uppercase; text-align: center;
         }
 
-        /* BGM 섹션 스타일 */
-        .bgm-player {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .bgm-player p {
-            font-size: 13px; color: #a5b8d0; 
-            letter-spacing: 2px; margin-bottom: 15px;
-        }
-
-        /* ENTER 버튼 */
+        .bgm-player { text-align: center; margin-bottom: 40px; }
+        
         .enter-btn { 
-            text-decoration: none; 
-            width: 220px; height: 80px; 
+            text-decoration: none; width: 220px; height: 75px; 
             background: #eef2f6; border-radius: 40px; 
             display: flex; align-items: center; justify-content: center; 
             font-weight: 800; color: #8ea8c9; letter-spacing: 5px;
             box-shadow: 15px 15px 30px #d1d9e6, -15px -15px 30px #ffffff; 
-            transition: all 0.3s ease; 
-            margin-bottom: 40px;
-        }
-
-        .enter-btn:hover { 
-            box-shadow: inset 8px 8px 16px #d1d9e6, inset -8px -8px 16px #ffffff; 
-            transform: scale(0.98); 
-        }
-
-        /* 모바일 최적화 (768px 이하) */
-        @media (max-width: 768px) {
-            body { justify-content: flex-start; } 
-            
-            .main-image-container { 
-                width: 240px; /* 모바일에서는 원 크기를 줄임 */
-                height: 240px;
-                margin-top: 40px; 
-            }
-            
-            .main-title { 
-                font-size: 1.4rem; 
-                letter-spacing: 6px; 
-                margin-bottom: 25px; 
-            }
-
-            .bgm-player iframe {
-                width: 240px; 
-                height: 135px;
-            }
-
-            .enter-btn {
-                width: 180px;
-                height: 65px;
-                font-size: 0.9rem;
-            }
+            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -114,22 +68,17 @@
     
     <div class="profile-stage">
         <div class="main-image-container">
-            <img src="jiwoo_profile.png" alt="한지우 대문 사진" class="main-image">
+            <img src="jiwoo_profile.png" alt="한지우" class="main-image">
         </div>
     </div>
 
     <h1 class="main-title">UNIVERSE<br><span style="font-size: 1.2rem; letter-spacing: 8px;">HAN JI WOO</span></h1>
 
     <div class="bgm-player">
-        <p>NOW PLAYING 🎵</p>
-        <iframe width="280" height="157" 
-            src="https://www.youtube.com/embed/RuRT3B4u5bk" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            style="border-radius: 20px; box-shadow: 0 10px 30px rgba(165, 184, 208, 0.1);">
-        </iframe>
+        <iframe width="280" height="157" src="https://www.youtube.com/embed/RuRT3B4u5bk" frameborder="0" style="border-radius: 20px;"></iframe>
     </div>
     
     <a href="menu.html" class="enter-btn">ENTER</a>
+
 </body>
 </html>
