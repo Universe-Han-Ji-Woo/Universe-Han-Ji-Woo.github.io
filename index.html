@@ -8,71 +8,63 @@
         body { 
             margin: 0; padding: 0; 
             background: #eef2f6; 
-            min-height: 100vh; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; 
+            min-height: 200vh; /* 스크롤 느낌을 위해 높이 확보 */
             font-family: 'Apple SD Gothic Neo', sans-serif;
+            overflow-x: hidden;
         }
 
-        .ghost-stage {
-            position: relative;
+        /* 🎬 메이저 홈마들의 시그니처: 화면 중앙 고정 스테이지 */
+        .main-stage {
+            position: fixed; /* 사진을 화면에 고정 */
+            top: 50%; left: 50%;
+            transform: translate(-50%, -55%);
             width: 100%;
-            max-width: 800px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* ✨ 상하 안개 레이어: 얼굴에 닿지 않게 범위를 조절했습니다 */
-        .ghost-stage::before, .ghost-stage::after {
-            content: '';
-            position: absolute;
-            left: 0; right: 0;
-            /* 안개 두께를 150px에서 100px로 줄여 얼굴 침범 방지 */
-            height: 100px; 
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        /* 상단: 위쪽 테두리 선만 딱 가리고 앞머리 직전에 투명해짐 */
-        .ghost-stage::before {
-            top: 0;
-            background: linear-gradient(to bottom, #eef2f6 5%, rgba(238, 242, 246, 0.8) 15%, transparent 100%);
-        }
-
-        /* 하단: 아래쪽 테두리 선만 딱 가리고 턱 라인 아래에서 투명해짐 */
-        .ghost-stage::after {
-            bottom: 0;
-            background: linear-gradient(to top, #eef2f6 5%, rgba(238, 242, 246, 0.8) 15%, transparent 100%);
+            max-width: 900px;
+            z-index: 1;
         }
 
         .main-image {
-            width: 550px; /* PC 황금 사이즈 */
-            height: auto;
+            width: 550px; /* 쫌좀님이 말씀하신 그 크기 */
             display: block;
+            margin: 0 auto;
             
-            /* 마스크 수치를 조정해 얼굴 부분은 100% 선명하게 노출 */
+            /* ✨ 핵심: 이중 마스크 페더링
+               얼굴과 앞머리는 건드리지 않고(20%~80%), 
+               상단과 하단 끝자락만 0% 투명도로 완전히 날려버립니다.
+            */
             -webkit-mask-image: linear-gradient(
                 to bottom, 
                 transparent 0%, 
-                black 12%,   /* 12% 지점부터 선명 (상단 선 삭제) */
-                black 88%,   /* 88% 지점까지 선명 (하단 선 삭제) */
+                black 20%, 
+                black 80%, 
                 transparent 100%
             );
             mask-image: linear-gradient(
                 to bottom, 
                 transparent 0%, 
-                black 12%, 
-                black 88%, 
+                black 20%, 
+                black 80%, 
                 transparent 100%
             );
             
-            filter: contrast(1.02) brightness(1.01);
+            filter: contrast(1.03) brightness(1.02);
+        }
+
+        /* 텍스트 및 버튼 섹션 (스크롤과 함께 올라오는 느낌) */
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            padding-top: 70vh; /* 사진 아래쪽에서 텍스트 시작 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .main-title {
             font-size: 2.5rem; font-weight: 200; color: #8ea8c9;
-            letter-spacing: 15px; margin-top: 30px;
-            text-transform: uppercase; text-align: center;
+            letter-spacing: 15px; text-transform: uppercase;
+            text-align: center; margin-bottom: 50px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.8);
         }
         
         .enter-btn { 
@@ -81,24 +73,25 @@
             display: flex; align-items: center; justify-content: center; 
             font-weight: 800; color: #8ea8c9; letter-spacing: 5px;
             box-shadow: 20px 20px 40px #d1d9e6, -20px -20px 40px #ffffff; 
-            margin-top: 50px; transition: 0.3s;
+            transition: 0.4s; margin-bottom: 100px;
         }
 
         @media (max-width: 768px) {
             .main-image { width: 320px; }
-            .ghost-stage::before, .ghost-stage::after { height: 60px; }
+            .main-stage { transform: translate(-50%, -50%); }
         }
     </style>
 </head>
 <body>
     
-    <div class="ghost-stage">
+    <div class="main-stage">
         <img src="jiwoo_profile.png" alt="한지우" class="main-image">
     </div>
 
-    <h1 class="main-title">UNIVERSE<br><span style="font-size: 1.1rem; letter-spacing: 10px; font-weight: 600;">HAN JI WOO</span></h1>
-
-    <a href="menu.html" class="enter-btn">ENTER</a>
+    <div class="content-overlay">
+        <h1 class="main-title">UNIVERSE<br><span style="font-size: 1.1rem; letter-spacing: 10px; font-weight: 600;">HAN JI WOO</span></h1>
+        <a href="menu.html" class="enter-btn">ENTER</a>
+    </div>
 
 </body>
 </html>
