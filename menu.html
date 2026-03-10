@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SELECT ACTOR</title>
-    <style>
+    <title>SELECT MENU</title> <style>
         body { 
             margin: 0; padding: 0; background: #eef2f6; 
             min-height: 100vh; display: flex; flex-direction: column; 
@@ -41,18 +40,18 @@
         }
         .nav-btn:hover { transform: scale(1.1); background: white; }
 
-        /* 배우 카드 컨테이너 */
-        .actor-container { display: flex; gap: 50px; margin-bottom: 20px; }
+        /* 배우 카드 컨테이너 - 한지우 버튼 하나만 있으므로 중앙 정렬 최적화 */
+        .actor-container { display: flex; justify-content: center; margin-bottom: 20px; width: 100%; }
 
         /* 배우 카드 */
         .actor-card { 
-            text-decoration: none; width: 240px; height: 140px; 
+            text-decoration: none; width: 530px; height: 140px; /* 크기를 키워 단독 버튼의 존재감을 높였습니다 */
             background: #eef2f6; border-radius: 40px; 
             display: flex; align-items: center; justify-content: center; 
             box-shadow: 15px 15px 30px #d1d9e6, -15px -15px 30px #ffffff; 
             transition: all 0.3s ease;
         }
-        .actor-name { font-size: 1.2rem; font-weight: 800; color: #555; letter-spacing: 2px; transition: 0.4s; }
+        .actor-name { font-size: 1.4rem; font-weight: 800; color: #8ea8c9; letter-spacing: 5px; transition: 0.4s; }
 
         .actor-card:hover { 
             box-shadow: inset 8px 8px 16px #d1d9e6, inset -8px -8px 16px #ffffff; 
@@ -79,59 +78,16 @@
             font-size: 0.85rem; font-weight: 700; letter-spacing: 2px; opacity: 0.8; transition: 0.3s; 
         }
 
-        /* 📱 모바일 반응형 디자인 (최적화 수정 완료) */
+        /* 📱 모바일 반응형 디자인 */
         @media (max-width: 768px) {
-            body { 
-                justify-content: center; /* 중앙 정렬 유지 */
-                padding: 20px 0; 
-            }
-            
-            /* BGM 플레이어 모바일 최적화 */
-            .bgm-player { 
-                top: 20px; left: 20px; 
-                padding: 8px 15px;
-                transform: scale(0.85); 
-                transform-origin: left top; 
-            }
-            
-            /* 사이드바를 우측 상단으로 이동하여 겹침 방지 */
-            .side-nav { 
-                left: auto; right: 20px; top: 20px; 
-                flex-direction: row; 
-            }
-            .nav-btn { width: 40px; height: 40px; font-size: 1rem; }
-
-            /* 배우 카드 세로 정렬 및 크기 조절 */
-            .actor-container { 
-                flex-direction: column; 
-                align-items: center; 
-                gap: 25px; 
-                margin-top: 80px; /* 상단 메뉴와 거리 확보 */
-                width: 100%; 
-            }
-            .actor-card { 
-                width: 80%; /* 화면 너비의 80% */
-                height: 110px; 
-                border-radius: 30px;
-            }
-            .actor-name { font-size: 1rem; }
-            
-            /* 방명록 버튼 최적화 */
-            .guestbook-btn { 
-                width: 80%; 
-                height: 90px; 
-                margin-top: 25px; 
-                border-radius: 30px;
-            }
-            .guestbook-name { font-size: 0.9rem; letter-spacing: 3px; }
-            
-            /* 뒤로가기 링크 위치 조정 */
-            .back-link { 
-                position: relative; 
-                bottom: auto; 
-                margin-top: 50px; 
-                font-size: 0.75rem;
-            }
+            body { justify-content: center; padding: 20px 0; }
+            .bgm-player { top: 20px; left: 20px; transform: scale(0.85); transform-origin: left top; }
+            .side-nav { left: auto; right: 20px; top: 20px; flex-direction: row; }
+            .actor-container { margin-top: 80px; }
+            .actor-card { width: 85%; height: 110px; }
+            .actor-name { font-size: 1.1rem; }
+            .guestbook-btn { width: 85%; height: 90px; }
+            .back-link { position: relative; bottom: auto; margin-top: 50px; }
         }
     </style>
 </head>
@@ -154,8 +110,7 @@
     </div>
 
     <div class="actor-container">
-        <a href="jiwoo-list.html" class="actor-card"><span class="actor-name">HAN JI WOO</span></a>
-        <a href="joyoon-list.html" class="actor-card"><span class="actor-name">JO YOON</span></a>
+        <a href="jiwoo-list.html" class="actor-card"><span class="actor-name">HAN JI WOO FILMOGRAPHY</span></a>
     </div>
 
     <a href="guestbook.html" class="guestbook-btn">
