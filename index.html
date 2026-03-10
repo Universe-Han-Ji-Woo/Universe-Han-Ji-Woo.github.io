@@ -22,86 +22,39 @@
             display: flex; flex-direction: column; align-items: center; z-index: 10;
         }
 
-        /* 🎬 상단 타이포 */
-        .header-text {
-            flex: 0 0 auto; width: 100%; padding-top: 8vh;
-            text-align: center; z-index: 30;
-        }
-        .univ-title {
-            font-family: 'Arial Black', sans-serif;
-            font-size: 3.8rem; font-weight: 900; color: #1a1a1a;
-            line-height: 0.9; letter-spacing: -2px; text-transform: uppercase; margin: 0;
-        }
-        .coming-soon-label {
-            font-size: 1.2rem; color: #8ea8c9; letter-spacing: 5px;
-            margin-top: 10px; font-weight: 900; text-transform: uppercase;
-        }
+        /* 🎬 타이포 & 배우님 (PC/모바일 반응형 유지) */
+        .header-text { flex: 0 0 auto; width: 100%; padding-top: 8vh; text-align: center; z-index: 30; }
+        .univ-title { font-family: 'Arial Black', sans-serif; font-size: 3.8rem; font-weight: 900; color: #1a1a1a; line-height: 0.9; letter-spacing: -2px; text-transform: uppercase; margin: 0; }
+        .coming-soon-label { font-size: 1.2rem; color: #8ea8c9; letter-spacing: 5px; margin-top: 10px; font-weight: 900; text-transform: uppercase; }
 
-        /* 🎬 중앙 배우님 (jiwoo_profile3.png) */
-        .hero-photo-zone {
-            flex: 1; width: 100%; display: flex; 
-            justify-content: center; align-items: center;
-            overflow: hidden; z-index: 20;
-        }
-        .main-img {
-            height: 80%; width: auto; object-fit: contain;
-            animation: softPulse 6s infinite alternate ease-in-out;
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-        }
+        .hero-photo-zone { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; z-index: 20; }
+        .main-img { height: 80%; width: auto; object-fit: contain; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); }
 
-        /* 🎬 하단 버튼 (STAY TUNED) */
-        .footer-btn-zone {
-            flex: 0 0 auto; width: 100%; height: 12vh;
-            display: flex; justify-content: center; align-items: center; z-index: 40;
-        }
-        .btn-stay {
-            cursor: pointer; border: none; width: 80%; height: 55px;
-            background: #1a1a1a; color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; letter-spacing: 10px; font-size: 0.95rem;
-            border-radius: 5px; transition: 0.4s; text-transform: uppercase;
-        }
+        .footer-btn-zone { flex: 0 0 auto; width: 100%; height: 12vh; display: flex; justify-content: center; align-items: center; z-index: 40; }
+        .btn-stay { cursor: pointer; border: none; width: 80%; height: 55px; background: #1a1a1a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; font-size: 0.95rem; border-radius: 5px; transition: 0.4s; text-transform: uppercase; }
 
-        /* 🛑 회원가입 팝업 모달 (항목 3개로 수정) */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px); 
-            display: none; align-items: center; justify-content: center;
-            z-index: 100; opacity: 0; transition: 0.3s;
-        }
+        /* 🛑 팝업 모달 (로그인/회원가입 공용) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: 0.3s; }
         .modal-overlay.active { display: flex; opacity: 1; }
 
-        .signup-card {
-            width: 85%; max-width: 420px; padding: 40px 10px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(142, 168, 201, 0.3);
-            border-radius: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.1);
-            text-align: center; position: relative;
-        }
-        .signup-card h3 { font-size: 2rem; margin-bottom: 20px; color: #1a1a1a; letter-spacing: -1px; }
-        .signup-input {
-            width: 85%; padding: 15px; margin-bottom: 12px;
-            border: 1px solid #eee; border-radius: 10px; font-size: 1rem;
-            outline: none; transition: 0.3s; background: #fcfcfc;
-        }
+        .auth-card { width: 85%; max-width: 420px; padding: 40px 10px; background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(142, 168, 201, 0.3); border-radius: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.1); text-align: center; position: relative; }
+        .auth-card h3 { font-size: 2rem; margin-bottom: 20px; color: #1a1a1a; letter-spacing: -1px; }
+        .auth-input { width: 85%; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 1rem; outline: none; transition: 0.3s; background: #fcfcfc; }
+        .btn-submit { width: 85%; padding: 18px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-weight: 900; font-size: 1.1rem; cursor: pointer; letter-spacing: 4px; margin-top: 15px; }
         
-        .btn-submit {
-            width: 85%; padding: 18px; background: #1a1a1a; color: #fff;
-            border: none; border-radius: 10px; font-weight: 900;
-            font-size: 1.1rem; cursor: pointer; letter-spacing: 4px; margin-top: 15px;
-        }
+        /* 하단 전환 링크 */
+        .switch-box { margin-top: 25px; font-size: 0.85rem; color: #666; }
+        .switch-link { color: #8ea8c9; text-decoration: underline; cursor: pointer; margin-left: 8px; font-weight: bold; }
         .close-btn { position: absolute; top: 15px; right: 25px; font-size: 2rem; cursor: pointer; color: #ddd; }
 
-        /* 💻 PC 위치 최적화 */
+        /* PC 위치 최적화 */
         @media (min-width: 1024px) {
-            .main-container { flex-direction: row; align-items: center; }
+            .main-container { flex-direction: row; }
             .header-text { flex: 1; text-align: left; padding-left: 8%; padding-top: 0; }
             .univ-title { font-size: 11rem; }
-            .coming-soon-label { font-size: 2.5rem; letter-spacing: 20px; }
-            .hero-photo-zone { flex: 1.5; height: 100%; justify-content: flex-end; }
-            .main-img { height: 95%; }
-            .footer-btn-zone { position: absolute; bottom: 8vh; left: 8%; width: auto; height: auto; }
-            .btn-stay { width: 380px; height: 75px; font-size: 1.2rem; }
+            .hero-photo-zone { flex: 1.5; justify-content: flex-end; }
+            .footer-btn-zone { position: absolute; bottom: 8vh; left: 8%; width: auto; }
+            .btn-stay { width: 380px; height: 75px; }
         }
 
         @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.04); } }
@@ -122,35 +75,63 @@
         </div>
 
         <div class="footer-btn-zone">
-            <button class="btn-stay" onclick="openSignup()">STAY TUNED</button>
+            <button class="btn-stay" onclick="openAuth('login')">STAY TUNED</button>
         </div>
     </div>
 
-    <div class="modal-overlay" id="signupModal">
-        <div class="signup-card">
-            <span class="close-btn" onclick="closeSignup()">×</span>
-            <h3>JOIN THE UNIVERSE</h3>
-            <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">FOR HAN JI WOO</p>
-            <form id="signupForm">
-                <input type="email" class="signup-input" placeholder="이메일 주소">
-                <input type="password" class="signup-input" placeholder="비밀번호">
-                <input type="text" class="signup-input" placeholder="사용할 닉네임">
-                <button type="button" class="btn-submit" onclick="closeSignup()">회원가입</button>
-            </form>
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-card">
+            <span class="close-btn" onclick="closeAuth()">×</span>
+            
+            <div id="loginSection">
+                <h3>LOGIN</h3>
+                <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">WELCOME BACK</p>
+                <input type="email" class="auth-input" placeholder="이메일 주소">
+                <input type="password" class="auth-input" placeholder="비밀번호">
+                <button type="button" class="btn-submit" onclick="closeAuth()">로그인</button>
+                <div class="switch-box">
+                    아직 회원이 아니신가요? <span class="switch-link" onclick="toggleAuth('signup')">회원가입하기</span>
+                </div>
+            </div>
+
+            <div id="signupSection" style="display: none;">
+                <h3>JOIN US</h3>
+                <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">FOR HAN JI WOO</p>
+                <input type="email" class="auth-input" placeholder="이메일 주소">
+                <input type="password" class="auth-input" placeholder="비밀번호">
+                <input type="text" class="auth-input" placeholder="사용할 닉네임">
+                <button type="button" class="btn-submit" onclick="closeAuth()">회원가입</button>
+                <div class="switch-box">
+                    이미 계정이 있으신가요? <span class="switch-link" onclick="toggleAuth('login')">로그인하기</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        function openSignup() {
-            const modal = document.getElementById('signupModal');
+        function openAuth(type) {
+            const modal = document.getElementById('authModal');
+            toggleAuth(type);
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
-        function closeSignup() {
-            const modal = document.getElementById('signupModal');
+
+        function closeAuth() {
+            const modal = document.getElementById('authModal');
             modal.classList.remove('active');
             setTimeout(() => modal.style.display = 'none', 300);
-            document.getElementById('signupForm').reset();
+        }
+
+        function toggleAuth(type) {
+            const loginSide = document.getElementById('loginSection');
+            const signupSide = document.getElementById('signupSection');
+            if(type === 'login') {
+                loginSide.style.display = 'block';
+                signupSide.style.display = 'none';
+            } else {
+                loginSide.style.display = 'none';
+                signupSide.style.display = 'block';
+            }
         }
     </script>
 </body>
