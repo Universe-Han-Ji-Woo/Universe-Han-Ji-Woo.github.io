@@ -7,101 +7,125 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경색: 차분하고 고급스러운 더스티 블루 톤 */
-            background: #d1d9e6; 
+            /* ✨ 배경색: 차가우면서도 깊이 있는 다크 그레이 무드 */
+            background: #2c2e33; 
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .main-container {
+        .layout-wrapper {
             position: relative;
             width: 100%;
-            max-width: 1400px;
+            max-width: 1600px;
             height: 100vh;
             display: flex;
             align-items: center;
         }
 
-        /* 🎬 사진: 과감하게 줌인하여 우측에 배치 */
-        .photo-box {
+        /* 🎬 사진: 우측에 아주 크게, 그리고 몽환적으로 */
+        .visual-photo {
             position: absolute;
-            right: -10%;
-            bottom: -5%;
-            width: 850px; /* 아주 크게 배치 */
+            right: 0;
+            bottom: -10%;
+            width: 900px; /* 압도적인 크기 */
             z-index: 1;
             
-            /* ✨ 대각선 마스크: 상단과 좌측을 배경색과 완벽히 섞어버림 */
+            /* ✨ 사진의 왼쪽과 위쪽을 배경색 속으로 녹여버리는 고난도 그라데이션 */
             -webkit-mask-image: radial-gradient(
                 circle at bottom right, 
-                black 30%, 
-                rgba(0,0,0,0.5) 60%, 
+                black 20%, 
+                rgba(0,0,0,0.4) 55%, 
                 transparent 90%
             );
             mask-image: radial-gradient(
                 circle at bottom right, 
-                black 30%, 
-                rgba(0,0,0,0.5) 60%, 
+                black 20%, 
+                rgba(0,0,0,0.4) 55%, 
                 transparent 90%
             );
         }
 
-        .main-image {
+        .main-img {
             width: 100%;
             height: auto;
-            filter: contrast(1.02) brightness(1.05) saturate(0.8);
-            opacity: 0.9;
+            filter: grayscale(0.2) contrast(1.1) brightness(0.9);
+            opacity: 0.85;
         }
 
-        /* ✍️ 타이포그래피: 잡지 제호처럼 굵고 감각적으로 배치 */
-        .text-wrap {
+        /* ✍️ 타이포그래피: 쫌좀님 취향을 반영한 거대 텍스트 배치 */
+        .text-overlay-wrap {
             position: relative;
             z-index: 10;
-            margin-left: 10%;
+            margin-left: 5%;
+            pointer-events: none;
         }
 
-        .main-title {
-            font-size: 7rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -5px; line-height: 0.9;
-            text-transform: uppercase; margin: 0;
-            opacity: 0.8;
-            mix-blend-mode: overlay; /* 배경/사진과 섞이는 효과 */
+        .large-title {
+            font-size: 11rem; /* 화면을 압도하는 크기 */
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -8px;
+            line-height: 0.85;
+            text-transform: uppercase;
+            opacity: 0.1; /* 배경과 녹아드는 은은함 */
+            margin: 0;
         }
 
-        .sub-brand {
-            font-size: 1.5rem; font-weight: 300; color: #4a5568;
-            letter-spacing: 15px; margin-top: 20px; display: block;
+        .front-title {
+            position: absolute;
+            top: 50%; left: 10px;
+            transform: translateY(-50%);
+        }
+
+        .actor-name-main {
+            font-size: 4.5rem; font-weight: 100; color: #8ea8c9;
+            letter-spacing: 30px; text-transform: uppercase;
+            white-space: nowrap;
         }
         
-        .enter-btn { 
+        .enter-link { 
             display: inline-flex;
-            text-decoration: none; width: 200px; height: 50px; 
-            background: #4a5568; 
-            align-items: center; justify-content: center; 
-            font-weight: 600; color: #ffffff; letter-spacing: 4px;
-            margin-top: 60px; transition: 0.5s;
-            clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%); /* 감각적인 평행사변형 버튼 */
+            text-decoration: none; width: 300px; height: 1px; 
+            background: #8ea8c9; 
+            margin-top: 100px;
+            position: relative;
+            pointer-events: auto;
+            transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .enter-btn:hover { background: #ffffff; color: #4a5568; }
 
-        @media (max-width: 1024px) {
-            .photo-box { width: 600px; right: -20%; }
-            .main-title { font-size: 4rem; }
+        .enter-link::before {
+            content: 'ENTER INTO THE UNIVERSE';
+            position: absolute;
+            top: -40px; left: 0;
+            color: #ffffff; font-size: 0.75rem; letter-spacing: 10px;
+            white-space: nowrap; opacity: 0.6;
+        }
+
+        .enter-link:hover { width: 450px; background: #ffffff; }
+
+        @media (max-width: 1200px) {
+            .large-title { font-size: 6rem; letter-spacing: -2px; }
+            .actor-name-main { font-size: 2.5rem; letter-spacing: 15px; }
+            .visual-photo { width: 600px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="main-container">
-        <div class="text-wrap">
-            <h1 class="main-title">THE<br>UNIVERSE</h1>
-            <span class="sub-brand">HAN JI WOO</span>
-            <a href="menu.html" class="enter-btn">ENTER</a>
+    <div class="layout-wrapper">
+        <div class="text-overlay-wrap">
+            <h1 class="large-title">JIWOO<br>ARCHIVE</h1>
+            
+            <div class="front-title">
+                <h2 class="actor-name-main">HAN JI WOO</h2>
+                <a href="menu.html" class="enter-link"></a>
+            </div>
         </div>
 
-        <div class="photo-box">
-            <img src="jiwoo_profile.png" alt="한지우" class="main-image">
+        <div class="visual-photo">
+            <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
 
