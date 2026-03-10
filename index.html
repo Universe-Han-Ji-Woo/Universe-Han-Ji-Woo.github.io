@@ -7,111 +7,118 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경색 변경: 훨씬 고급스럽고 눈이 편안한 뮤트 샌드 톤 */
-            background: #f2f0eb; 
+            /* ✨ 배경색: 깊고 묵직한 다크 차콜 (고급스러운 무게감) */
+            background: #1a1c1e; 
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
         }
 
-        .container {
+        /* 🎬 시네마틱 무대 */
+        .cinema-stage {
             position: relative;
             width: 100%;
-            max-width: 1200px;
-            height: 90vh;
+            max-width: 1000px;
             display: flex;
+            justify-content: center;
             align-items: center;
         }
 
-        /* 🎬 사진: 왼쪽 하단에서 피어오르는 비대칭 배치 */
-        .photo-wrap {
+        /* ✨ 사진 뒤에서 은은하게 퍼지는 후광 (경계선 소멸 장치) */
+        .cinema-stage::before {
+            content: '';
             position: absolute;
-            left: -30px; 
-            bottom: -20px;
-            width: 680px; /* 웅장한 크기 */
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(142, 168, 201, 0.15) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .photo-frame {
+            position: relative;
             z-index: 1;
-            
-            /* 상단과 우측 경계선을 배경색(#f2f0eb)과 완벽히 융합시키는 마스크 */
-            -webkit-mask-image: radial-gradient(
-                circle at bottom left, 
-                black 10%, 
-                rgba(0,0,0,0.6) 45%, 
-                transparent 85%
+            /* 위아래 경계선을 어둠 속으로 녹여버리는 강력한 마스크 */
+            -webkit-mask-image: linear-gradient(
+                to bottom, 
+                transparent 0%, 
+                black 25%, 
+                black 75%, 
+                transparent 100%
             );
-            mask-image: radial-gradient(
-                circle at bottom left, 
-                black 10%, 
-                rgba(0,0,0,0.6) 45%, 
-                transparent 85%
+            mask-image: linear-gradient(
+                to bottom, 
+                transparent 0%, 
+                black 25%, 
+                black 75%, 
+                transparent 100%
             );
         }
 
         .main-image {
-            width: 100%;
+            width: 600px; /* 이번엔 중앙에서 압도적인 크기로 */
             height: auto;
-            /* 배경색에 맞춰 톤을 살짝 누른 감성 필터 */
-            filter: contrast(1.01) brightness(1.02) saturate(0.9);
-            opacity: 0.95;
+            display: block;
+            /* 다크 무드에 맞춘 대비/밝기 조정 */
+            filter: contrast(1.1) brightness(0.95) saturate(1.1);
         }
 
-        /* ✍️ 텍스트: 우측 상단에 세련되게 배치 */
-        .info-wrap {
+        /* ✍️ 타이포: 어둠 속에서 빛나는 메탈릭 실버 톤 */
+        .text-overlay {
             position: absolute;
-            right: 100px;
-            top: 20%;
+            width: 100%;
+            text-align: center;
+            bottom: -60px; /* 사진 하단 경계선 위치에 배치 */
             z-index: 10;
-            text-align: right;
         }
 
         .main-title {
-            font-size: 5rem; font-weight: 100; color: #7a7672;
-            letter-spacing: 25px; line-height: 1.1;
-            text-transform: uppercase; margin: 0;
+            font-size: 3.5rem; font-weight: 100; color: #d1d9e6;
+            letter-spacing: 25px; text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            margin: 0;
         }
 
-        .sub-desc {
-            font-size: 0.9rem; font-weight: 400; color: #a19d98;
-            letter-spacing: 5px; margin-top: 30px; display: block;
-            text-transform: uppercase;
-        }
-        
         .enter-btn { 
             display: inline-flex;
-            text-decoration: none; width: 220px; height: 60px; 
-            background: transparent;
-            border: 1px solid #7a7672; /* 깔끔한 라인 버튼 */
-            border-radius: 0px; /* 매거진 느낌의 직선 미학 */
-            align-items: center; justify-content: center; 
-            font-weight: 500; color: #7a7672; letter-spacing: 6px;
-            margin-top: 60px; transition: 0.4s;
+            text-decoration: none; width: 240px; height: 1px; /* 선 하나로 시작하는 미니멀리즘 */
+            background: #4a4d52; 
+            margin-top: 80px;
+            position: relative;
+            transition: 0.5s;
         }
-        .enter-btn:hover { background: #7a7672; color: #f2f0eb; }
+        
+        /* 버튼 텍스트 */
+        .enter-btn::after {
+            content: 'ENTER PROJECT';
+            position: absolute;
+            top: -30px; left: 50%;
+            transform: translateX(-50%);
+            color: #8ea8c9; font-size: 0.8rem; letter-spacing: 8px; font-weight: 600;
+            white-space: nowrap;
+        }
 
-        /* 📱 모바일 대응 */
-        @media (max-width: 900px) {
-            .container { flex-direction: column; justify-content: flex-end; }
-            .photo-wrap { position: relative; left: 0; bottom: 0; width: 110%; }
-            .info-wrap { position: relative; right: 0; top: 0; text-align: center; padding: 40px 0; }
-            .main-title { font-size: 2.8rem; letter-spacing: 12px; }
+        .enter-btn:hover { background: #8ea8c9; box-shadow: 0 0 20px rgba(142, 168, 201, 0.5); }
+
+        @media (max-width: 768px) {
+            .main-image { width: 320px; }
+            .main-title { font-size: 1.8rem; letter-spacing: 12px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="container">
-        <div class="photo-wrap">
+    <div class="cinema-stage">
+        <div class="photo-frame">
             <img src="jiwoo_profile.png" alt="한지우" class="main-image">
         </div>
 
-        <div class="info-wrap">
-            <h1 class="main-title">HAN<br>JIWOO</h1>
-            <span class="sub-desc">Archive: The First Universe</span>
-            <a href="menu.html" class="enter-btn">ENTER VIEW</a>
+        <div class="text-overlay">
+            <h1 class="main-title">UNIVERSE</h1>
         </div>
     </div>
+
+    <a href="menu.html" class="enter-btn"></a>
 
 </body>
 </html>
