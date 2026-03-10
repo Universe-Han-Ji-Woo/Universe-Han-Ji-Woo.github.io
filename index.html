@@ -7,14 +7,14 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #16181d; /* ✨ 깊고 푸른빛이 감도는 다크 인디고 */
+            background: #111214; /* ✨ 흑연보다 깊은 딥 블랙 */
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .ether-container {
+        .hologram-wrapper {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -23,122 +23,120 @@
             align-items: center;
         }
 
-        /* 🎬 메인 비주얼 프레임 */
-        .visual-frame {
+        /* 🎬 메인 비주얼 구역 */
+        .visual-zone {
             position: absolute;
-            right: -5%;
-            bottom: -2%;
+            right: 0;
             width: 900px;
+            height: 100%;
             z-index: 1;
+            display: flex;
+            align-items: center;
             
-            /* ✨ 사진 전체를 몽환적인 원형 안개로 감싸 경계 소멸 */
-            -webkit-mask-image: radial-gradient(circle at center, black 10%, rgba(0,0,0,0.5) 50%, transparent 85%);
-            mask-image: radial-gradient(circle at center, black 10%, rgba(0,0,0,0.5) 50%, transparent 85%);
+            -webkit-mask-image: linear-gradient(to left, black 40%, transparent 95%);
+            mask-image: linear-gradient(to left, black 40%, transparent 95%);
         }
 
         .main-img {
             width: 100%;
             height: auto;
-            display: block;
-            opacity: 0.8;
-            filter: contrast(1.1) brightness(1.1) saturate(1.2);
-            /* ✨ 효과 1: 아주 미세하게 일렁이는 효과 */
-            animation: etherealWave 8s infinite alternate ease-in-out;
+            opacity: 0.75;
+            filter: contrast(1.2) brightness(1.1) saturate(1.1);
+            /* ✨ 효과 1: 아주 미세한 떨림과 크기 변화 */
+            animation: subtleVibrate 10s infinite alternate;
         }
 
-        /* ✨ 효과 2: 사진 위를 스쳐가는 프리즘(무지갯빛) 광원 모션 */
-        .prism-light {
+        /* ✨ 효과 2: 사진 위를 흐르는 디지털 홀로그램 노이즈 */
+        .hologram-overlay {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: linear-gradient(
-                135deg,
-                transparent 40%,
-                rgba(142, 168, 201, 0.1) 45%,
-                rgba(255, 255, 255, 0.2) 50%,
-                rgba(142, 168, 201, 0.1) 55%,
-                transparent 60%
-            );
+            background: linear-gradient(rgba(142, 168, 201, 0.1) 1px, transparent 1px);
+            background-size: 100% 3px;
             z-index: 2;
-            mix-blend-mode: color-dodge;
-            animation: prismScan 7s infinite linear;
+            pointer-events: none;
+            opacity: 0.3;
+            animation: scanLine 4s infinite linear;
         }
 
-        @keyframes etherealWave {
-            from { transform: scale(1.02) rotate(-1deg); filter: hue-rotate(0deg); }
-            to { transform: scale(1.08) rotate(1deg); filter: hue-rotate(5deg); }
+        @keyframes subtleVibrate {
+            0% { transform: scale(1) translateX(0); }
+            50% { transform: scale(1.03) translateX(10px); }
+            100% { transform: scale(1) translateX(0); }
         }
 
-        @keyframes prismScan {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(20deg); }
+        @keyframes scanLine {
+            from { background-position: 0 0; }
+            to { background-position: 0 100%; }
         }
 
-        /* ✍️ 타이포그래피: 좌측에 압도적인 텍스트와 모션 */
-        .text-stage {
+        /* ✍️ 타이포그래피: 사진의 경계를 가로지르는 배치 */
+        .text-overlay-stage {
             position: relative;
             z-index: 10;
             margin-left: 6%;
         }
 
-        .floating-title {
-            font-size: 12rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -10px; line-height: 0.8;
+        .glitch-title {
+            font-size: 13rem; font-weight: 900; color: #ffffff;
+            letter-spacing: -12px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            opacity: 0.07;
-            /* ✨ 효과 3: 글자가 위아래로 둥둥 떠다님 */
-            animation: floatText 5s infinite alternate ease-in-out;
+            opacity: 0.8;
+            /* ✨ 효과 3: 글자가 지직거리는 글리치 효과 */
+            animation: textGlitch 5s infinite;
         }
 
-        .main-actor-label {
-            font-size: 4.5rem; font-weight: 100; color: #8ea8c9;
+        @keyframes textGlitch {
+            0%, 100% { transform: translate(0); text-shadow: none; }
+            92% { transform: translate(0); text-shadow: none; }
+            94% { transform: translate(-5px, 2px); text-shadow: 2px 0 red, -2px 0 cyan; }
+            96% { transform: translate(5px, -2px); text-shadow: -2px 0 red, 2px 0 cyan; }
+            98% { transform: translate(-2px, -1px); text-shadow: 2px 0 blue, -2px 0 yellow; }
+        }
+
+        .sub-identity {
+            font-size: 4rem; font-weight: 100; color: #8ea8c9;
             letter-spacing: 25px; text-transform: uppercase;
-            margin-top: -30px;
-            text-shadow: 0 0 40px rgba(142, 168, 201, 0.5);
-        }
-
-        @keyframes floatText {
-            from { transform: translateY(0); }
-            to { transform: translateY(-20px); }
+            margin-top: -20px;
+            text-shadow: 0 0 30px rgba(142, 168, 201, 0.4);
         }
         
-        .enter-btn-prism { 
+        .enter-btn-hologram { 
             display: inline-flex;
-            text-decoration: none; width: 300px; height: 1px; 
-            background: linear-gradient(to right, #8ea8c9, transparent); 
-            margin-top: 100px;
+            text-decoration: none; width: 320px; height: 60px; 
+            border: 1px solid #ffffff; 
+            background: transparent;
+            align-items: center; justify-content: center; 
+            font-weight: 800; color: #ffffff; letter-spacing: 8px;
+            margin-top: 80px; transition: 0.4s;
             position: relative;
-            transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow: hidden;
         }
         
-        .enter-btn-prism::before {
-            content: 'ENTER THE ARCHIVE';
-            position: absolute; top: -35px; left: 0;
-            color: #ffffff; font-size: 0.8rem; letter-spacing: 12px;
-            transition: 0.4s;
+        .enter-btn-hologram:hover { 
+            background: #ffffff; color: #111214; 
+            box-shadow: 0 0 50px rgba(255,255,255,0.3);
+            letter-spacing: 12px;
         }
-
-        .enter-btn-prism:hover { width: 500px; background: #ffffff; }
-        .enter-btn-prism:hover::before { letter-spacing: 18px; color: #8ea8c9; }
 
         @media (max-width: 1200px) {
-            .floating-title { font-size: 6rem; }
-            .main-actor-label { font-size: 2.5rem; letter-spacing: 12px; }
-            .visual-frame { width: 600px; }
+            .glitch-title { font-size: 7rem; letter-spacing: -5px; }
+            .sub-identity { font-size: 2.5rem; letter-spacing: 12px; }
+            .visual-zone { width: 600px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="ether-container">
-        <div class="text-stage">
-            <h1 class="floating-title">ETHEREAL<br>MUSE</h1>
-            <h2 class="main-actor-label">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-prism"></a>
+    <div class="hologram-wrapper">
+        <div class="text-overlay-stage">
+            <h1 class="glitch-title">UNIVERSE<br>LIMITLESS</h1>
+            <h2 class="sub-identity">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-hologram">ENTER NOW</a>
         </div>
 
-        <div class="visual-frame">
-            <div class="prism-light"></div>
+        <div class="visual-zone">
+            <div class="hologram-overlay"></div>
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
