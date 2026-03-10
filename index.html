@@ -7,138 +7,125 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경: 금속 광택이 느껴지는 플래티넘 그라데이션 */
-            background: linear-gradient(135deg, #ffffff 0%, #e0e5ec 50%, #ffffff 100%);
+            background: #ffffff; 
             min-height: 100vh;
-            font-family: 'Impact', sans-serif;
+            font-family: 'Arial Black', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 효과 1: 화면 전체에 흐르는 미세한 '액체 금속' 질감 */
-        .chrome-bg {
+        /* 🎬 효과 1: 배경 전체를 흐르는 무한 루프 타이포그래피 (Marquee) */
+        .bg-marquee-container {
             position: absolute;
-            width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
-            opacity: 0.1; pointer-events: none;
+            width: 100%;
+            height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: space-around;
+            opacity: 0.04; /* 아주 은은하게 */
+            pointer-events: none;
+            z-index: 1;
         }
 
-        .liquid-wrapper {
+        .marquee-line {
+            font-size: 15rem; white-space: nowrap;
+            animation: marqueeMove 20s linear infinite;
+        }
+        .line-reverse { animation: marqueeMove 25s linear infinite reverse; }
+
+        @keyframes marqueeMove {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .kinetic-wrapper {
             position: relative;
             width: 100%; max-width: 1600px;
             height: 100vh;
-            display: flex; align-items: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 비주얼: 메탈릭 프레임 안에 갇힌 배우님 (얼굴 절대 사수) */
-        .photo-chrome-box {
-            position: absolute;
-            right: 5%;
-            width: 800px;
-            z-index: 5;
-            /* ✨ 효과 2: 사진 테두리에 흐르는 수은 같은 리퀴드 보더 */
-            padding: 10px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(20px);
-            box-shadow: 20px 20px 60px rgba(0,0,0,0.05);
+        /* 🎬 비주얼: 중앙에 가장 고화질로 배치 (효과 최소화) */
+        .photo-prime-box {
+            position: relative;
+            width: 750px;
+            z-index: 10;
+            filter: drop-shadow(0 30px 60px rgba(0,0,0,0.1));
         }
 
         .main-img {
             width: 100%; height: auto; display: block;
-            filter: grayscale(0.1) contrast(1.1) brightness(1.1);
-            /* ✨ 얼굴 보존: 사진은 선명하게 유지 */
-            animation: chromeFloat 6s infinite alternate ease-in-out;
+            /* ✨ 화질 우선: 필터나 마스크를 최소화하여 선명도 유지 */
+            border-radius: 10px;
+            animation: primeFloat 4s infinite alternate ease-in-out;
         }
 
-        /* ✨ 효과 3: 사진 위로 슥 지나가는 '무지개 레이저 스캔' (GIF 감성) */
-        .laser-scanner {
+        @keyframes primeFloat {
+            from { transform: translateY(0); }
+            to { transform: translateY(-15px); }
+        }
+
+        /* ✍️ 타이포그래피: 사진과 겹치는 레이어드 디자인 */
+        .front-text-overlay {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(142, 168, 201, 0.4), #fff, rgba(255, 105, 180, 0.3), transparent);
-            z-index: 10;
-            mix-blend-mode: color-dodge;
-            animation: scanMove 4s infinite linear;
-        }
-
-        @keyframes chromeFloat {
-            from { transform: translateY(0) scale(1); }
-            to { transform: translateY(-20px) scale(1.02); }
-        }
-
-        @keyframes scanMove {
-            0% { transform: translateX(-150%) skewX(-30deg); }
-            100% { transform: translateX(150%) skewX(-30deg); }
-        }
-
-        /* ✍️ 타이포그래피: 잉크처럼 뭉개진 듯 세련된 폰트 */
-        .text-chrome-zone {
-            position: relative;
+            bottom: 15%; left: 5%;
             z-index: 20;
-            margin-left: 5%;
         }
 
-        .giant-metal-txt {
-            font-size: 16rem; font-weight: 900; 
-            color: #000;
-            letter-spacing: -15px; line-height: 0.75;
+        .bold-main-title {
+            font-size: 14rem; font-weight: 900; color: #1a1a1a;
+            letter-spacing: -10px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 4: 글자가 은색으로 번쩍이는 메탈릭 질감 */
-            background: linear-gradient(45deg, #000 30%, #8ea8c9 50%, #000 70%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 3s infinite linear;
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; /* 사진 위에서도 잘 보이게 외곽선 */
         }
 
-        @keyframes shine {
-            to { background-position: 200% center; }
-        }
-
-        .sub-tag-line {
-            font-size: 5rem; font-weight: 900; color: #1a1a1a;
-            letter-spacing: 20px; text-transform: uppercase;
-            margin-top: -20px;
-            text-decoration: underline;
-            text-underline-offset: 15px;
+        .side-label {
+            position: absolute;
+            top: 20%; right: 5%;
+            writing-mode: vertical-rl; /* 세로 쓰기 */
+            font-size: 1.5rem; letter-spacing: 15px; color: #8ea8c9;
+            font-weight: 900; border-left: 2px solid #8ea8c9; padding-left: 10px;
         }
         
-        /* 🎬 버튼: 미래지향적 사이버 디자인 */
-        .enter-btn-chrome { 
+        /* 🎬 버튼: 볼드하고 직관적인 디자인 */
+        .enter-btn-bold { 
             display: inline-flex;
             text-decoration: none; width: 400px; height: 80px; 
-            background: #000; color: #fff;
+            background: #1a1a1a; color: #fff;
             align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 1.5rem; letter-spacing: 15px;
-            margin-top: 100px; transition: 0.3s;
-            clip-path: polygon(0% 20%, 10% 0%, 100% 0%, 100% 80%, 90% 100%, 0% 100%);
+            font-weight: 900; font-size: 1.4rem; letter-spacing: 12px;
+            margin-top: 50px; transition: 0.4s;
+            border: 2px solid #1a1a1a;
         }
         
-        .enter-btn-chrome:hover { 
-            background: #8ea8c9;
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(142, 168, 201, 0.6);
+        .enter-btn-bold:hover { 
+            background: transparent; color: #1a1a1a;
+            transform: scale(1.05);
         }
 
         @media (max-width: 1200px) {
-            .giant-metal-txt { font-size: 8rem; }
-            .photo-chrome-box { width: 100%; opacity: 0.3; }
+            .bold-main-title { font-size: 7rem; }
+            .photo-prime-box { width: 90%; }
+            .side-label { display: none; }
         }
     </style>
 </head>
 <body>
     
-    <div class="chrome-bg"></div>
+    <div class="bg-marquee-container">
+        <div class="marquee-line">HAN JI WOO UNIVERSE HAN JI WOO UNIVERSE</div>
+        <div class="marquee-line line-reverse">JIWOO ARCHIVE 2026 JIWOO ARCHIVE 2026</div>
+        <div class="marquee-line">HAN JI WOO UNIVERSE HAN JI WOO UNIVERSE</div>
+    </div>
 
-    <div class="liquid-wrapper">
-        <div class="text-chrome-zone">
-            <h1 class="giant-metal-txt">METAL<br>SOUL</h1>
-            <h2 class="sub-tag-line">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-chrome">OPEN CORE</a>
+    <div class="kinetic-wrapper">
+        <div class="side-label">EST. 2026 / FAN PAGE</div>
+
+        <div class="front-text-overlay">
+            <h1 class="bold-main-title">TRUE<br>ICON</h1>
+            <a href="menu.html" class="enter-btn-bold">VIEW GALLERY</a>
         </div>
 
-        <div class="photo-chrome-box">
-            <div class="laser-scanner"></div>
+        <div class="photo-prime-box">
             <img src="jiwoo_profile2.png" alt="한지우" class="main-img">
         </div>
     </div>
