@@ -7,132 +7,138 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경: 맑은 물줄기가 느껴지는 청량한 그라데이션 */
-            background: radial-gradient(circle at top left, #ffffff, #f0faff, #eef5ff);
+            /* ✨ 배경: 금속 광택이 느껴지는 플래티넘 그라데이션 */
+            background: linear-gradient(135deg, #ffffff 0%, #e0e5ec 50%, #ffffff 100%);
             min-height: 100vh;
-            font-family: 'Apple SD Gothic Neo', sans-serif;
+            font-family: 'Impact', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 효과 1: 공중에 떠다니는 투명한 물방울(Liquid Bubbles) */
-        .water-drops {
+        /* 🎬 효과 1: 화면 전체에 흐르는 미세한 '액체 금속' 질감 */
+        .chrome-bg {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .drop {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            filter: blur(5px);
-            animation: bubbleUp 10s infinite linear;
+            width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
+            opacity: 0.1; pointer-events: none;
         }
 
-        @keyframes bubbleUp {
-            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-            50% { opacity: 0.5; }
-            100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
-        }
-
-        .aquarelle-wrapper {
+        .liquid-wrapper {
             position: relative;
             width: 100%; max-width: 1600px;
             height: 100vh;
             display: flex; align-items: center;
         }
 
-        /* 🎬 비주얼: 중앙 우측 배치 & 수채화 마스크 */
-        .photo-aquarelle-box {
+        /* 🎬 비주얼: 메탈릭 프레임 안에 갇힌 배우님 (얼굴 절대 사수) */
+        .photo-chrome-box {
             position: absolute;
-            right: 2%;
-            width: 850px;
+            right: 5%;
+            width: 800px;
             z-index: 5;
+            /* ✨ 효과 2: 사진 테두리에 흐르는 수은 같은 리퀴드 보더 */
+            padding: 10px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            box-shadow: 20px 20px 60px rgba(0,0,0,0.05);
         }
 
         .main-img {
             width: 100%; height: auto; display: block;
-            opacity: 0.95;
-            filter: contrast(1.05) saturate(1.2);
-            /* ✨ 얼굴 사수: 중앙은 선명, 외곽은 물감이 번진 듯한 거친 마스크 */
-            -webkit-mask-image: radial-gradient(circle, black 35%, rgba(0,0,0,0.5) 60%, transparent 85%);
-            mask-image: radial-gradient(circle, black 35%, rgba(0,0,0,0.5) 60%, transparent 85%);
-            animation: softWave 8s infinite alternate ease-in-out;
+            filter: grayscale(0.1) contrast(1.1) brightness(1.1);
+            /* ✨ 얼굴 보존: 사진은 선명하게 유지 */
+            animation: chromeFloat 6s infinite alternate ease-in-out;
         }
 
-        @keyframes softWave {
-            from { transform: scale(1) rotate(-1deg); filter: hue-rotate(0deg); }
-            to { transform: scale(1.05) rotate(1deg); filter: hue-rotate(5deg); }
+        /* ✨ 효과 3: 사진 위로 슥 지나가는 '무지개 레이저 스캔' (GIF 감성) */
+        .laser-scanner {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(142, 168, 201, 0.4), #fff, rgba(255, 105, 180, 0.3), transparent);
+            z-index: 10;
+            mix-blend-mode: color-dodge;
+            animation: scanMove 4s infinite linear;
         }
 
-        /* ✍️ 타이포그래피: 좌측에 맑고 시원하게 배치 */
-        .text-water-zone {
+        @keyframes chromeFloat {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-20px) scale(1.02); }
+        }
+
+        @keyframes scanMove {
+            0% { transform: translateX(-150%) skewX(-30deg); }
+            100% { transform: translateX(150%) skewX(-30deg); }
+        }
+
+        /* ✍️ 타이포그래피: 잉크처럼 뭉개진 듯 세련된 폰트 */
+        .text-chrome-zone {
             position: relative;
             z-index: 20;
-            margin-left: 6%;
+            margin-left: 5%;
         }
 
-        .giant-water-txt {
-            font-size: 15rem; font-weight: 900; 
-            color: #8ea8c9;
-            letter-spacing: -12px; line-height: 0.8;
+        .giant-metal-txt {
+            font-size: 16rem; font-weight: 900; 
+            color: #000;
+            letter-spacing: -15px; line-height: 0.75;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 2: 글자 안에 흐르는 물결 텍스처 */
-            background: linear-gradient(to bottom, #8ea8c9, #ffffff);
+            /* ✨ 효과 4: 글자가 은색으로 번쩍이는 메탈릭 질감 */
+            background: linear-gradient(45deg, #000 30%, #8ea8c9 50%, #000 70%);
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 10px 20px rgba(142, 168, 201, 0.3));
+            animation: shine 3s infinite linear;
         }
 
-        .sub-water-label {
-            font-size: 4.5rem; font-weight: 100; color: #1a1a1a;
-            letter-spacing: 25px; text-transform: uppercase;
-            margin-top: 10px;
-            opacity: 0.7;
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .sub-tag-line {
+            font-size: 5rem; font-weight: 900; color: #1a1a1a;
+            letter-spacing: 20px; text-transform: uppercase;
+            margin-top: -20px;
+            text-decoration: underline;
+            text-underline-offset: 15px;
         }
         
-        /* 🎬 버튼: 물방울처럼 둥글고 투명한 디자인 */
-        .enter-btn-aqua { 
+        /* 🎬 버튼: 미래지향적 사이버 디자인 */
+        .enter-btn-chrome { 
             display: inline-flex;
-            text-decoration: none; width: 350px; height: 75px; 
-            background: rgba(142, 168, 201, 0.1);
-            border: 2px solid #8ea8c9;
-            border-radius: 50px; /* 완전 둥글게 */
+            text-decoration: none; width: 400px; height: 80px; 
+            background: #000; color: #fff;
             align-items: center; justify-content: center; 
-            font-weight: 900; color: #8ea8c9; letter-spacing: 12px;
-            margin-top: 80px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 900; font-size: 1.5rem; letter-spacing: 15px;
+            margin-top: 100px; transition: 0.3s;
+            clip-path: polygon(0% 20%, 10% 0%, 100% 0%, 100% 80%, 90% 100%, 0% 100%);
         }
         
-        .enter-btn-aqua:hover { 
-            background: #8ea8c9; color: #fff;
+        .enter-btn-chrome:hover { 
+            background: #8ea8c9;
             transform: scale(1.1);
-            box-shadow: 0 20px 40px rgba(142, 168, 201, 0.4);
+            box-shadow: 0 0 30px rgba(142, 168, 201, 0.6);
         }
 
         @media (max-width: 1200px) {
-            .giant-water-txt { font-size: 8rem; }
-            .photo-aquarelle-box { width: 100%; opacity: 0.3; }
+            .giant-metal-txt { font-size: 8rem; }
+            .photo-chrome-box { width: 100%; opacity: 0.3; }
         }
     </style>
 </head>
 <body>
     
-    <div class="water-drops">
-        <div class="drop" style="left: 10%; width: 50px; height: 50px; animation-delay: 0s;"></div>
-        <div class="drop" style="left: 30%; width: 80px; height: 80px; animation-delay: 2s;"></div>
-        <div class="drop" style="left: 70%; width: 40px; height: 40px; animation-delay: 4s;"></div>
-        <div class="drop" style="left: 90%; width: 60px; height: 60px; animation-delay: 1s;"></div>
-    </div>
+    <div class="chrome-bg"></div>
 
-    <div class="aquarelle-wrapper">
-        <div class="text-water-zone">
-            <h1 class="giant-water-txt">AQUA<br>PURE</h1>
-            <h2 class="sub-water-label">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-aqua">DIVE IN</a>
+    <div class="liquid-wrapper">
+        <div class="text-chrome-zone">
+            <h1 class="giant-metal-txt">METAL<br>SOUL</h1>
+            <h2 class="sub-tag-line">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-chrome">OPEN CORE</a>
         </div>
 
-        <div class="photo-aquarelle-box">
+        <div class="photo-chrome-box">
+            <div class="laser-scanner"></div>
             <img src="jiwoo_profile2.png" alt="한지우" class="main-img">
         </div>
     </div>
