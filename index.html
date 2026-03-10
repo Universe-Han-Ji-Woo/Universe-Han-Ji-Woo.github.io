@@ -7,75 +7,126 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경색: 깊고 오묘한 다크 에메랄드 */
-            background: #0a1a1a; 
+            background: #000; 
             min-height: 100vh;
-            font-family: 'Apple SD Gothic Neo', sans-serif;
+            font-family: 'Arial Black', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .liquid-j-container {
+        .explosion-wrapper {
             position: relative;
             width: 100%;
-            max-width: 1600px;
             height: 100vh;
-            display: flex;
-            align-items: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 비주얼 마스크: 글자 'J' 모양 안에만 사진 표시 */
-        .j-mask-visual {
+        /* 🎬 타이포그래피: 사진 뒤에서 X자로 교차하는 거대 글자 */
+        .bg-x-text {
             position: absolute;
-            left: 10%;
-            width: 600px;
-            height: 80vh;
-            z-index: 2;
-            
-            /* ✨ 효과 1: 글자 'J' 모양으로 사진을 자름 (Masking) */
-            -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB4PSI1MCIgeT0iNzAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZ들GUiIGZ들bD0iY들YWNrIj5KPC90ZXh0Pjwvc3ZnPg==');
-            mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB4PSI1MCIgeT0iNzAiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC1zaXplPSI5MCIgdGV4dC1hbmNob3I9Im1pZ들GUiIGZ들bD0iY들YWNrIj5KPC90ZXh0Pjwvc3ZnPg==');
-            -webkit-mask-size: contain; mask-size: contain;
-            -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-            -webkit-mask-position: center; mask-position: center;
-            
-            overflow: hidden;
-            filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.2));
+            font-size: 18rem; font-weight: 900; color: rgba(255, 255, 255, 0.03);
+            text-transform: uppercase; white-space: nowrap;
+            z-index: 1;
+        }
+        .text-left { transform: rotate(-45deg); left: -10%; }
+        .text-right { transform: rotate(45deg); right: -10%; }
+
+        /* 🎬 메인 비주얼: 중앙 배치 & 하이퍼 모션 */
+        .central-photo-box {
+            position: relative;
+            width: 700px;
+            z-index: 10;
+            /* ✨ 효과 1: 사진이 심장박동처럼 뛰는 비트 효과 */
+            animation: heartBeat 2s infinite ease-in-out;
         }
 
         .main-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.8;
-            filter: contrast(1.2) saturate(1.1) brightness(1.1);
-            /* ✨ 효과 2: 사진이 아주 천천히 흔들리는 효과 */
-            animation: softSwayJ 15s infinite alternate ease-in-out;
+            width: 100%; height: auto;
+            filter: contrast(1.2) brightness(1.1);
+            /* ✨ 효과 2: 사진 경계를 파편처럼 부수는 마스크 */
+            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 85%);
+            mask-image: radial-gradient(circle, black 40%, transparent 85%);
         }
 
-        /* ✨ 효과 3: 'J' 모양 위에 맺혀 흐르는 리퀴드 글래스 (Liquid Glass) */
-        .liquid-drops {
+        /* ✨ 효과 3: 화면 전체를 덮는 유리 파편 파티클 (Fragment Rain) */
+        .shards-overlay {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 20%);
-            background-size: 80px 80px;
-            z-index: 3;
-            opacity: 0.4;
-            mix-blend-mode: screen;
-            animation: dropFlow 10s infinite linear;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 15;
+            background-image: 
+                linear-gradient(45deg, rgba(142, 168, 201, 0.1) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%);
+            background-size: 60px 60px;
+            animation: shardFly 3s infinite linear;
         }
 
-        @keyframes softSwayJ {
-            from { transform: scale(1) rotate(-1deg); }
-            to { transform: scale(1.05) rotate(1deg); }
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.03); filter: brightness(1.3); }
         }
 
-        @keyframes dropFlow {
+        @keyframes shardFly {
             from { background-position: 0 0; }
-            to { background-position: 40px 100%; }
+            to { background-position: 120px 240px; }
         }
 
-        /* ✍️ 타이포그래피: 우측에 압도적으로 배치 */
-        .text-overlay-side {
-            position: relative
+        /* ✍️ 중앙 하단 텍스트 & 버튼 */
+        .bottom-ui {
+            position: absolute;
+            bottom: 8%;
+            text-align: center;
+            z-index: 20;
+        }
+
+        .actor-name-center {
+            font-size: 5rem; font-weight: 900; color: #fff;
+            letter-spacing: 30px; text-transform: uppercase;
+            margin-bottom: 40px;
+            text-shadow: 0 0 20px rgba(142, 168, 201, 0.8);
+        }
+        
+        .enter-btn-center { 
+            display: inline-flex;
+            text-decoration: none; width: 400px; height: 70px; 
+            border: 1px solid #fff; 
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            align-items: center; justify-content: center; 
+            font-weight: 900; color: #fff; letter-spacing: 15px;
+            transition: 0.4s;
+        }
+        
+        .enter-btn-center:hover { 
+            background: #fff; color: #000;
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(142, 168, 201, 0.4);
+        }
+
+        @media (max-width: 1200px) {
+            .bg-x-text { font-size: 8rem; }
+            .actor-name-center { font-size: 2.5rem; letter-spacing: 15px; }
+            .central-photo-box { width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="explosion-wrapper">
+        <div class="bg-x-text text-left">HAN JI WOO</div>
+        <div class="bg-x-text text-right">JIWOO UNIVERSE</div>
+
+        <div class="central-photo-box">
+            <img src="jiwoo_profile2.png" alt="한지우" class="main-img">
+        </div>
+
+        <div class="shards-overlay"></div>
+
+        <div class="bottom-ui">
+            <h2 class="actor-name-center">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-center">VIEW ARCHIVE</a>
+        </div>
+    </div>
+
+</body>
+</html>
