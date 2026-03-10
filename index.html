@@ -7,59 +7,52 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #eef2f6; /* 배경색 */
+            background: #eef2f6; /* 배경색 고정 */
             min-height: 100vh; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
             font-family: 'Apple SD Gothic Neo', sans-serif;
         }
 
-        /* 🎭 사진과 배경을 하나로 묶는 마법의 안개 컨테이너 */
-        .visual-container {
+        /* 🎬 이미지 경계선을 '삭제'하는 메인 컨테이너 */
+        .fade-wrapper {
             position: relative;
-            width: 450px; /* 사진보다 훨씬 넓게 설정해서 경계가 퍼질 공간 확보 */
-            height: 450px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            max-width: 500px;
             margin-top: 40px;
+            line-height: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .main-image {
-            width: 320px; /* 실제 사진 크기 */
-            height: 320px;
-            object-fit: cover;
-            border-radius: 50%; /* 일단 둥글게 깎아서 모서리 강한 선을 1차 제거 */
+            width: 85%; /* 컨테이너보다 작게 설정해서 블러 공간 확보 */
+            height: auto;
+            /* 1. 이미지 자체의 모서리 각진 선을 부드럽게 뭉갭니다 */
+            filter: blur(0.5px); 
         }
 
-        /* ✨ 3중 안개 레이어: 사진의 경계선을 배경색으로 뭉개버립니다 */
-        .visual-container::before {
+        /* ✨ 필살기: 5중 그라데이션 마스크 (상하좌우 경계선을 안개로 덮음) */
+        .fade-wrapper::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 2;
-            /* 밖에서 안으로 들어올수록 투명해지는 배경색 그라데이션 */
-            background: radial-gradient(
-                circle, 
-                transparent 20%,            /* 중심(얼굴)은 투명하게 비움 */
-                rgba(238, 242, 246, 0.5) 50%, /* 중간부터 배경색이 섞임 */
-                rgba(238, 242, 246, 0.8) 75%, /* 경계선 부근을 배경색으로 덮음 */
-                rgba(238, 242, 246, 1) 95%    /* 끝부분은 완전 배경색과 합체 */
-            );
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            /* 중앙(지우 배우님 얼굴)은 투명하게 비우고, 
+               가장자리로 갈수록 배경색(#eef2f6)을 겹겹이 쌓아 
+               사진의 네모난 끝선을 아예 '지워' 버립니다.
+            */
+            background: 
+                radial-gradient(circle at center, transparent 20%, #eef2f6 85%),
+                linear-gradient(to right, #eef2f6 0%, transparent 20%, transparent 80%, #eef2f6 100%),
+                linear-gradient(to bottom, #eef2f6 0%, transparent 20%, transparent 80%, #eef2f6 100%);
+            pointer-events: none;
         }
 
-        /* 🎬 마스크 효과로 사진 끝을 한번 더 날립니다 */
-        .mask-wrapper {
-            line-height: 0;
-            -webkit-mask-image: radial-gradient(circle, black 30%, rgba(0,0,0,0.5) 60%, transparent 85%);
-            mask-image: radial-gradient(circle, black 30%, rgba(0,0,0,0.5) 60%, transparent 85%);
-        }
-
-        /* 나머지 디자인 요소 */
+        /* 타이틀 및 버튼 */
         .main-title {
-            font-size: 2.2rem; font-weight: 200; color: #8ea8c9;
-            letter-spacing: 12px; margin-top: 10px;
+            font-size: 2rem; font-weight: 200; color: #8ea8c9;
+            letter-spacing: 12px; margin-top: 30px;
             text-transform: uppercase; text-align: center;
-            z-index: 3;
         }
         
         .enter-btn { 
@@ -68,22 +61,14 @@
             display: flex; align-items: center; justify-content: center; 
             font-weight: 800; color: #8ea8c9; letter-spacing: 5px;
             box-shadow: 20px 20px 40px #d1d9e6, -20px -20px 40px #ffffff; 
-            margin-top: 30px; transition: 0.3s; z-index: 3;
-        }
-
-        @media (max-width: 600px) {
-            .visual-container { width: 320px; height: 320px; }
-            .main-image { width: 220px; height: 220px; }
-            .main-title { font-size: 1.5rem; letter-spacing: 6px; }
+            margin-top: 40px; transition: 0.3s;
         }
     </style>
 </head>
 <body>
     
-    <div class="visual-container">
-        <div class="mask-wrapper">
-            <img src="jiwoo_profile.png" alt="한지우" class="main-image">
-        </div>
+    <div class="fade-wrapper">
+        <img src="jiwoo_profile.png" alt="한지우" class="main-image">
     </div>
 
     <h1 class="main-title">UNIVERSE<br><span style="font-size: 1rem; letter-spacing: 8px; font-weight: 600;">HAN JI WOO</span></h1>
