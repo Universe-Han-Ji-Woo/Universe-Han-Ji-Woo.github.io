@@ -11,7 +11,7 @@
             overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* ✨ 배경 효과 */
+        /* ✨ 배경 효과: 리퀴드 후광 */
         .liquid-bg {
             position: absolute; width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%);
@@ -23,7 +23,7 @@
             display: flex; flex-direction: column; align-items: center; z-index: 10;
         }
 
-        /* 🎬 상단: 타이포 (영어 유지) */
+        /* 🎬 상단: 타이포 (영어 원복) */
         .header-text {
             flex: 0 0 auto; width: 100%; padding-top: 8vh;
             text-align: center; z-index: 30;
@@ -38,7 +38,7 @@
             margin-top: 10px; font-weight: 900; text-transform: uppercase;
         }
 
-        /* 🎬 중앙: 배우님 (절대 사수) */
+        /* 🎬 중앙: 배우님 (새로운 파일 jiwoo_profile3.png 적용) */
         .hero-photo-zone {
             flex: 1; width: 100%; display: flex; 
             justify-content: center; align-items: center;
@@ -50,7 +50,7 @@
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
         }
 
-        /* 🎬 하단: 메인 버튼 (영어 STAY TUNED 유지) */
+        /* 🎬 하단: 메인 대문 버튼 (STAY TUNED 유지) */
         .footer-btn-zone {
             flex: 0 0 auto; width: 100%; height: 12vh;
             display: flex; justify-content: center; align-items: center; z-index: 40;
@@ -79,22 +79,22 @@
             border-radius: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.1);
             text-align: center; position: relative;
         }
-        /* 팝업 안의 버튼만 '회원가입' 한글로 변경 */
-        .btn-submit {
-            width: 85%; padding: 18px; background: #1a1a1a; color: #fff;
-            border: none; border-radius: 10px; font-weight: 900;
-            font-size: 1.1rem; cursor: pointer; letter-spacing: 4px; margin-top: 15px;
-        }
-
         .signup-card h3 { font-size: 2rem; margin-bottom: 20px; color: #1a1a1a; letter-spacing: -1px; }
         .signup-input {
             width: 85%; padding: 15px; margin-bottom: 12px;
             border: 1px solid #eee; border-radius: 10px; font-size: 1rem;
             outline: none; transition: 0.3s; background: #fcfcfc;
         }
+        
+        /* 팝업 내부 버튼만 '회원가입' 한글로 */
+        .btn-submit {
+            width: 85%; padding: 18px; background: #1a1a1a; color: #fff;
+            border: none; border-radius: 10px; font-weight: 900;
+            font-size: 1.1rem; cursor: pointer; letter-spacing: 4px; margin-top: 15px;
+        }
         .close-btn { position: absolute; top: 15px; right: 25px; font-size: 2rem; cursor: pointer; color: #ddd; }
 
-        /* 💻 PC 레이아웃 (위치 다르게 적용) */
+        /* 💻 데스크탑(PC) 위치 최적화 */
         @media (min-width: 1024px) {
             .main-container { flex-direction: row; align-items: center; }
             .header-text { flex: 1; text-align: left; padding-left: 8%; padding-top: 0; }
@@ -121,7 +121,7 @@
         </div>
 
         <div class="hero-photo-zone">
-            <img src="jiwoo_profile2.png" alt="배우 한지우" class="main-img">
+            <img src="jiwoo_profile3.png" alt="배우 한지우" class="main-img">
         </div>
 
         <div class="footer-btn-zone">
