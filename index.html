@@ -7,15 +7,14 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경색: 깊고 신비로운 차콜 바이올렛 (파티클이 가장 돋보임) */
-            background: #191b22; 
+            background: #0f0f10; /* ✨ 깊이감 있는 에스프레소 블랙 */
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .cosmic-wrapper {
+        .cinema-wrapper {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -24,129 +23,120 @@
             align-items: center;
         }
 
-        /* 🎬 사진 컨테이너: 오로라와 파티클 효과를 위한 무대 */
-        .stage-visual {
+        /* 🎬 필름 스테이지: 노이즈와 빛 효과를 위한 메인 프레임 */
+        .film-stage {
             position: absolute;
-            right: 0;
+            right: -2%;
             bottom: -5%;
-            width: 850px; 
+            width: 850px;
             z-index: 1;
             
-            /* ✨ 사진의 왼쪽과 위쪽을 배경색(#191b22)으로 부드럽게 녹임 */
-            -webkit-mask-image: radial-gradient(circle at bottom right, black 20%, transparent 85%);
-            mask-image: radial-gradient(circle at bottom right, black 20%, transparent 85%);
-        }
-
-        /* ✨ 효과 1: 사진 뒤에서 은은하게 색이 변하며 흐르는 오로라 라이트 */
-        .stage-visual::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(
-                circle, 
-                rgba(142, 168, 201, 0.1) 0%, 
-                rgba(100, 149, 237, 0.05) 40%, 
-                transparent 70%
-            );
-            z-index: 0;
-            animation: auroraFlow 15s infinite alternate;
+            /* ✨ 상단과 좌측을 어둠 속으로 녹여버리는 마스크 */
+            -webkit-mask-image: radial-gradient(circle at bottom right, black 30%, transparent 90%);
+            mask-image: radial-gradient(circle at bottom right, black 30%, transparent 90%);
         }
 
         .main-img {
             width: 100%;
             height: auto;
             display: block;
-            opacity: 0.8;
-            filter: contrast(1.1) brightness(1.1);
-            position: relative;
-            z-index: 1; /* 오로라보다 위에, 파티클보다 아래 */
+            opacity: 0.85;
+            filter: contrast(1.1) brightness(1.05) grayscale(0.1);
+            /* ✨ 효과 1: 아주 천천히 숨쉬는 듯한 줌 효과 */
+            animation: slowBreath 15s infinite alternate ease-in-out;
         }
 
-        /* ✨ 효과 2: 사진 위를 눈부시게 감싸는 반짝이는 입자들 (파티클 오버레이) */
-        .stage-visual::after {
+        /* ✨ 효과 2: 필름 영화 특유의 빛 번짐(Light Leak) 효과 */
+        .film-stage::after {
             content: '';
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(white 1px, transparent 1px),
-                radial-gradient(white 1px, transparent 1px);
-            background-size: 50px 50px;
-            background-position: 0 0, 25px 25px;
+            background: linear-gradient(120deg, transparent 30%, rgba(255, 200, 150, 0.08) 50%, transparent 70%);
             z-index: 2;
-            opacity: 0.15;
-            animation: particleDrift 8s infinite linear;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            animation: filmFlare 4s infinite alternate;
         }
 
-        @keyframes auroraFlow {
-            from { transform: translateX(-10%) translateY(-10%) rotate(0deg); }
-            to { transform: translateX(10%) translateY(10%) rotate(5deg); }
+        /* ✨ 효과 3: 지직거리는 노이즈 질감 (필름 감성) */
+        .grain-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png'); /* 노이즈 패턴 */
+            opacity: 0.05;
+            z-index: 3;
+            pointer-events: none;
         }
 
-        @keyframes particleDrift {
-            from { background-position: 0 0, 25px 25px; }
-            to { background-position: -50px -100px, -25px -75px; }
+        @keyframes slowBreath {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
         }
 
-        /* ✍️ 타이포그래피: 좌측에 큼지막하고 우아하게 */
-        .text-overlay-box {
+        @keyframes filmFlare {
+            0% { opacity: 0; transform: translateX(-20%) scale(0.8); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(20%) scale(1.2); }
+        }
+
+        /* ✍️ 타이포그래피: 좌측에 큼지막하게 배치 */
+        .text-group {
             position: relative;
             z-index: 10;
-            margin-left: 7%;
+            margin-left: 8%;
         }
 
-        .huge-brand {
+        .huge-title {
             font-size: 11rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -5px; line-height: 0.85;
+            letter-spacing: -8px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            opacity: 0.1; /* 배경에 녹아드는 은은한 거대 글자 */
+            opacity: 0.1;
         }
 
-        .sub-brand-visual {
+        .actor-title {
             font-size: 4rem; font-weight: 100; color: #8ea8c9;
-            letter-spacing: 20px; text-transform: uppercase;
-            margin-top: -30px; margin-left: 5px;
-            text-shadow: 0 0 30px rgba(142, 168, 201, 0.3);
+            letter-spacing: 25px; text-transform: uppercase;
+            margin-top: -30px;
+            text-shadow: 0 0 20px rgba(142, 168, 201, 0.4);
         }
         
-        .enter-btn-glitch { 
+        .enter-btn-retro { 
             display: inline-flex;
-            text-decoration: none; width: 280px; height: 60px; 
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
+            text-decoration: none; width: 260px; height: 60px; 
+            border: 1px solid rgba(255,255,255,0.3);
+            background: transparent;
             align-items: center; justify-content: center; 
-            font-weight: 700; color: #ffffff; letter-spacing: 6px;
-            margin-top: 70px; transition: 0.5s;
-            position: relative;
-            overflow: hidden;
+            font-weight: 600; color: #ffffff; letter-spacing: 5px;
+            margin-top: 80px; transition: 0.4s;
         }
         
-        .enter-btn-glitch:hover { 
-            background: #ffffff; color: #191b22; 
-            box-shadow: 0 0 50px rgba(255,255,255,0.2);
+        .enter-btn-retro:hover { 
+            background: #ffffff; color: #0f0f10; 
+            box-shadow: 0 0 40px rgba(255,255,255,0.15);
         }
 
         @media (max-width: 1200px) {
-            .huge-brand { font-size: 6rem; }
-            .sub-brand-visual { font-size: 2.5rem; letter-spacing: 12px; margin-top: -20px; }
-            .stage-visual { width: 550px; }
+            .huge-title { font-size: 6rem; }
+            .actor-title { font-size: 2.2rem; letter-spacing: 12px; }
+            .film-stage { width: 550px; }
         }
     </style>
 </head>
 <body>
+    <div class="grain-overlay"></div>
     
-    <div class="cosmic-wrapper">
-        <div class="text-overlay-box">
-            <h1 class="huge-brand">UNIV<br>ERSE</h1>
-            <h2 class="sub-brand-visual">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-glitch">ENTER PROJECT</a>
+    <div class="cinema-wrapper">
+        <div class="text-group">
+            <h1 class="huge-title">MEMOIR<br>ARCHIVE</h1>
+            <h2 class="actor-title">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-retro">VIEW FULL STORY</a>
         </div>
 
-        <div class="stage-visual">
+        <div class="film-stage">
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
-
 </body>
 </html>
