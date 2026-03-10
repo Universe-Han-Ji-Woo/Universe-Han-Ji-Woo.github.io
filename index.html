@@ -7,117 +7,131 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            /* ✨ 배경색: 깊은 바다 같은 미드나잇 틸 (고급스러운 다크 무드) */
-            background: #1e292b; 
+            background: #121416; /* ✨ 묵직한 블랙 차콜 */
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .main-frame {
+        .motion-wrapper {
             position: relative;
             width: 100%;
-            max-width: 1500px;
+            max-width: 1600px;
             height: 100vh;
             display: flex;
             align-items: center;
         }
 
-        /* 🎬 사진: 우측 하단에서 빛을 받으며 올라오는 배치 */
-        .visual-spotlight {
+        /* 🎬 사진 컨테이너: 사진 위로 빛 효과를 얹기 위한 장치 */
+        .photo-container {
             position: absolute;
-            right: -2%;
+            right: -5%;
             bottom: -5%;
-            width: 850px; 
+            width: 850px;
             z-index: 1;
+            overflow: hidden; /* 사진이 커질 때 프레임 유지 */
             
-            /* ✨ 핵심: 빛이 번지는 듯한 라운드 마스크로 상단과 좌측을 소멸시킴 */
-            -webkit-mask-image: radial-gradient(
-                circle at bottom right, 
-                black 20%, 
-                rgba(0,0,0,0.4) 50%, 
-                transparent 85%
-            );
-            mask-image: radial-gradient(
-                circle at bottom right, 
-                black 20%, 
-                rgba(0,0,0,0.4) 50%, 
-                transparent 85%
-            );
+            -webkit-mask-image: radial-gradient(circle at bottom right, black 20%, transparent 85%);
+            mask-image: radial-gradient(circle at bottom right, black 20%, transparent 85%);
         }
 
         .main-img {
             width: 100%;
             height: auto;
-            /* 신비로운 분위기를 위한 채도 조정 */
-            filter: contrast(1.1) brightness(0.9) saturate(1.1);
-            opacity: 0.85;
+            display: block;
+            opacity: 0.8;
+            filter: contrast(1.1) brightness(1.1);
+            /* ✨ 효과 1: 아주 천천히 커지는 무드 (Ken Burns) */
+            animation: slowZoom 20s infinite alternate;
         }
 
-        /* ✍️ 타이포그래피: 좌측에 큼지막한 세로형 텍스트 */
-        .text-side-wrap {
+        /* ✨ 효과 2: 사진 위를 지나가는 은은한 빛줄기 (홈마들 필살기) */
+        .photo-container::after {
+            content: '';
+            position: absolute;
+            top: -100%; left: -100%;
+            width: 200%; height: 200%;
+            background: linear-gradient(
+                135deg, 
+                transparent 45%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                transparent 55%
+            );
+            z-index: 2;
+            animation: lightSweep 6s infinite;
+        }
+
+        @keyframes slowZoom {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        @keyframes lightSweep {
+            from { transform: translateX(-20%) translateY(-20%); }
+            to { transform: translateX(20%) translateY(20%); }
+        }
+
+        /* ✍️ 타이포그래피: 좌측에 큼지막하게 배치 */
+        .text-side {
             position: relative;
             z-index: 10;
-            margin-left: 5%;
+            margin-left: 7%;
         }
 
-        .giant-word {
-            font-size: 13rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -10px; line-height: 0.8;
+        .main-logo {
+            font-size: 10rem; font-weight: 900; color: #ffffff;
+            letter-spacing: -5px; line-height: 0.85;
             text-transform: uppercase; margin: 0;
-            opacity: 0.05; /* 배경에 녹아든 은은한 거대 글자 */
+            opacity: 0.15;
+            animation: fadeInText 2s ease-out;
         }
 
-        .point-title {
-            position: absolute;
-            top: 50%; left: 10%;
-            transform: translateY(-50%);
+        .sub-name {
+            font-size: 4rem; font-weight: 100; color: #8ea8c9;
+            letter-spacing: 20px; text-transform: uppercase;
+            margin-top: -30px;
+            text-shadow: 0 0 30px rgba(142, 168, 201, 0.3);
         }
 
-        .actor-label {
-            font-size: 3rem; font-weight: 100; color: #8ea8c9;
-            letter-spacing: 25px; text-transform: uppercase;
-            white-space: nowrap;
-            text-shadow: 0 0 20px rgba(142, 168, 201, 0.4);
+        @keyframes fadeInText {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 0.15; transform: translateX(0); }
         }
         
-        .enter-btn-neon { 
+        .enter-btn-motion { 
             display: inline-flex;
-            text-decoration: none; width: 260px; height: 55px; 
-            border: 1px solid rgba(142, 168, 201, 0.5);
-            background: transparent;
+            text-decoration: none; width: 280px; height: 60px; 
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
             align-items: center; justify-content: center; 
-            font-weight: 700; color: #8ea8c9; letter-spacing: 5px;
-            margin-top: 80px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            font-weight: 700; color: #ffffff; letter-spacing: 6px;
+            margin-top: 70px; transition: 0.5s;
+            overflow: hidden; position: relative;
         }
-        .enter-btn-neon:hover { 
-            background: rgba(142, 168, 201, 0.1);
-            color: #ffffff;
-            box-shadow: 0 0 30px rgba(142, 168, 201, 0.3);
-            border: 1px solid #ffffff;
+        
+        .enter-btn-motion:hover { 
+            background: #ffffff; color: #121416; 
+            box-shadow: 0 0 50px rgba(255,255,255,0.2);
         }
 
         @media (max-width: 1200px) {
-            .giant-word { font-size: 7rem; }
-            .actor-label { font-size: 2rem; letter-spacing: 12px; }
-            .visual-spotlight { width: 550px; }
+            .main-logo { font-size: 6rem; }
+            .sub-name { font-size: 2.5rem; letter-spacing: 12px; }
+            .photo-container { width: 550px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="main-frame">
-        <div class="text-side-wrap">
-            <h1 class="giant-word">UNIV<br>ERSE</h1>
-            
-            <div class="point-title">
-                <h2 class="actor-label">HAN JI WOO</h2>
-                <a href="menu.html" class="enter-btn-neon">EXPLORE ARCHIVE</a>
-            </div>
+    <div class="motion-wrapper">
+        <div class="text-side">
+            <h1 class="main-logo">VISION<br>MUSE</h1>
+            <h2 class="sub-name">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-motion">ENTER PROJECT</a>
         </div>
 
-        <div class="visual-spotlight">
+        <div class="photo-container">
             <img src="jiwoo_profile.png" alt="한지우" class="main-img">
         </div>
     </div>
