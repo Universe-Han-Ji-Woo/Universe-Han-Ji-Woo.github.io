@@ -13,73 +13,75 @@
             font-family: 'Apple SD Gothic Neo', sans-serif;
         }
 
-        /* 🎬 홈마들이 쓰는 고난도 마스크 컨테이너 */
-        .frame-container {
+        /* 🎬 사진과 안개를 하나로 묶는 무대 */
+        .stage-box {
             position: relative;
             width: 100%;
             max-width: 800px;
             display: flex;
             justify-content: center;
             align-items: center;
-            
-            /* ✨ 핵심 필살기: 이중 선형 마스크 
-               상단(0~30%)과 하단(70~100%)을 아주 길고 부드럽게 날립니다.
-               중앙 40% 영역(얼굴)은 100% 선명하게 유지합니다.
-            */
-            -webkit-mask-image: linear-gradient(
-                to bottom, 
-                transparent 0%, 
-                rgba(0,0,0,0.5) 15%, 
-                black 30%, 
-                black 70%, 
-                rgba(0,0,0,0.5) 85%, 
-                transparent 100%
-            );
-            mask-image: linear-gradient(
-                to bottom, 
-                transparent 0%, 
-                rgba(0,0,0,0.5) 15%, 
-                black 30%, 
-                black 70%, 
-                rgba(0,0,0,0.5) 85%, 
-                transparent 100%
-            );
+            margin-top: 20px;
+        }
+
+        /* ✨ 필살기 1: 사진 위쪽을 배경색으로 덮는 안개 */
+        .stage-box::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: 0; right: 0;
+            height: 120px; /* 안개 두께 */
+            background: linear-gradient(to bottom, #eef2f6 15%, transparent 100%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* ✨ 필살기 2: 사진 아래쪽을 배경색으로 덮는 안개 */
+        .stage-box::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 0; right: 0;
+            height: 120px;
+            background: linear-gradient(to top, #eef2f6 15%, transparent 100%);
+            z-index: 5;
+            pointer-events: none;
         }
 
         .main-image {
-            /* PC 사이즈 550px 유지 */
-            width: 550px; 
+            width: 550px; /* 쫌좀님 맞춤 PC 크기 */
             height: auto;
             display: block;
-            /* 사진 자체에 아주 미세한 블러를 줘서 배경과 톤을 맞춤 */
-            filter: brightness(1.02) contrast(1.01) blur(0.2px);
+            position: relative;
+            z-index: 1; /* 안개보다 아래에 배치 */
+            
+            /* 사진 자체의 경계선도 1차로 흐릿하게 깎아줍니다 */
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
         }
 
         .main-title {
             font-size: 2.2rem; font-weight: 200; color: #8ea8c9;
-            letter-spacing: 15px; margin-top: 30px;
+            letter-spacing: 12px; margin-top: 40px;
             text-transform: uppercase; text-align: center;
         }
         
         .enter-btn { 
             text-decoration: none; width: 220px; height: 75px; 
-            background: #eef2f6; border-radius: 50px; 
+            background: white; border-radius: 50px; 
             display: flex; align-items: center; justify-content: center; 
             font-weight: 800; color: #8ea8c9; letter-spacing: 5px;
-            /* 홈마 감성 뉴모피즘 버튼 */
-            box-shadow: 12px 12px 24px #d1d9e6, -12px -12px 24px #ffffff; 
+            box-shadow: 15px 15px 30px #d1d9e6, -15px -15px 30px #ffffff; 
             margin-top: 50px; transition: 0.3s;
         }
 
         @media (max-width: 768px) {
-            .main-image { width: 300px; }
-            .main-title { font-size: 1.5rem; letter-spacing: 8px; }
+            .main-image { width: 320px; }
+            .stage-box::before, .stage-box::after { height: 70px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="frame-container">
+    <div class="stage-box">
         <img src="jiwoo_profile.png" alt="한지우" class="main-image">
     </div>
 
