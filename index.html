@@ -8,86 +8,106 @@
         body { 
             margin: 0; padding: 0; 
             background: #eef2f6; 
-            min-height: 100vh; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; 
+            min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
+            overflow: hidden; /* 대문은 깔끔하게 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* 🎬 사진과 안개를 하나로 묶는 무대 */
-        .stage-box {
+        /* 🎬 전체 레이아웃 컨테이너 */
+        .wrapper {
             position: relative;
             width: 100%;
-            max-width: 800px;
+            max-width: 1200px;
+            height: 80vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin-top: 20px;
         }
 
-        /* ✨ 필살기 1: 사진 위쪽을 배경색으로 덮는 안개 */
-        .stage-box::before {
-            content: '';
+        /* ✨ 사진 위치: 과감하게 우측으로 밀고 크기도 키움 */
+        .photo-section {
             position: absolute;
-            top: -5px; left: 0; right: 0;
-            height: 120px; /* 안개 두께 */
-            background: linear-gradient(to bottom, #eef2f6 15%, transparent 100%);
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        /* ✨ 필살기 2: 사진 아래쪽을 배경색으로 덮는 안개 */
-        .stage-box::after {
-            content: '';
-            position: absolute;
-            bottom: -5px; left: 0; right: 0;
-            height: 120px;
-            background: linear-gradient(to top, #eef2f6 15%, transparent 100%);
-            z-index: 5;
-            pointer-events: none;
+            right: -50px; /* 살짝 화면 밖으로 나가게 해서 경계선을 소멸시킴 */
+            bottom: -50px;
+            width: 700px; /* PC에서 시원하게 키움 */
+            z-index: 1;
+            
+            /* 상단과 좌측 경계선을 안개처럼 날려버리는 마스크 */
+            -webkit-mask-image: radial-gradient(
+                circle at bottom right, 
+                black 20%, 
+                rgba(0,0,0,0.6) 50%, 
+                transparent 85%
+            );
+            mask-image: radial-gradient(
+                circle at bottom right, 
+                black 20%, 
+                rgba(0,0,0,0.6) 50%, 
+                transparent 85%
+            );
         }
 
         .main-image {
-            width: 550px; /* 쫌좀님 맞춤 PC 크기 */
+            width: 100%;
             height: auto;
             display: block;
+            filter: contrast(1.02) brightness(1.03);
+        }
+
+        /* ✍️ 타이포그래피: 좌측 여백을 세련되게 채움 */
+        .text-section {
             position: relative;
-            z-index: 1; /* 안개보다 아래에 배치 */
-            
-            /* 사진 자체의 경계선도 1차로 흐릿하게 깎아줍니다 */
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
-            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+            z-index: 10;
+            margin-left: 80px;
+            pointer-events: none;
         }
 
         .main-title {
-            font-size: 2.2rem; font-weight: 200; color: #8ea8c9;
-            letter-spacing: 12px; margin-top: 40px;
-            text-transform: uppercase; text-align: center;
+            font-size: 4rem; font-weight: 100; color: #8ea8c9;
+            letter-spacing: 20px; line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .sub-title {
+            font-size: 1.2rem; font-weight: 600; color: #a4bdda;
+            letter-spacing: 12px; margin-top: 20px; display: block;
         }
         
         .enter-btn { 
-            text-decoration: none; width: 220px; height: 75px; 
-            background: white; border-radius: 50px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: 800; color: #8ea8c9; letter-spacing: 5px;
+            display: inline-flex;
+            text-decoration: none; width: 180px; height: 60px; 
+            background: white; border-radius: 30px; 
+            align-items: center; justify-content: center; 
+            font-weight: 800; color: #8ea8c9; letter-spacing: 3px;
             box-shadow: 15px 15px 30px #d1d9e6, -15px -15px 30px #ffffff; 
-            margin-top: 50px; transition: 0.3s;
+            margin-top: 60px; transition: 0.3s;
+            pointer-events: auto;
         }
 
-        @media (max-width: 768px) {
-            .main-image { width: 320px; }
-            .stage-box::before, .stage-box::after { height: 70px; }
+        /* 📱 모바일: 다시 중앙 정렬로 센스 있게 변경 */
+        @media (max-width: 900px) {
+            .wrapper { flex-direction: column; justify-content: center; height: auto; }
+            .photo-section { position: relative; right: 0; bottom: 0; width: 100%; margin-bottom: 30px; }
+            .text-section { margin-left: 0; text-align: center; }
+            .main-title { font-size: 2.5rem; letter-spacing: 10px; }
         }
     </style>
 </head>
 <body>
     
-    <div class="stage-box">
-        <img src="jiwoo_profile.png" alt="한지우" class="main-image">
+    <div class="wrapper">
+        <div class="text-section">
+            <h1 class="main-title">UNIVERSE<br>JI WOO</h1>
+            <span class="sub-title">DEAR MY MUSE</span>
+            <a href="menu.html" class="enter-btn">ENTER</a>
+        </div>
+
+        <div class="photo-section">
+            <img src="jiwoo_profile.png" alt="한지우" class="main-image">
+        </div>
     </div>
-
-    <h1 class="main-title">UNIVERSE<br><span style="font-size: 1rem; letter-spacing: 8px; font-weight: 600;">HAN JI WOO</span></h1>
-
-    <a href="menu.html" class="enter-btn">ENTER</a>
 
 </body>
 </html>
