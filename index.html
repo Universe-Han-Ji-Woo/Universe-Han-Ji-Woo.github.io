@@ -14,11 +14,11 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 효과 1: 배경에 흐르는 거대 리퀴드 쉐이프 (진짜 움직임) */
+        /* 🎬 효과 1: 배경에 흐르는 거대 리퀴드 쉐이프 (모핑 애니메이션) */
         .liquid-bg {
             position: absolute;
             width: 800px; height: 800px;
-            background: linear-gradient(45deg, rgba(142, 168, 201, 0.1), rgba(255, 255, 255, 0.5));
+            background: radial-gradient(circle, rgba(142, 168, 201, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
             filter: blur(80px);
             border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
             animation: liquidMorph 12s infinite alternate ease-in-out;
@@ -26,8 +26,8 @@
         }
 
         @keyframes liquidMorph {
-            0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: translate(-10%, -10%) rotate(0deg); }
-            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(10%, 10%) rotate(180deg); }
+            0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: translate(-15%, -15%) rotate(0deg); }
+            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(15%, 15%) rotate(180deg); }
         }
 
         .motion-wrapper {
@@ -47,69 +47,83 @@
 
         .main-img {
             width: 100%; height: auto; display: block;
-            /* ✨ 얼굴 사수: 중앙은 냅두고 외곽만 울렁거리게 마스킹 */
-            -webkit-mask-image: radial-gradient(circle, black 30%, transparent 90%);
+            /* ✨ 얼굴 사수: 중앙 선명, 외곽 몽환 마스크 */
+            -webkit-mask-image: radial-gradient(circle, black 35%, transparent 95%);
             /* ✨ 효과 2: 하이퍼 줌 & 웨이브 모션 */
             animation: hyperWave 5s infinite ease-in-out;
         }
 
         @keyframes hyperWave {
             0%, 100% { transform: scale(1) skew(0deg); filter: brightness(1); }
-            50% { transform: scale(1.08) skew(1deg); filter: brightness(1.1); }
+            50% { transform: scale(1.06) skew(0.5deg); filter: brightness(1.08); }
         }
 
-        /* ✍️ 타이포그래피: 사진을 뚫고 나오는 입체 배치 */
+        /* ✍️ 타이포그래피: 유니버스 & 오픈 티징 문구 */
         .text-motion-zone {
             position: relative;
             z-index: 20;
             margin-left: 5%;
         }
 
-        .mega-kinetic-txt {
-            font-size: 14rem; font-weight: 900; color: #1a1a1a;
-            letter-spacing: -12px; line-height: 0.8;
+        .mega-universe-txt {
+            font-size: 13rem; font-weight: 900; color: #1a1a1a;
+            letter-spacing: -10px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 3: 글자 뒷부분에 반짝이는 크롬 광택 */
-            background: linear-gradient(to bottom, #1a1a1a 40%, #8ea8c9);
+            /* ✨ 효과 3: 블랙에서 블루로 흐르는 그라데이션 */
+            background: linear-gradient(to bottom, #1a1a1a 50%, #8ea8c9);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: textFloat 3s infinite alternate ease-in-out;
         }
 
         @keyframes textFloat {
-            from { transform: translateX(-20px); opacity: 0.8; }
-            to { transform: translateX(0); opacity: 1; }
+            from { transform: translateX(-15px); }
+            to { transform: translateX(0); }
         }
 
-        .sub-motion-label {
-            font-size: 5rem; font-weight: 100; color: #8ea8c9;
-            letter-spacing: 20px; text-transform: uppercase;
-            margin-top: 10px;
-            animation: blink 2s infinite;
+        .sub-coming-soon {
+            font-size: 3.5rem; font-weight: 900; color: #8ea8c9;
+            letter-spacing: 15px; text-transform: uppercase;
+            margin-top: 5px;
+            display: flex; align-items: center;
+        }
+
+        .sub-coming-soon::after {
+            content: "LOADING...";
+            font-size: 0.8rem; letter-spacing: 2px; margin-left: 20px;
+            animation: blink 1.5s infinite;
+        }
+
+        .artist-name {
+            font-size: 1.5rem; font-weight: 100; color: #1a1a1a;
+            letter-spacing: 25px; text-transform: uppercase;
+            margin-top: 40px; opacity: 0.6;
         }
 
         @keyframes blink {
-            50% { opacity: 0.3; }
+            50% { opacity: 0; }
         }
         
-        /* 🎬 버튼: 마우스 올리면 좌우로 늘어나는 인터랙티브 디자인 */
+        /* 🎬 버튼: 마우스 올리면 확장되는 인터랙티브 디자인 */
         .enter-btn-motion { 
             display: inline-flex;
-            text-decoration: none; width: 300px; height: 70px; 
+            text-decoration: none; width: 320px; height: 70px; 
             background: #1a1a1a; color: #fff;
             align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 1.2rem; letter-spacing: 15px;
-            margin-top: 80px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 900; font-size: 1.1rem; letter-spacing: 12px;
+            margin-top: 60px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 5px;
         }
         
         .enter-btn-motion:hover { 
-            width: 450px;
+            width: 480px;
             background: #8ea8c9;
-            letter-spacing: 25px;
+            letter-spacing: 20px;
         }
 
         @media (max-width: 1200px) {
-            .mega-kinetic-txt { font-size: 7rem; }
+            .mega-universe-txt { font-size: 7rem; }
+            .sub-coming-soon { font-size: 2rem; letter-spacing: 8px; }
             .photo-motion-box { width: 100%; opacity: 0.3; }
         }
     </style>
@@ -120,9 +134,10 @@
 
     <div class="motion-wrapper">
         <div class="text-motion-zone">
-            <h1 class="mega-kinetic-txt">FLOW<br>SPACE</h1>
-            <h2 class="sub-motion-label">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-motion">ENTER</a>
+            <h1 class="mega-universe-txt">UNIVERSE<br>ARCHIVE</h1>
+            <h2 class="sub-coming-soon">COMING SOON</h2>
+            <div class="artist-name">HAN JI WOO</div>
+            <a href="#" class="enter-btn-frost" style="display:none;"></a> <a href="menu.html" class="enter-btn-motion">STAY TUNED</a>
         </div>
 
         <div class="photo-motion-box">
