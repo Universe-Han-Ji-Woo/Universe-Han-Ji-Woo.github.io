@@ -7,14 +7,14 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #08090a; 
+            background: #050505; 
             min-height: 100vh;
-            font-family: 'Impact', 'Apple SD Gothic Neo', sans-serif;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .glitch-container {
+        .main-stage {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -23,89 +23,124 @@
             align-items: center;
         }
 
-        /* 🎬 사진 구역: 사진을 배경의 일부처럼 배치 */
-        .visual-glitch-box {
+        /* 🎬 비주얼 박스: 사진 위치를 중앙 우측으로 조정 */
+        .photo-visual-box {
             position: absolute;
-            right: 0;
-            width: 50%; /* 사진을 오른쪽 절반에 꽉 채움 */
-            height: 100%;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 800px;
+            z-index: 2;
             overflow: hidden;
-            z-index: 1;
+            
+            /* ✨ 경계선 삭제: 부드러운 안개 마스크 */
+            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 85%);
+            mask-image: radial-gradient(circle at center, black 30%, transparent 85%);
         }
 
         .main-img {
             width: 100%;
-            height: 100%;
-            object-fit: cover; /* 사진 위치/크기 변경: 화면 절반을 꽉 채우는 박력 */
-            opacity: 0.6;
-            filter: contrast(1.2) grayscale(0.3);
-            /* ✨ 효과 1: GIF처럼 지직거리는 글리치 모션 */
-            animation: imgGlitch 3s infinite;
+            height: auto;
+            display: block;
+            opacity: 0.8;
+            filter: contrast(1.2) brightness(1.1);
+            /* ✨ 효과 1: GIF 감성의 줌 인-아웃 반복 모션 */
+            animation: gifZoom 8s infinite ease-in-out;
         }
 
-        /* ✨ 효과 2: 사진 위를 가로지르는 세로 스캔라인 (GIF 질감) */
-        .visual-glitch-box::after {
-            content: '';
+        /* ✨ 효과 2: 사진 위를 빠르게 스쳐가는 무지갯빛 프리즘 광선 */
+        .light-sweep {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
-            background-size: 100% 2px, 3px 100%;
-            z-index: 2;
-            pointer-events: none;
+            top: 0; left: -150%;
+            width: 300%; height: 100%;
+            background: linear-gradient(
+                105deg, 
+                transparent 40%, 
+                rgba(255, 255, 255, 0.3) 45%, 
+                rgba(142, 168, 201, 0.4) 50%, 
+                rgba(255, 255, 255, 0.3) 55%, 
+                transparent 60%
+            );
+            z-index: 3;
+            mix-blend-mode: screen;
+            animation: fastSweep 3s infinite cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-        @keyframes imgGlitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-5px, 5px) skew(1deg); }
-            40% { transform: translate(-5px, -5px) scale(1.02); }
-            60% { transform: translate(5px, 5px) skew(-1deg); }
-            80% { transform: translate(5px, -5px); }
-            100% { transform: translate(0); }
+        @keyframes gifZoom {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
         }
 
-        /* ✍️ 타이포그래피: 좌측에 웅장하고 압도적으로 */
-        .text-overlay {
+        @keyframes fastSweep {
+            0% { left: -150%; }
+            100% { left: 150%; }
+        }
+
+        /* ✍️ 타이포그래피: 좌측에 압도적으로 배치 */
+        .text-overlay-group {
             position: relative;
             z-index: 10;
-            margin-left: 8%;
+            margin-left: 7%;
         }
 
-        .giant-impact {
-            font-size: 15rem; font-weight: 900; color: #ffffff;
-            letter-spacing: -10px; line-height: 0.8;
+        .huge-word {
+            font-size: 14rem; font-weight: 900; color: #ffffff;
+            letter-spacing: -8px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            text-shadow: 10px 10px 0px #8ea8c9; /* 그림자로 입체감 극대화 */
-            /* ✨ 효과 3: 글자가 좌우로 미세하게 떨리는 진동 효과 */
-            animation: textVibrate 0.2s infinite;
+            opacity: 0.15;
+            /* ✨ 효과 3: 텍스트가 미세하게 숨쉬는 효과 */
+            animation: textBreath 4s infinite alternate;
         }
 
-        @keyframes textVibrate {
-            0% { transform: translate(0); }
-            50% { transform: translate(2px, 2px); }
-            100% { transform: translate(0); }
+        .actor-title-main {
+            font-size: 4.5rem; font-weight: 100; color: #8ea8c9;
+            letter-spacing: 25px; text-transform: uppercase;
+            margin-top: -30px;
+            text-shadow: 0 0 30px rgba(142, 168, 201, 0.5);
         }
 
-        .actor-id {
-            font-size: 4rem; font-weight: 100; color: #ffffff;
-            letter-spacing: 20px; text-transform: uppercase;
-            margin-top: 20px;
-            background: #8ea8c9;
-            padding: 10px 20px;
-            display: inline-block;
+        @keyframes textBreath {
+            from { transform: scale(1); opacity: 0.1; }
+            to { transform: scale(1.02); opacity: 0.2; }
         }
         
-        .enter-btn-glitch { 
-            display: flex;
-            text-decoration: none; width: 350px; height: 70px; 
-            border: 2px solid #ffffff; 
-            background: transparent;
+        .enter-btn-cinematic { 
+            display: inline-flex;
+            text-decoration: none; width: 320px; height: 65px; 
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
             align-items: center; justify-content: center; 
-            font-weight: 900; color: #ffffff; letter-spacing: 10px;
-            margin-top: 80px; transition: 0.3s;
-            position: relative;
+            font-weight: 800; color: #ffffff; letter-spacing: 10px;
+            margin-top: 100px; transition: 0.5s;
         }
         
-        .enter-btn-glitch:hover { 
-            background: #ffffff; color: #0
+        .enter-btn-cinematic:hover { 
+            background: #ffffff; color: #050505; 
+            box-shadow: 0 0 50px rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 1200px) {
+            .huge-word { font-size: 7rem; }
+            .actor-title-main { font-size: 2.5rem; letter-spacing: 12px; }
+            .photo-visual-box { width: 550px; right: 0; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="main-stage">
+        <div class="text-overlay-group">
+            <h1 class="huge-word">ETERNAL<br>MUSE</h1>
+            <h2 class="actor-title-main">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-cinematic">ENTER ARCHIVE</a>
+        </div>
+
+        <div class="photo-visual-box">
+            <div class="light-sweep"></div>
+            <img src="jiwoo_profile.png" alt="한지우" class="main-img">
+        </div>
+    </div>
+
+</body>
+</html>
