@@ -121,10 +121,57 @@
             letter-spacing: 20px;
         }
 
+        /* 📱 모바일 반응형: 얼굴 절대 사수 버전 */
         @media (max-width: 1200px) {
-            .mega-universe-txt { font-size: 7rem; }
-            .sub-coming-soon { font-size: 2rem; letter-spacing: 8px; }
-            .photo-motion-box { width: 100%; opacity: 0.3; }
+            .motion-wrapper {
+                flex-direction: column; /* 세로 정렬 */
+                justify-content: flex-start; /* 위에서부터 정렬 */
+                padding-top: 10vh; /* 위쪽 여백 */
+            }
+
+            .photo-motion-box {
+                position: relative; /* 상대 위치 */
+                right: auto; /* 우측 고정 해제 */
+                width: 100%; /* 너비 100% */
+                display: flex; justify-content: center; /* 중앙 정렬 */
+                margin-bottom: 5vh; /* 아래쪽 여백 */
+            }
+
+            .main-img {
+                width: 80%; /* 사진 크기 조절 */
+                height: auto;
+                -webkit-mask-image: radial-gradient(circle, black 40%, transparent 95%); /* 마스크 조절 */
+                opacity: 0.9; /* 사진 선명도 유지 */
+            }
+
+            .text-motion-zone {
+                position: relative; /* 상대 위치 */
+                z-index: 20;
+                margin-left: 0; /* 좌측 여백 해제 */
+                text-align: center; /* 중앙 정렬 */
+            }
+
+            .mega-universe-txt {
+                font-size: 6rem; /* 글자 크기 조절 */
+                letter-spacing: -5px; /* 자간 조절 */
+            }
+
+            .sub-coming-soon {
+                font-size: 2rem; /* 글자 크기 조절 */
+                letter-spacing: 8px; /* 자간 조절 */
+                justify-content: center; /* 중앙 정렬 */
+            }
+
+            .artist-name {
+                font-size: 1.2rem; /* 글자 크기 조절 */
+                letter-spacing: 15px; /* 자간 조절 */
+                margin-top: 20px; /* 위쪽 여백 조절 */
+            }
+
+            .enter-btn-motion {
+                margin-top: 40px; /* 위쪽 여백 조절 */
+                width: 300px; /* 너비 조절 */
+            }
         }
     </style>
 </head>
@@ -137,7 +184,7 @@
             <h1 class="mega-universe-txt">UNIVERSE<br>ARCHIVE</h1>
             <h2 class="sub-coming-soon">COMING SOON</h2>
             <div class="artist-name">HAN JI WOO</div>
-            <a href="#" class="enter-btn-frost" style="display:none;"></a> <a href="menu.html" class="enter-btn-motion">STAY TUNED</a>
+            <a href="menu.html" class="enter-btn-motion">STAY TUNED</a>
         </div>
 
         <div class="photo-motion-box">
