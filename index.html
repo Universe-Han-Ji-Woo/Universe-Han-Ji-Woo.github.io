@@ -7,57 +7,54 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #eef2f6; /* 대문 배경색 고정 */
+            background: #eef2f6; 
             min-height: 100vh; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
             font-family: 'Apple SD Gothic Neo', sans-serif;
         }
 
-        /* 🎬 사진이 배경에 스며드는 컨테이너 */
+        /* 🎬 메인 스테이지 - PC에서 더 넓게 확보 */
         .ghost-stage {
             position: relative;
             width: 100%;
-            max-width: 500px;
+            max-width: 800px; /* 컨테이너 최대폭 확장 */
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .main-image {
-            width: 320px; 
+            /* 1. PC 기본 크기를 대폭 키웠습니다 */
+            width: 550px; 
             height: auto;
-            /* ✨ 핵심 필살기: 이중 마스크 페더링
-               중심(얼굴) 15%는 선명하게, 그 이후부터 95% 지점까지 
-               아주 길고 부드럽게 투명도를 조절해서 경계선을 '소멸'시킵니다.
-            */
+            
+            /* 2. 사진이 커진 만큼 블러(페더링) 범위를 더 넓고 세밀하게 조정해서 
+               경계선이 절대 생기지 않도록 했습니다. */
             -webkit-mask-image: radial-gradient(
                 circle at center, 
-                rgba(0,0,0,1) 10%, 
-                rgba(0,0,0,0.6) 40%, 
+                rgba(0,0,0,1) 15%, 
+                rgba(0,0,0,0.7) 45%, 
                 rgba(0,0,0,0.2) 75%, 
-                transparent 92%
+                transparent 95%
             );
             mask-image: radial-gradient(
                 circle at center, 
-                rgba(0,0,0,1) 10%, 
-                rgba(0,0,0,0.6) 40%, 
+                rgba(0,0,0,1) 15%, 
+                rgba(0,0,0,0.7) 45%, 
                 rgba(0,0,0,0.2) 75%, 
-                transparent 92%
+                transparent 95%
             );
             
-            /* 사진 가장자리를 배경색과 더 쫀득하게 붙이는 필터 */
             filter: brightness(1.02) contrast(1.02) blur(0.3px);
         }
 
-        /* 메인 타이틀 */
         .main-title {
-            font-size: 2.2rem; font-weight: 200; color: #8ea8c9;
-            letter-spacing: 12px; margin-top: 10px;
+            font-size: 2.5rem; font-weight: 200; color: #8ea8c9;
+            letter-spacing: 15px; margin-top: 15px;
             text-transform: uppercase; text-align: center;
         }
         
-        /* ENTER 버튼 (더 깔끔하고 모던하게) */
         .enter-btn { 
             text-decoration: none; width: 220px; height: 75px; 
             background: white; border-radius: 50px; 
@@ -66,11 +63,20 @@
             box-shadow: 20px 20px 40px #d1d9e6, -20px -20px 40px #ffffff; 
             margin-top: 50px; transition: 0.4s;
         }
-        .enter-btn:hover { transform: translateY(-3px); box-shadow: 10px 10px 25px #d1d9e6; }
+        .enter-btn:hover { transform: translateY(-3px); }
 
-        @media (max-width: 600px) {
-            .main-image { width: 260px; }
-            .main-title { font-size: 1.5rem; letter-spacing: 6px; }
+        /* 📱 모바일 버전 - 쫌좀님이 괜찮다고 하신 기존 크기 유지 */
+        @media (max-width: 768px) {
+            .main-image { 
+                width: 300px; /* 모바일은 기존 느낌 그대로 */
+            }
+            .main-title { 
+                font-size: 1.6rem; 
+                letter-spacing: 8px; 
+            }
+            .ghost-stage {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -80,7 +86,7 @@
         <img src="jiwoo_profile.png" alt="한지우" class="main-image">
     </div>
 
-    <h1 class="main-title">UNIVERSE<br><span style="font-size: 1rem; letter-spacing: 8px; font-weight: 600;">HAN JI WOO</span></h1>
+    <h1 class="main-title">UNIVERSE<br><span style="font-size: 1.1rem; letter-spacing: 10px; font-weight: 600;">HAN JI WOO</span></h1>
 
     <a href="menu.html" class="enter-btn">ENTER</a>
 
