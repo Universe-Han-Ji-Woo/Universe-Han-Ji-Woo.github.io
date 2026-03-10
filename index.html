@@ -7,30 +7,14 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #000; 
+            background: #050010; 
             min-height: 100vh;
             font-family: 'Arial Black', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 배경 효과: 은하수처럼 흐르는 미세 파티클 */
-        body::before {
-            content: "";
-            position: absolute;
-            width: 200%; height: 200%;
-            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px);
-            background-size: 100px 100px;
-            z-index: 0;
-            animation: starMove 100s linear infinite;
-        }
-
-        @keyframes starMove {
-            from { transform: translate(-25%, -25%); }
-            to { transform: translate(0, 0); }
-        }
-
-        .aura-container {
+        .stage-wrapper {
             position: relative;
             width: 100%;
             max-width: 1600px;
@@ -38,112 +22,128 @@
             display: flex; align-items: center;
         }
 
-        /* 🎬 비주얼: 배우님 얼굴을 절대 지키는 대형 배치 */
-        .photo-aura-box {
+        /* ✨ 효과 1: 사진 뒤에서 솟구치는 수직 레이저 라인들 */
+        .bg-laser-lines {
             position: absolute;
-            right: 0%;
-            width: 900px;
+            top: 0; right: 10%; width: 600px; height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 10%, rgba(142, 168, 201, 0.1) 11%, transparent 12%,
+                transparent 40%, rgba(255, 255, 255, 0.1) 41%, transparent 42%,
+                transparent 70%, rgba(142, 168, 201, 0.1) 71%, transparent 72%
+            );
+            z-index: 1;
+            animation: linePulse 3s infinite alternate;
+        }
+
+        /* 🎬 비주얼: 배우님 얼굴을 선명하게 지키는 대형 배치 */
+        .photo-center-visual {
+            position: absolute;
+            right: 5%;
+            width: 850px;
             z-index: 5;
-            /* ✨ 효과 1: 사진 뒤에서 뿜어져 나오는 무지갯빛 오로라 */
-            filter: drop-shadow(0 0 50px rgba(142, 168, 201, 0.3));
+            filter: drop-shadow(0 0 30px rgba(142, 168, 201, 0.2));
         }
 
         .main-img {
-            width: 100%;
-            height: auto;
-            display: block;
-            opacity: 0.9;
+            width: 100%; height: auto; display: block;
+            opacity: 0.95;
             filter: contrast(1.1) brightness(1.1);
-            /* ✨ 얼굴 보존: 외곽만 아주 넓고 부드럽게 안개 처리 */
-            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 85%);
-            mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 85%);
-            animation: gentleFloat 6s infinite alternate ease-in-out;
+            /* ✨ 얼굴 보존: 외곽만 아주 미세하게 안개 처리 */
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 45%, transparent 90%);
+            mask-image: radial-gradient(circle at 50% 50%, black 45%, transparent 90%);
+            animation: slowFloating 8s infinite ease-in-out;
         }
 
-        /* ✨ 효과 2: 사진 위를 흐르는 프리즘 광섬유 (어지럽지 않은 선형 빛) */
-        .light-stream {
+        /* ✨ 효과 2: 사진 앞으로 스쳐 지나가는 홀로그램 빔 */
+        .front-beam {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(105deg, transparent 40%, rgba(142, 168, 201, 0.1) 45%, rgba(255, 255, 255, 0.2) 50%, rgba(142, 168, 201, 0.1) 55%, transparent 60%);
-            z-index: 6;
-            animation: streamMove 4s infinite linear;
-        }
-
-        @keyframes gentleFloat {
-            from { transform: translateY(0); }
-            to { transform: translateY(-20px); }
-        }
-
-        @keyframes streamMove {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* ✍️ 타이포그래피: 좌측에 묵직하고 웅장하게 */
-        .text-overlay {
-            position: relative;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
             z-index: 10;
+            transform: skewX(-15deg);
+            animation: beamPass 5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes linePulse {
+            from { opacity: 0.3; transform: scaleX(1); }
+            to { opacity: 1; transform: scaleX(1.2); }
+        }
+
+        @keyframes slowFloating {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(0.5deg); }
+        }
+
+        @keyframes beamPass {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        /* ✍️ 타이포그래피: 좌측에 꽉 차게 배치 */
+        .text-box-main {
+            position: relative;
+            z-index: 20;
             margin-left: 5%;
         }
 
-        .huge-title {
+        .huge-title-36 {
             font-size: 15rem; font-weight: 900; color: #ffffff;
             letter-spacing: -12px; line-height: 0.75;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 3: 글자 안에서 은은하게 빛나는 펄 광택 */
-            background: linear-gradient(to right, #fff, #8ea8c9, #fff);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shineText 5s linear infinite;
+            /* ✨ 효과 3: 글자 아래로 흐르는 은은한 네온 그림자 */
+            text-shadow: 0 0 20px rgba(142, 168, 201, 0.4);
+            animation: textBreath 4s infinite alternate;
         }
 
-        @keyframes shineText {
-            to { background-position: 200% center; }
-        }
-
-        .actor-id-tag {
+        .actor-tag-36 {
             font-size: 5rem; font-weight: 900; color: #8ea8c9;
             letter-spacing: 20px; text-transform: uppercase;
             margin-top: -30px;
-            text-shadow: 0 0 20px rgba(142, 168, 201, 0.5);
+            border-bottom: 8px solid #ffffff;
+            display: inline-block;
+        }
+
+        @keyframes textBreath {
+            from { opacity: 0.8; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.02); }
         }
         
-        .enter-btn-prism { 
-            display: inline-flex;
-            text-decoration: none; width: 380px; height: 75px; 
-            border: 1px solid #fff; 
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(5px);
+        .enter-btn-36 { 
+            display: flex;
+            text-decoration: none; width: 380px; height: 80px; 
+            background: linear-gradient(45deg, #8ea8c9, #ffffff);
+            color: #050010;
             align-items: center; justify-content: center; 
-            font-weight: 900; color: #fff; letter-spacing: 12px;
+            font-weight: 900; font-size: 1.4rem; letter-spacing: 15px;
             margin-top: 80px; transition: 0.4s;
+            clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
         }
         
-        .enter-btn-prism:hover { 
-            background: #fff; color: #000;
-            transform: scale(1.05) skewX(-5deg);
+        .enter-btn-36:hover { 
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(142, 168, 201, 0.5);
         }
 
         @media (max-width: 1200px) {
-            .huge-title { font-size: 8rem; }
-            .actor-id-tag { font-size: 2.5rem; letter-spacing: 10px; }
-            .photo-aura-box { width: 100%; opacity: 0.4; }
+            .huge-title-36 { font-size: 8rem; }
+            .actor-tag-36 { font-size: 2.5rem; letter-spacing: 10px; }
+            .photo-center-visual { width: 100%; opacity: 0.4; }
         }
     </style>
 </head>
 <body>
     
-    <div class="aura-container">
-        <div class="text-overlay">
-            <h1 class="huge-title">SUPER<br>NOVA</h1>
-            <h2 class="actor-id-tag">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-prism">ACCESS ARCHIVE</a>
+    <div class="stage-wrapper">
+        <div class="bg-laser-lines"></div>
+
+        <div class="text-box-main">
+            <h1 class="huge-title-36">GRAND<br>OPEN</h1>
+            <h2 class="actor-tag-36">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-36">ENTER ARCHIVE</a>
         </div>
 
-        <div class="photo-aura-box">
-            <div class="light-stream"></div>
+        <div class="photo-center-visual">
+            <div class="front-beam"></div>
             <img src="jiwoo_profile2.png" alt="한지우" class="main-img">
         </div>
     </div>
