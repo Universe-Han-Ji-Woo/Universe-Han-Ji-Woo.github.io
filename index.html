@@ -7,132 +7,132 @@
     <style>
         body { 
             margin: 0; padding: 0; 
-            background: #f8faff; 
+            /* ✨ 배경: 맑은 물줄기가 느껴지는 청량한 그라데이션 */
+            background: radial-gradient(circle at top left, #ffffff, #f0faff, #eef5ff);
             min-height: 100vh;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 🎬 효과 1: 공중에 떠다니는 미세한 눈가루(Snow Dust) */
-        .snow-dust {
+        /* 🎬 효과 1: 공중에 떠다니는 투명한 물방울(Liquid Bubbles) */
+        .water-drops {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(circle, rgba(142, 168, 201, 0.2) 1px, transparent 1px);
-            background-size: 50px 50px;
+            pointer-events: none;
             z-index: 1;
-            animation: snowMove 20s linear infinite;
+        }
+        .drop {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            filter: blur(5px);
+            animation: bubbleUp 10s infinite linear;
         }
 
-        @keyframes snowMove {
-            from { background-position: 0 0; }
-            to { background-position: 500px 1000px; }
+        @keyframes bubbleUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
         }
 
-        .ethereal-wrapper {
+        .aquarelle-wrapper {
             position: relative;
             width: 100%; max-width: 1600px;
             height: 100vh;
             display: flex; align-items: center;
         }
 
-        /* 🎬 비주얼: 우측 하단에 배치하고 안개 마스크 처리 */
-        .photo-frost-box {
+        /* 🎬 비주얼: 중앙 우측 배치 & 수채화 마스크 */
+        .photo-aquarelle-box {
             position: absolute;
-            right: -2%; bottom: -5%;
-            width: 900px;
+            right: 2%;
+            width: 850px;
             z-index: 5;
         }
 
         .main-img {
             width: 100%; height: auto; display: block;
-            opacity: 0.9;
-            filter: contrast(1.05) brightness(1.05) saturate(1.1);
-            /* ✨ 얼굴 사수: 얼굴은 선명하게, 외곽은 아주 넓게 안개 효과 */
-            -webkit-mask-image: radial-gradient(circle at 60% 40%, black 20%, transparent 85%);
-            animation: slowSway 10s infinite alternate ease-in-out;
+            opacity: 0.95;
+            filter: contrast(1.05) saturate(1.2);
+            /* ✨ 얼굴 사수: 중앙은 선명, 외곽은 물감이 번진 듯한 거친 마스크 */
+            -webkit-mask-image: radial-gradient(circle, black 35%, rgba(0,0,0,0.5) 60%, transparent 85%);
+            mask-image: radial-gradient(circle, black 35%, rgba(0,0,0,0.5) 60%, transparent 85%);
+            animation: softWave 8s infinite alternate ease-in-out;
         }
 
-        /* ✨ 효과 2: 사진 위를 부드럽게 훑는 '윈터 라이트(Winter Light)' */
-        .winter-light {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.4), transparent);
-            z-index: 10;
-            animation: lightSweep 7s infinite ease-in-out;
+        @keyframes softWave {
+            from { transform: scale(1) rotate(-1deg); filter: hue-rotate(0deg); }
+            to { transform: scale(1.05) rotate(1deg); filter: hue-rotate(5deg); }
         }
 
-        @keyframes slowSway {
-            from { transform: scale(1) translateX(0); }
-            to { transform: scale(1.03) translateX(-10px); }
-        }
-
-        @keyframes lightSweep {
-            0% { transform: translateX(-100%); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateX(100%); opacity: 0; }
-        }
-
-        /* ✍️ 타이포그래피: 좌측 상단에 맑고 투명하게 */
-        .text-frost-zone {
+        /* ✍️ 타이포그래피: 좌측에 맑고 시원하게 배치 */
+        .text-water-zone {
             position: relative;
             z-index: 20;
             margin-left: 6%;
-            margin-top: -5%;
         }
 
-        .giant-frost-txt {
-            font-size: 14rem; font-weight: 900; color: #1a1a1a;
-            letter-spacing: -10px; line-height: 0.85;
+        .giant-water-txt {
+            font-size: 15rem; font-weight: 900; 
+            color: #8ea8c9;
+            letter-spacing: -12px; line-height: 0.8;
             text-transform: uppercase; margin: 0;
-            /* ✨ 효과 3: 글자 뒷부분에 투명한 오로라 광택 */
-            text-shadow: 15px 15px 40px rgba(142, 168, 201, 0.2);
+            /* ✨ 효과 2: 글자 안에 흐르는 물결 텍스처 */
+            background: linear-gradient(to bottom, #8ea8c9, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 10px 20px rgba(142, 168, 201, 0.3));
         }
 
-        .sub-frost-label {
-            font-size: 4.5rem; font-weight: 100; color: #8ea8c9;
+        .sub-water-label {
+            font-size: 4.5rem; font-weight: 100; color: #1a1a1a;
             letter-spacing: 25px; text-transform: uppercase;
             margin-top: 10px;
+            opacity: 0.7;
         }
         
-        /* 🎬 버튼: 유리처럼 투명한 디자인 */
-        .enter-btn-frost { 
+        /* 🎬 버튼: 물방울처럼 둥글고 투명한 디자인 */
+        .enter-btn-aqua { 
             display: inline-flex;
-            text-decoration: none; width: 360px; height: 70px; 
-            border: 1px solid rgba(142, 168, 201, 0.5);
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            text-decoration: none; width: 350px; height: 75px; 
+            background: rgba(142, 168, 201, 0.1);
+            border: 2px solid #8ea8c9;
+            border-radius: 50px; /* 완전 둥글게 */
             align-items: center; justify-content: center; 
-            font-weight: 900; color: #1a1a1a; letter-spacing: 12px;
-            margin-top: 80px; transition: 0.5s;
+            font-weight: 900; color: #8ea8c9; letter-spacing: 12px;
+            margin-top: 80px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
-        .enter-btn-frost:hover { 
-            background: #1a1a1a; color: #fff;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            transform: translateY(-5px);
+        .enter-btn-aqua:hover { 
+            background: #8ea8c9; color: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 20px 40px rgba(142, 168, 201, 0.4);
         }
 
         @media (max-width: 1200px) {
-            .giant-frost-txt { font-size: 7rem; }
-            .sub-frost-label { font-size: 2.5rem; letter-spacing: 12px; }
-            .photo-frost-box { width: 100%; opacity: 0.3; }
+            .giant-water-txt { font-size: 8rem; }
+            .photo-aquarelle-box { width: 100%; opacity: 0.3; }
         }
     </style>
 </head>
 <body>
     
-    <div class="snow-dust"></div>
+    <div class="water-drops">
+        <div class="drop" style="left: 10%; width: 50px; height: 50px; animation-delay: 0s;"></div>
+        <div class="drop" style="left: 30%; width: 80px; height: 80px; animation-delay: 2s;"></div>
+        <div class="drop" style="left: 70%; width: 40px; height: 40px; animation-delay: 4s;"></div>
+        <div class="drop" style="left: 90%; width: 60px; height: 60px; animation-delay: 1s;"></div>
+    </div>
 
-    <div class="ethereal-wrapper">
-        <div class="text-frost-zone">
-            <h1 class="giant-frost-txt">FROST<br>LIGHT</h1>
-            <h2 class="sub-frost-label">HAN JI WOO</h2>
-            <a href="menu.html" class="enter-btn-frost">VIEW MORE</a>
+    <div class="aquarelle-wrapper">
+        <div class="text-water-zone">
+            <h1 class="giant-water-txt">AQUA<br>PURE</h1>
+            <h2 class="sub-water-label">HAN JI WOO</h2>
+            <a href="menu.html" class="enter-btn-aqua">DIVE IN</a>
         </div>
 
-        <div class="photo-frost-box">
-            <div class="winter-light"></div>
+        <div class="photo-aquarelle-box">
             <img src="jiwoo_profile2.png" alt="한지우" class="main-img">
         </div>
     </div>
