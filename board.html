@@ -9,7 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // 관리자님의 Firebase 설정 (그대로 유지)
+        // Firebase 설정 (기존 정보 유지)
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             authDomain: "jiwoo-fanpage.firebaseapp.com",
@@ -30,14 +30,14 @@
             window.scrollTo(0,0);
         }
 
-        // 1. 목록 불러오기 (번호순 정렬)
+        // 1. 목록 불러오기
         function loadList() {
             db.ref('posts_v2').orderByChild('timestamp').on('value', (snapshot) => {
                 allPosts = [];
                 snapshot.forEach((child) => {
                     allPosts.push({ key: child.key, ...child.val() });
                 });
-                allPosts.reverse(); // 최신글이 위로 (번호가 크게)
+                allPosts.reverse();
                 renderTable(allPosts);
             });
         }
@@ -60,32 +60,34 @@
             });
         }
 
-        // 2. 검색
-        function searchPosts() {
-            const kw = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allPosts.filter(p => p.title.toLowerCase().includes(kw) || p.content.toLowerCase().includes(kw));
-            renderTable(filtered);
-        }
-
-        // 3. 등록
+        // 2. 글 등록/수정
         async function submitPost() {
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
             const imageUrl = document.getElementById('postImgUrl').value;
             const nick = sessionStorage.getItem('userNick') || '관리자';
+            const editKey = document.getElementById('editKey').value;
 
             if(!title || !content) return alert("내용을 입력해주세요!");
 
-            await db.ref('posts_v2').push({
+            const postData = {
                 title, content, nickname: nick, imageUrl,
                 date: new Date().toISOString().split('T')[0],
-                views: 0, likes: 0, timestamp: Date.now()
-            });
-            alert("등록완료!");
+                timestamp: Date.now()
+            };
+
+            if(editKey) {
+                await db.ref('posts_v2/' + editKey).update(postData);
+                alert("수정되었습니다!");
+            } else {
+                postData.views = 0; postData.likes = 0;
+                await db.ref('posts_v2').push(postData);
+                alert("등록완료!");
+            }
             location.reload();
         }
 
-        // 4. 상세보기 (요청하신 레이아웃 적용)
+        // 3. 상세보기 및 버튼 배치
         function showDetail(key) {
             db.ref('posts_v2/' + key).once('value', (snapshot) => {
                 const post = snapshot.val();
@@ -102,8 +104,29 @@
                 document.getElementById('likeBtn').onclick = () => {
                     db.ref('posts_v2/' + key).transaction(p => { if(p) p.likes = (p.likes || 0) + 1; return p; });
                 };
+
+                // 삭제/수정 버튼 기능 연결
+                document.getElementById('deleteBtn').onclick = () => deletePost(key);
+                document.getElementById('editBtn').onclick = () => prepareEdit(key, post);
+
                 showView('detail');
             });
+        }
+
+        function deletePost(key) {
+            if(confirm("정말 삭제하시겠습니까?")) {
+                db.ref('posts_v2/' + key).remove();
+                alert("삭제되었습니다.");
+                location.reload();
+            }
+        }
+
+        function prepareEdit(key, post) {
+            document.getElementById('editKey').value = key;
+            document.getElementById('postTitle').value = post.title;
+            document.getElementById('postContent').value = post.content;
+            document.getElementById('postImgUrl').value = post.imageUrl || '';
+            showView('write');
         }
 
         window.onload = loadList;
@@ -111,39 +134,39 @@
 
     <style>
         body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
-        .nav { background: #000; color: #fff; padding: 15px; text-align: center; font-weight: bold; letter-spacing: 1px; }
+        .nav { background: #000; color: #fff; padding: 15px; text-align: center; font-weight: bold; }
         .container { max-width: 900px; margin: 0 auto; padding: 20px; }
 
-        /* 테이블 공통 */
+        /* 목록 디자인 */
         table { width: 100%; border-collapse: collapse; border-top: 2px solid #000; margin-top: 10px; }
         th { background: #f9f9f9; padding: 12px; font-size: 0.85rem; border-bottom: 1px solid #ddd; }
         td { padding: 15px 5px; text-align: center; border-bottom: 1px solid #eee; cursor: pointer; font-size: 0.95rem; }
+        .btn-write-trigger { float: right; background: #e91e63; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; }
 
-        /* 글쓰기 버튼 */
-        .btn-write-trigger { float: right; background: #e91e63; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        /* 글쓰기 영역 디자인 (넓게) */
+        .input-box { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        textarea.input-box { height: 450px; resize: none; }
+        .btn-submit { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* 상세보기 레이아웃 (수정/삭제 우측 상단 배치) */
+        .detail-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .detail-title { font-size: 1.8rem; font-weight: bold; flex: 1; }
+        .top-admin-btns { display: flex; gap: 5px; }
+        .btn-small { background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #666; }
+        .btn-small:hover { background: #f0f0f0; }
+
+        .detail-info { color: #888; font-size: 0.9rem; padding-bottom: 15px; border-bottom: 1px solid #eee; margin-bottom: 20px; }
+        .detail-content { min-height: 350px; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; }
+
+        /* 하단 버튼: 좋아요(좌), 목록(우) */
+        .detail-footer-btns { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid #eee; margin-top: 40px; }
+        .btn-like { background: #fff; border: 1px solid #ddd; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .btn-list-go { background: #f8f8f8; border: 1px solid #ddd; padding: 10px 25px; border-radius: 5px; cursor: pointer; }
 
         /* 검색/페이징 구역 */
-        .footer-area { margin-top: 20px; text-align: center; }
-        .btn-page { padding: 8px 15px; border: 1px solid #ddd; background: #fff; cursor: pointer; margin: 0 5px; border-radius: 4px; }
-        .search-box { margin-top: 20px; display: flex; justify-content: center; gap: 5px; }
-        .search-box input { padding: 10px; border: 1px solid #ddd; border-radius: 4px; width: 250px; }
-        .btn-search { padding: 10px 20px; background: #fff; border: 1px solid #ddd; cursor: pointer; }
-
-        /* 글쓰기 폼 넓게 */
-        .input-box { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-size: 1rem; }
-        textarea.input-box { height: 400px; resize: none; }
-        .btn-submit { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; }
-
-        /* 상세보기 (핵심!) */
-        .detail-wrap { border-top: 2px solid #000; margin-top: 20px; padding-top: 20px; }
-        .detail-title { font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; }
-        .detail-info { color: #888; font-size: 0.9rem; padding-bottom: 20px; border-bottom: 1px solid #eee; margin-bottom: 20px; }
-        .detail-content { min-height: 300px; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; }
-        
-        /* 버튼 배치: 좋아요는 왼쪽, 목록은 오른쪽 */
-        .detail-btns { display: flex; justify-content: space-between; align-items: center; padding: 40px 0; border-top: 1px solid #eee; }
-        .btn-like { background: #fff; border: 1px solid #ddd; padding: 10px 25px; border-radius: 30px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: bold; }
-        .btn-list-view { background: #f8f8f8; border: 1px solid #ddd; padding: 10px 25px; border-radius: 5px; cursor: pointer; color: #333; }
+        .list-footer { margin-top: 30px; text-align: center; }
+        .search-box { margin-top: 15px; display: flex; justify-content: center; gap: 5px; }
+        .search-box input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
 
         @media (max-width:600px) { th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { display: none; } }
     </style>
@@ -153,42 +176,48 @@
     <div class="container">
         
         <div id="listView" class="view-section">
-            <button class="btn-write-trigger" onclick="showView('write')">글쓰기</button>
+            <button class="btn-write-trigger" onclick="document.getElementById('editKey').value=''; showView('write')">글쓰기</button>
             <table>
                 <thead>
                     <tr><th width="60">번호</th><th>제목</th><th width="100">작성자</th><th width="100">날짜</th><th width="60">조회</th></tr>
                 </thead>
                 <tbody id="postTableBody"></tbody>
             </table>
-            <div class="footer-area">
-                <button class="btn-page">이전</button> <button class="btn-page">다음</button>
+            <div class="list-footer">
+                <div><button class="btn-small">이전</button> <button class="btn-small">다음</button></div>
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="검색어를 입력하세요">
-                    <button class="btn-search" onclick="searchPosts()">검색</button>
+                    <input type="text" id="searchInput" placeholder="검색">
+                    <button class="btn-small">검색</button>
                 </div>
             </div>
         </div>
 
         <div id="writeView" class="view-section" style="display:none;">
-            <h3>게시글 작성</h3>
-            <input type="text" id="postTitle" class="input-box" placeholder="제목을 입력하세요">
-            <textarea id="postContent" class="input-box" placeholder="내용을 자유롭게 입력하세요 (공간이 넓습니다)"></textarea>
-            <input type="text" id="postImgUrl" class="input-box" placeholder="이미지 주소 URL (선택사항)">
-            <button class="btn-submit" onclick="submitPost()">등록하기</button>
-            <button class="btn-list-view" style="width:100%; margin-top:10px;" onclick="showView('list')">취소</button>
+            <input type="hidden" id="editKey">
+            <h3>게시글 작성/수정</h3>
+            <input type="text" id="postTitle" class="input-box" placeholder="제목">
+            <textarea id="postContent" class="input-box" placeholder="내용을 넓게 작성하세요"></textarea>
+            <input type="text" id="postImgUrl" class="input-box" placeholder="이미지 주소 URL">
+            <button class="btn-submit" onclick="submitPost()">등록/수정하기</button>
+            <button class="btn-list-go" style="width:100%; margin-top:10px;" onclick="showView('list')">취소</button>
         </div>
 
         <div id="detailView" class="view-section" style="display:none;">
-            <div class="detail-wrap">
+            <div class="detail-header-row">
                 <div class="detail-title" id="detailTitle"></div>
-                <div class="detail-info" id="detailInfo"></div>
-                <div id="detailImage"></div>
-                <div class="detail-content" id="detailContent"></div>
-                
-                <div class="detail-btns">
-                    <button class="btn-like" id="likeBtn">❤️ 좋아요 <span id="likeCount">0</span></button>
-                    <button class="btn-list-view" onclick="showView('list')">목록보기</button>
+                <div class="top-admin-btns">
+                    <button class="btn-small" id="editBtn">수정</button>
+                    <button class="btn-small" id="deleteBtn">삭제</button>
                 </div>
+            </div>
+            <div class="detail-info" id="detailInfo"></div>
+            
+            <div id="detailImage"></div>
+            <div class="detail-content" id="detailContent"></div>
+            
+            <div class="detail-footer-btns">
+                <button class="btn-like" id="likeBtn">❤️ 좋아요 <span id="likeCount">0</span></button>
+                <button class="btn-list-go" onclick="showView('list')">목록보기</button>
             </div>
         </div>
 
