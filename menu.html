@@ -3,100 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universe | Control Tower</title>
+    <title>Universe | Mission Control</title>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #050a10; color: #fff;
+            background: #000; color: #fff;
             font-family: 'Apple SD Gothic Neo', sans-serif;
-            display: flex; flex-direction: column; align-items: center;
             overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 컨트롤 타워 배경 */
-        .tower-bg {
+        /* 웅장한 우주 배경 */
+        .space-bg {
             position: fixed; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
             z-index: -1;
         }
 
-        /* 상단 환영 섹션 */
-        .welcome-section {
-            margin-top: 10vh; text-align: center;
-            animation: fadeInDown 1s ease-out;
+        /* 별들이 흐르는 효과 */
+        .stars {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/stars.png') repeat;
+            opacity: 0.5; animation: moveStars 100s linear infinite;
         }
-        .welcome-msg {
-            font-size: 1.8rem; font-weight: bold; letter-spacing: 2px;
-            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+
+        @keyframes moveStars {
+            from { background-position: 0 0; }
+            to { background-position: 10000px 5000px; }
+        }
+
+        /* 상단 시스템 헤더 */
+        .system-header {
+            margin-top: 10vh; text-align: center; z-index: 10;
+        }
+        .system-title {
+            font-size: 2.5rem; font-weight: 900; letter-spacing: 12px;
+            text-shadow: 0 0 30px rgba(79, 172, 254, 0.6);
+            animation: fadeIn 2s ease-in;
+            color: #fff;
+            text-transform: uppercase;
         }
         .status-msg {
-            color: #8ea8c9; font-size: 0.9rem; margin-top: 15px;
-            letter-spacing: 4px; text-transform: uppercase;
+            color: #4facfe; font-size: 0.8rem; margin-top: 20px;
+            letter-spacing: 6px; opacity: 0.8;
+            animation: pulse 2s infinite;
         }
 
-        /* 메뉴 카드 컨테이너 */
-        .hub-container {
-            display: flex; gap: 40px; margin-top: 10vh;
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
-        .hub-card {
-            width: 200px; height: 300px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.4s;
-            backdrop-filter: blur(10px);
-        }
-        .hub-card:hover {
-            transform: translateY(-20px);
-            background: rgba(255,255,255,0.1);
-            border-color: #fff;
-            box-shadow: 0 0 30px rgba(255,255,255,0.2);
-        }
-        .hub-card i { font-size: 3rem; margin-bottom: 20px; }
-        .hub-card span { font-size: 1rem; letter-spacing: 2px; }
 
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* 행성 메뉴 정렬 */
+        .planet-hub {
+            display: flex; justify-content: center; align-items: center;
+            gap: 70px; height: 55vh; width: 100%;
+        }
+
+        /* 행성(메뉴) 공통 스타일 */
+        .planet {
+            position: relative; width: 190px; height: 190px;
+            border-radius: 50%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            text-decoration: none; color: white;
+            box-shadow: inset -25px -25px 60px rgba(0,0,0,0.6);
+        }
+
+        /* 각 행성별 색상 */
+        .gallery-planet { background: radial-gradient(circle at 30% 30%, #5ee7ff, #0061ff); box-shadow: 0 0 45px rgba(0, 97, 255, 0.4); }
+        .profile-planet { background: radial-gradient(circle at 30% 30%, #f6d365, #fda085); box-shadow: 0 0 45px rgba(253, 160, 133, 0.4); }
+        .video-planet { background: radial-gradient(circle at 30% 30%, #ff0844, #ffb199); box-shadow: 0 0 45px rgba(255, 8, 68, 0.4); }
+
+        .planet:hover {
+            transform: scale(1.15) translateY(-25px);
+            box-shadow: 0 0 70px rgba(255, 255, 255, 0.5);
+        }
+
+        .planet span {
+            font-weight: bold; font-size: 1.15rem; letter-spacing: 3px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            margin-top: 5px;
+        }
+
+        /* 둥실둥실 애니메이션 */
+        .float { animation: floating 4s ease-in-out infinite; }
+        .float-delay-1 { animation: floating 5s ease-in-out infinite 1s; }
+        .float-delay-2 { animation: floating 4.5s ease-in-out infinite 0.5s; }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
     <script>
-        // URL에서 사용자 이름을 가져오는 함수
+        // URL에서 user 파라미터는 유지하되 화면에 띄우지는 않습니다.
         const urlParams = new URLSearchParams(window.location.search);
         const userName = urlParams.get('user') || 'Explorer';
 
         function navigateTo(page) {
             location.href = `${page}.html?user=${encodeURIComponent(userName)}`;
         }
-
-        window.onload = () => {
-            // HTML 요소에 사용자 이름 주입
-            document.getElementById('user-display').innerText = userName;
-        };
     </script>
 </head>
 <body>
-    <div class="tower-bg"></div>
+    <div class="space-bg"></div>
+    <div class="stars"></div>
 
-    <div class="welcome-section">
-        <div class="welcome-msg">Welcome back, <span id="user-display"></span>!</div>
+    <div class="system-header">
+        <div class="system-title">Mission Control</div>
         <div class="status-msg">현재 우주의 상태는 평온합니다</div>
     </div>
 
-    <div class="hub-container">
-        <div class="hub-card" onclick="navigateTo('gallery')">
-            <div style="font-size: 40px; margin-bottom: 15px;">🌌</div>
+    <div class="planet-hub">
+        <div class="planet gallery-planet float" onclick="navigateTo('gallery')">
+            <span style="font-size: 2.2rem;">🌌</span>
             <span>GALLERY</span>
         </div>
 
-        <div class="hub-card" onclick="alert('준비 중인 구역입니다.')">
-            <div style="font-size: 40px; margin-bottom: 15px;">👤</div>
+        <div class="planet profile-planet float-delay-1" onclick="alert('데이터를 전송받는 중입니다...')">
+            <span style="font-size: 2.2rem;">👤</span>
             <span>PROFILE</span>
         </div>
 
-        <div class="hub-card" onclick="alert('준비 중인 구역입니다.')">
-            <div style="font-size: 40px; margin-bottom: 15px;">🎬</div>
+        <div class="planet video-planet float-delay-2" onclick="alert('광년 거리에서 이동 중입니다...')">
+            <span style="font-size: 2.2rem;">🎬</span>
             <span>VIDEO</span>
         </div>
     </div>
