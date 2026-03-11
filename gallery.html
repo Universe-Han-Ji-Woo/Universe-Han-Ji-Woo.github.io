@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universe | Galaxy Gallery</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #050a10; color: #fff;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* 성운 느낌의 갤러리 배경 */
+        .gallery-bg {
+            fixed: absolute; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 30%, #1a1a2e 0%, #050a10 70%),
+                        radial-gradient(circle at 80% 70%, #16213e 0%, #050a10 70%);
+            z-index: -1; position: fixed;
+        }
+
+        .header {
+            padding: 40px; text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 { font-family: 'Arial Black', sans-serif; letter-spacing: 10px; margin: 0; }
+        .header p { color: #8ea8c9; font-size: 0.8rem; margin-top: 10px; letter-spacing: 3px; }
+
+        /* 뒤로가기 버튼 */
+        .back-btn {
+            position: fixed; top: 30px; left: 30px;
+            padding: 10px 20px; border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px; cursor: pointer; color: #fff; font-size: 0.7rem;
+            background: rgba(255,255,255,0.05); z-index: 100;
+        }
+        .back-btn:hover { background: #fff; color: #000; }
+    </style>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const user = urlParams.get('user');
+
+        function goBack() {
+            location.href = `menu.html?user=${encodeURIComponent(user)}`;
+        }
+
+        window.onload = () => {
+            if (!user) { location.href = "index.html"; }
+        };
+    </script>
+</head>
+<body>
+    <div class="gallery-bg"></div>
+    <div class="back-btn" onclick="goBack()">← BACK TO HUB</div>
+
+    <div class="header">
+        <h1>GALAXY GALLERY</h1>
+        <p>성운처럼 빛나는 지우 배우님의 기록들</p>
+    </div>
+
+    <div id="photo-nebula" style="padding: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;">
+        <p style="color: rgba(255,255,255,0.2);">성운 데이터를 불러오는 중...</p>
+    </div>
+</body>
+</html>
