@@ -17,17 +17,7 @@
         .btn-stay { cursor: pointer; border: none; width: 80%; height: 55px; background: #1a1a1a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; font-size: 0.95rem; border-radius: 5px; transition: 0.4s; text-transform: uppercase; }
 
         #accessDeniedMsg { 
-            display: none; 
-            margin-top: 15px; 
-            padding: 8px 20px; 
-            border: 1px solid #1a1a1a; 
-            background: white; 
-            color: #1a1a1a; 
-            font-size: 0.75rem; 
-            letter-spacing: 1px; 
-            font-weight: bold;
-            border-radius: 50px;
-            animation: fadeIn 0.5s ease;
+            display: none; margin-top: 15px; padding: 8px 20px; border: 1px solid #1a1a1a; background: white; color: #1a1a1a; font-size: 0.75rem; letter-spacing: 1px; font-weight: bold; border-radius: 50px; animation: fadeIn 0.5s ease;
         }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: 0.3s; }
@@ -94,11 +84,9 @@
     </div>
 
     <script>
-        // 페이지 로드 시 상태 확인
         window.onload = function() { checkLoginStatus(); };
 
         function checkLoginStatus() {
-            // sessionStorage는 브라우저 탭 세션동안 유지됨 (시크릿 모드에서도 해당 탭에서는 유효)
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             const userNick = sessionStorage.getItem('userNick');
             const mainBtn = document.getElementById('mainEntryBtn');
@@ -107,12 +95,10 @@
             if (isLoggedIn === 'true') {
                 mainBtn.innerText = "ENTER ARCHIVE";
                 mainBtn.onclick = function() {
-                    // 🔒 로그인 성공 후 버튼 눌렀을 때 2차 검증
                     if (userNick === "관리자") {
                         const choice = confirm("이동할 페이지를 선택하세요.\n\n[확인] : 아카이브\n[취소] : 게시판");
                         location.href = choice ? "archive.html" : "board.html";
                     } else {
-                        // 관리자가 아니면 무조건 "정렬 중" 메시지 노출
                         deniedMsg.style.display = 'block';
                         setTimeout(() => { deniedMsg.style.display = 'none'; }, 3000);
                     }
@@ -126,71 +112,56 @@
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
-
         function closeAuth() {
             const modal = document.getElementById('authModal');
             modal.classList.remove('active');
             setTimeout(() => modal.style.display = 'none', 300);
         }
-
         function toggleAuth(type) {
             document.getElementById('loginSection').style.display = type === 'login' ? 'block' : 'none';
             document.getElementById('signupSection').style.display = type === 'signup' ? 'block' : 'none';
         }
 
-        // 🛠️ 크롬/시크릿모드 철벽 대응: 가입 로직
         function handleSignup() {
-            const emailInput = document.getElementById('signupEmail').value.trim();
+            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
             const pw = document.getElementById('signupPw').value.trim();
             const nick = document.getElementById('signupNick').value.trim();
-            
-            if(!emailInput || !pw || !nick) {
-                alert("정보를 모두 입력해주세요.");
-                return;
-            }
+            if(!email || !pw || !nick) return;
 
-            // 크롬 대소문자 이슈 방지: 키값 자체를 소문자로 통일
-            const email = emailInput.toLowerCase();
-            const userData = { email: email, pw: pw, nick: nick };
-            
-            // 저장 방식 강화: 깃허브 도메인에서도 꼬이지 않게 고유 키 사용
             try {
-                localStorage.setItem("FANPAGE_USER_" + email, JSON.stringify(userData));
+                localStorage.setItem("USER_" + email, JSON.stringify({ email, pw, nick }));
                 document.getElementById('signupSuccessMsg').style.display = 'block';
                 setTimeout(() => { toggleAuth('login'); }, 1000);
             } catch(e) {
-                alert("브라우저 보안 설정으로 인해 가입 정보를 저장할 수 없습니다.");
+                alert("브라우저 저장소가 차단되었습니다. 하지만 관리자 로그인은 가능합니다.");
+                toggleAuth('login');
             }
         }
 
-        // 🛠️ 크롬/시크릿모드 철벽 대응: 로그인 로직
         function handleLogin() {
-            const emailInput = document.getElementById('loginEmail').value.trim();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const pw = document.getElementById('loginPw').value.trim();
             
-            if(!emailInput || !pw) {
-                alert("이메일과 비밀번호를 입력해주세요.");
+            // 🚨 [무적 비상문] 크롬/시크릿모드 어디서든 이 정보만 맞으면 통과!
+            if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('userNick', '관리자');
+                closeAuth();
+                checkLoginStatus();
                 return;
             }
 
-            const email = emailInput.toLowerCase();
-            const storedData = localStorage.getItem("FANPAGE_USER_" + email);
-            
+            // 일반 유저용 저장소 로직
+            const storedData = localStorage.getItem("USER_" + email);
             if (storedData) {
                 const user = JSON.parse(storedData);
                 if (user.pw === pw) {
-                    // 로그인 상태를 세션에 기록 (탭 닫기 전까지 유지)
                     sessionStorage.setItem('isLoggedIn', 'true');
                     sessionStorage.setItem('userNick', user.nick);
                     closeAuth();
-                    checkLoginStatus(); // 버튼 상태 즉시 업데이트
-                } else {
-                    alert("비밀번호가 일치하지 않습니다.");
-                }
-            } else {
-                // 이 부분이 뜨면 100% 저장된 키가 없다는 뜻 (가입을 다시 해야 함)
-                alert("가입 정보가 없습니다. 이메일을 확인하거나 새로 가입해주세요.");
-            }
+                    checkLoginStatus(); 
+                } else { alert("비밀번호 불일치"); }
+            } else { alert("가입 정보가 없습니다. 관리자 계정이 아니라면 새로 가입해주세요."); }
         }
     </script>
 </body>
