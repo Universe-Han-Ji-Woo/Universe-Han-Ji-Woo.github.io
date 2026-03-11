@@ -7,159 +7,148 @@
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // 관리자님의 Firebase 설정값
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             authDomain: "jiwoo-fanpage.firebaseapp.com",
+            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com", 
             projectId: "jiwoo-fanpage",
             storageBucket: "jiwoo-fanpage.firebasestorage.app",
             messagingSenderId: "928634858988",
             appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
         };
         firebase.initializeApp(firebaseConfig);
+        
         const auth = firebase.auth();
+        const db = firebase.database();
 
-        // 로그인 로직
+        // 📊 실시간 접속자 추적 (실시간 탐사 중)
+        function trackOnlineUsers() {
+            const connectedRef = db.ref(".info/connected");
+            const onlineRef = db.ref("online_users").push();
+
+            connectedRef.on("value", (snap) => {
+                if (snap.val() === true) {
+                    onlineRef.set(true);
+                    onlineRef.onDisconnect().remove();
+                }
+            });
+
+            db.ref("online_users").on("value", (snap) => {
+                const count = snap.numChildren() || 0;
+                document.getElementById('onlineCount').innerText = `${count}명 실시간 탐사 중`;
+            });
+        }
+
+        // 📊 누적 가입자 표시 (지우 유니버스 입성)
+        function updateTotalFans() {
+            const totalFans = 127; // 👈 여기 숫자만 관리자님이 가끔 수정해 주세요!
+            document.getElementById('userCount').innerText = `${totalFans}명 지우 유니버스 입성`;
+        }
+
+        window.onload = () => {
+            trackOnlineUsers();
+            updateTotalFans();
+        };
+
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
-            
-            // 🚨 관리자 프리패스
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
                 sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userNick', '관리자');
-                const choice = confirm("관리자님 환영합니다!\n\n[확인] 아카이브로 이동\n[취소] 게시판으로 이동");
-                location.href = choice ? "archive.html" : "board.html";
+                sessionStorage.setItem('userNick', 'ADMIN');
+                location.href = confirm("관리자님 환영합니다!") ? "archive.html" : "board.html";
                 return;
             }
-
-            // 일반 팬 로그인
-            auth.signInWithEmailAndPassword(email, pw)
-                .then(() => {
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    sessionStorage.setItem('userNick', '팬');
-                    closeAuth();
-                    // 📢 "오픈 준비 중" 멘트 노출
-                    document.getElementById('accessDeniedMsg').style.display = 'block';
-                })
-                .catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
+            auth.signInWithEmailAndPassword(email, pw).then(() => {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('userNick', 'FAN');
+                closeAuth();
+                document.getElementById('statusZone').style.display = 'flex';
+                document.getElementById('nickBadge').innerText = "FAN";
+            }).catch(() => alert("정보가 틀렸습니다."));
         }
 
-        // 회원가입 로직
         function handleSignup() {
             const email = document.getElementById('sEmail').value;
             const pw = document.getElementById('sPw').value;
-            auth.createUserWithEmailAndPassword(email, pw)
-                .then(() => { 
-                    alert("가입이 완료되었습니다! 로그인을 진행해 주세요."); 
-                    location.reload(); 
-                })
-                .catch((err) => alert("가입 오류: " + err.message));
+            auth.createUserWithEmailAndPassword(email, pw).then(() => {
+                alert("가입 성공!"); location.reload();
+            }).catch((err) => alert(err.message));
         }
 
-        function openAuth() { 
-            const modal = document.getElementById('authModal');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-        function closeAuth() {
-            const modal = document.getElementById('authModal');
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 400);
-        }
+        function openAuth() { document.getElementById('authModal').classList.add('active'); document.getElementById('authModal').style.display = 'flex'; }
+        function closeAuth() { document.getElementById('authModal').classList.remove('active'); setTimeout(() => document.getElementById('authModal').style.display = 'none', 400); }
     </script>
 
     <style>
-        /* 👑 복구된 메인 디자인 */
         body { margin: 0; padding: 0; background: #ffffff; height: 100vh; font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; }
         .liquid-bg { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); z-index: 1; }
-        
         .main-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        
-        .header-text { flex: 0 0 auto; width: 100%; padding-top: 8vh; text-align: center; z-index: 30; }
+        .header-text { padding-top: 8vh; text-align: center; }
         .univ-title { font-family: 'Arial Black', sans-serif; font-size: 3.8rem; font-weight: 900; color: #1a1a1a; line-height: 0.9; letter-spacing: -2px; text-transform: uppercase; margin: 0; }
-        .coming-soon-label { font-size: 1.2rem; color: #8ea8c9; letter-spacing: 5px; margin-top: 10px; font-weight: 900; text-transform: uppercase; }
+        .coming-soon-label { font-size: 1.2rem; color: #8ea8c9; letter-spacing: 5px; margin-top: 10px; font-weight: 900; }
+        .hero-photo-zone { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .main-img { height: 85%; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); }
+        .footer-btn-zone { height: 15vh; display: flex; justify-content: center; align-items: center; }
+        .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 320px; height: 55px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 8px; border-radius: 5px; text-transform: uppercase; }
 
-        .hero-photo-zone { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; z-index: 20; }
-        .main-img { height: 85%; width: auto; object-fit: contain; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); }
-        
-        .footer-btn-zone { flex: 0 0 auto; width: 100%; height: 18vh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 40; }
-        .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 380px; height: 55px; background: #1a1a1a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; font-size: 0.95rem; border-radius: 5px; transition: 0.4s; text-transform: uppercase; }
-        
-        /* 💡 멘트 스타일 수정 */
-        #accessDeniedMsg { 
+        /* 🏷️ 우측 상단 상태창 (배우님 얼굴 안 가리게) */
+        #statusZone { 
             display: none; 
-            margin-top: 15px; 
-            padding: 12px 25px; 
-            border: 2px solid #1a1a1a; 
-            background: white; 
-            color: #1a1a1a; 
-            font-size: 0.9rem; 
-            letter-spacing: 0px; 
-            font-weight: bold; 
-            border-radius: 5px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            position: fixed; 
+            right: 25px; 
+            top: 25px; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            z-index: 100;
         }
+        .nick-box { font-size: 0.6rem; border: 1px solid #1a1a1a; padding: 2px 6px; font-weight: bold; margin-bottom: 8px; background: #fff; letter-spacing: 1px; }
+        .status-msg { font-size: 0.75rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+        .count-info { font-size: 0.65rem; color: #888; text-align: right; margin-top: 2px; letter-spacing: -0.2px; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: 0.3s; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 500; opacity: 0; transition: 0.3s; }
         .modal-overlay.active { display: flex; opacity: 1; }
-        .auth-card { width: 85%; max-width: 420px; padding: 45px 10px; background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(142, 168, 201, 0.3); border-radius: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.1); text-align: center; }
-        .auth-input { width: 85%; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 1rem; outline: none; background: #fcfcfc; }
-        .btn-submit { width: 85%; padding: 18px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-weight: 900; font-size: 1.1rem; cursor: pointer; letter-spacing: 4px; margin-top: 15px; }
-
-        @media (min-width: 1024px) {
-            .main-container { flex-direction: row; }
-            .header-text { flex: 1; text-align: left; padding-left: 8%; padding-top: 0; }
-            .univ-title { font-size: 11rem; }
-            .hero-photo-zone { flex: 1.5; justify-content: flex-end; }
-            .main-img { height: 95%; }
-            .footer-btn-zone { position: absolute; bottom: 8vh; left: 8%; width: auto; align-items: flex-start; }
-        }
-
+        .auth-card { width: 85%; max-width: 400px; padding: 40px 10px; background: #fff; border-radius: 25px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        .auth-input { width: 80%; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 1rem; }
+        .btn-submit { width: 85%; padding: 15px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; }
         @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.04); } }
     </style>
 </head>
 <body>
-
     <div class="liquid-bg"></div>
-
     <div class="main-container">
-        <div class="header-text">
-            <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
-            <h2 class="coming-soon-label">COMING SOON</h2>
-        </div>
-        
-        <div class="hero-photo-zone">
-            <img src="jiwoo_profile3.png" alt="Han Ji Woo" class="main-img">
-        </div>
+        <div class="header-text"><h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1><h2 class="coming-soon-label">COMING SOON</h2></div>
+        <div class="hero-photo-zone"><img src="jiwoo_profile3.png" alt="Han Ji Woo" class="main-img"></div>
+        <div class="footer-btn-zone"><button class="btn-stay" onclick="openAuth()">STAY TUNED</button></div>
+    </div>
 
-        <div class="footer-btn-zone">
-            <button class="btn-stay" onclick="openAuth()">STAY TUNED</button>
-            <div id="accessDeniedMsg">현재 오픈 준비 중입니다. 조금만 기다려 주세요!</div>
-        </div>
+    <div id="statusZone">
+        <div class="nick-box" id="nickBadge">FAN</div>
+        <div class="status-msg">오픈 준비 중</div>
+        <div class="count-info" id="userCount">0명 지우 유니버스 입성</div>
+        <div class="count-info" id="onlineCount">1명 실시간 탐사 중</div>
     </div>
 
     <div class="modal-overlay" id="authModal">
         <div class="auth-card">
             <div id="loginBox">
-                <h3 style="font-size:2rem; margin-bottom:20px;">LOGIN</h3>
-                <input type="email" id="lEmail" class="auth-input" placeholder="이메일 주소">
+                <h3>LOGIN</h3>
+                <input type="email" id="lEmail" class="auth-input" placeholder="이메일">
                 <input type="password" id="lPw" class="auth-input" placeholder="비밀번호">
                 <button class="btn-submit" onclick="handleLogin()">로그인</button>
-                <p style="margin-top:25px; font-size:0.85rem; color:#666;">계정이 없으신가요? <span onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';" style="color:#8ea8c9; cursor:pointer; font-weight:bold; text-decoration:underline;">회원가입</span></p>
+                <p style="margin-top:20px; font-size:0.8rem;">계정이 없나요? <span onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';" style="color:#8ea8c9; cursor:pointer; font-weight:bold;">회원가입</span></p>
             </div>
             <div id="signBox" style="display:none;">
-                <h3 style="font-size:2rem; margin-bottom:20px;">JOIN US</h3>
-                <input type="email" id="sEmail" class="auth-input" placeholder="이메일 주소">
+                <h3>JOIN US</h3>
+                <input type="email" id="sEmail" class="auth-input" placeholder="이메일">
                 <input type="password" id="sPw" class="auth-input" placeholder="비밀번호">
                 <button class="btn-submit" onclick="handleSignup()">가입하기</button>
-                <p style="margin-top:25px; font-size:0.85rem; cursor:pointer;" onclick="document.getElementById('signBox').style.display='none'; document.getElementById('loginBox').style.display='block';">돌아가기</p>
             </div>
-            <button style="margin-top:25px; background:none; border:none; text-decoration:underline; cursor:pointer; color:#999;" onclick="closeAuth()">창 닫기</button>
+            <button style="margin-top:20px; border:none; background:none; text-decoration:underline; cursor:pointer; color:#999;" onclick="closeAuth()">닫기</button>
         </div>
     </div>
-
 </body>
 </html>
