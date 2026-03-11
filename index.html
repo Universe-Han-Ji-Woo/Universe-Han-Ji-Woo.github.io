@@ -16,7 +16,6 @@
         .footer-btn-zone { flex: 0 0 auto; width: 100%; height: 18vh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 40; }
         .btn-stay { cursor: pointer; border: none; width: 80%; height: 55px; background: #1a1a1a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; font-size: 0.95rem; border-radius: 5px; transition: 0.4s; text-transform: uppercase; }
 
-        /* 🔒 오픈 준비 안내 문구 */
         #accessDeniedMsg { 
             display: none; 
             margin-top: 15px; 
@@ -106,7 +105,6 @@
             if (isLoggedIn === 'true') {
                 mainBtn.innerText = "ENTER ARCHIVE";
                 mainBtn.onclick = function() {
-                    // ⭐ 핵심 로직: 로그인했어도 닉네임이 '관리자'가 아니면 무조건 메시지 띄움
                     if (userNick === "관리자") {
                         const choice = confirm("이동할 페이지를 선택하세요.\n\n[확인] : 아카이브\n[취소] : 게시판");
                         location.href = choice ? "archive.html" : "board.html";
@@ -136,30 +134,60 @@
             document.getElementById('signupSection').style.display = type === 'signup' ? 'block' : 'none';
         }
 
+        // 🛠️ 크롬 대응 강화: 가입 로직
         function handleSignup() {
-            const email = document.getElementById('signupEmail').value.trim();
+            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
             const pw = document.getElementById('signupPw').value.trim();
             const nick = document.getElementById('signupNick').value.trim();
-            if(!email || !pw || !nick) return;
-            localStorage.setItem('user_' + email, JSON.stringify({ email, pw, nick }));
-            document.getElementById('signupSuccessMsg').style.display = 'block';
-            setTimeout(() => { toggleAuth('login'); }, 1000);
+            
+            if(!email || !pw || !nick) {
+                alert("항목을 모두 입력해주세요.");
+                return;
+            }
+            
+            // 키 충돌을 방지하기 위해 특수 키 사용
+            const userKey = "JIWOO_USER_" + email;
+            const userData = { email, pw, nick };
+            
+            try {
+                localStorage.setItem(userKey, JSON.stringify(userData));
+                document.getElementById('signupSuccessMsg').style.display = 'block';
+                setTimeout(() => { toggleAuth('login'); }, 1000);
+            } catch (e) {
+                alert("브라우저 저장소 오류입니다. 쿠키 설정을 확인해주세요.");
+            }
         }
 
+        // 🛠️ 크롬 대응 강화: 로그인 로직
         function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
             const pw = document.getElementById('loginPw').value.trim();
-            const storedData = localStorage.getItem('user_' + email);
+            
+            if(!email || !pw) {
+                alert("이메일과 비밀번호를 입력해주세요.");
+                return;
+            }
+
+            const userKey = "JIWOO_USER_" + email;
+            const storedData = localStorage.getItem(userKey);
             
             if (storedData) {
-                const user = JSON.parse(storedData);
-                if (user.pw === pw) {
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    sessionStorage.setItem('userNick', user.nick);
-                    closeAuth();
-                    checkLoginStatus(); 
-                } else { alert("비밀번호 불일치"); }
-            } else { alert("가입 정보 없음"); }
+                try {
+                    const user = JSON.parse(storedData);
+                    if (user.pw === pw) {
+                        sessionStorage.setItem('isLoggedIn', 'true');
+                        sessionStorage.setItem('userNick', user.nick);
+                        closeAuth();
+                        checkLoginStatus(); 
+                    } else {
+                        alert("비밀번호가 틀렸습니다.");
+                    }
+                } catch (e) {
+                    alert("데이터 로드 오류입니다.");
+                }
+            } else {
+                alert("가입 정보가 없습니다. 이메일을 다시 확인하거나 새로 가입해주세요.");
+            }
         }
     </script>
 </body>
