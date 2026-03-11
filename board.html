@@ -2,121 +2,87 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>QUEST BOOK</title>
-    <style>
-        body { margin: 0; background-color: #ebf1f6; font-family: 'Apple SD Gothic Neo', sans-serif; }
-        
-        /* 네비게이션 바 레이아웃 수정 */
-        .nav-bar { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 20px; 
-            max-width: 600px; 
-            margin: 0 auto; 
-        }
-        
-        .nav-left { display: flex; align-items: center; gap: 15px; }
-        .home-icon { font-size: 1.5rem; text-decoration: none; cursor: pointer; color: inherit; }
-        
-        /* 🎥 영상 저장소 링크 스타일 */
-        .archive-link { 
-            text-decoration: none; 
-            color: #a5b8d0; 
-            font-size: 0.85rem; 
-            font-weight: bold; 
-            letter-spacing: 1px;
-            padding: 5px 10px;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        .archive-link:hover { background: rgba(165, 184, 208, 0.1); }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universe | Free Board</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-        .board-container { width: 92%; max-width: 600px; margin: 10px auto; padding: 25px; background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); box-sizing: border-box; }
-        .board-title { color: #a5b8d0; text-align: center; letter-spacing: 5px; font-size: 1.1rem; margin-bottom: 25px; font-weight: 300; }
-        .input-box { width: 100%; padding: 18px; border: 1px solid #f0f4f8; border-radius: 20px; font-size: 0.9rem; outline: none; background: #f9fbfc; box-sizing: border-box; color: #666; margin-bottom: 8px; resize: none; }
-        .pw-input { width: 100%; padding: 12px 18px; border: 1px solid #f0f4f8; border-radius: 15px; font-size: 0.8rem; outline: none; background: #f9fbfc; box-sizing: border-box; color: #666; margin-bottom: 12px; }
-        .submit-btn { width: 100%; background: #a5b8d0; color: white; border: none; padding: 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.85rem; letter-spacing: 2px; }
-        #post-list { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
-        .post-card { background: #fff; padding: 18px; border-radius: 20px; border: 1px solid #f4f7f9; }
-        .post-content { font-size: 0.85rem; color: #555; line-height: 1.6; margin: 0; white-space: pre-wrap; }
-        .post-info { font-size: 0.7rem; color: #cbd5e0; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .del-btn { background: none; border: none; color: #ff9b9b; cursor: pointer; font-size: 0.7rem; }
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
+            authDomain: "jiwoo-fanpage.firebaseapp.com",
+            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com", 
+            projectId: "jiwoo-fanpage",
+            storageBucket: "jiwoo-fanpage.firebasestorage.app",
+            messagingSenderId: "928634858988",
+            appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function writePost() {
+            const nick = sessionStorage.getItem('userNick') || '익명팬';
+            const content = document.getElementById('postContent').value;
+            if(!content) return alert("내용을 입력해주세요!");
+
+            db.ref('posts').push({
+                nickname: nick,
+                content: content,
+                timestamp: Date.now()
+            }).then(() => {
+                document.getElementById('postContent').value = '';
+                alert("한지우 유니버스에 기록되었습니다.");
+            });
+        }
+
+        function loadPosts() {
+            db.ref('posts').on('value', (snapshot) => {
+                const board = document.getElementById('boardList');
+                board.innerHTML = '';
+                const data = snapshot.val();
+                if(data) {
+                    Object.values(data).reverse().forEach(post => {
+                        const date = new Date(post.timestamp).toLocaleString();
+                        board.innerHTML += `
+                            <div class="post-card">
+                                <div class="post-info"><b>${post.nickname}</b> <span>${date}</span></div>
+                                <div class="post-text">${post.content}</div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+        }
+        window.onload = loadPosts;
+    </script>
+
+    <style>
+        /* 🎨 핑크 제거! 한지우 전용 블랙 & 네이비 스타일 */
+        body { margin: 0; background: #ffffff; font-family: 'Apple SD Gothic Neo', sans-serif; }
+        .nav { padding: 20px; background: #1a1a1a; color: #fff; text-align: center; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        
+        /* 글쓰기 구역 */
+        .write-zone { background: #f4f7fa; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #eee; }
+        textarea { width: 100%; height: 90px; border: 1px solid #ddd; border-radius: 10px; padding: 15px; box-sizing: border-box; resize: none; font-size: 1rem; outline: none; }
+        .btn-post { width: 100%; padding: 15px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; margin-top: 10px; font-weight: 900; cursor: pointer; letter-spacing: 5px; }
+
+        /* 게시글 리스트 */
+        .post-card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #f0f0f0; border-left: 5px solid #1a1a1a; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .post-info { font-size: 0.8rem; color: #999; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .post-info b { color: #1a1a1a; }
+        .post-text { font-size: 1rem; line-height: 1.6; color: #333; word-break: break-all; }
     </style>
 </head>
 <body>
-    <div class="nav-bar">
-        <div class="nav-left">
-            <a href="index.html" class="home-icon">🏠</a>
-            <a href="archive.html" class="archive-link">ARCHIVE</a>
+    <div class="nav">UNIVERSE : FREE BOARD</div>
+    <div class="container">
+        <div class="write-zone">
+            <textarea id="postContent" placeholder="지우 배우님께 따뜻한 한마디를 남겨주세요."></textarea>
+            <button class="btn-post" onclick="writePost()">POST</button>
         </div>
+        <div id="boardList"></div>
     </div>
-    
-    <div class="board-container">
-        <h2 class="board-title">QUEST BOOK</h2>
-        <textarea id="postInput" class="input-box" rows="3" placeholder="지우님께 따뜻한 한마디를 남겨주세요!"></textarea>
-        <input type="password" id="pwInput" class="pw-input" placeholder="비밀번호 4자리 (삭제 시 필요)">
-        <button id="saveBtn" class="submit-btn">작성 완료</button>
-        <div id="post-list"></div>
-    </div>
-
-<script type="module">
-    // 🛡️ 보안 로직: 관리자 체크
-    window.addEventListener('DOMContentLoaded', () => {
-        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-        const userNick = sessionStorage.getItem('userNick');
-
-        if (isLoggedIn !== 'true' || userNick !== '관리자') {
-            alert("접근 권한이 없습니다.");
-            location.href = "index.html";
-        }
-    });
-
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDXz0NasgyMsWtlXriyqocMF1Tqe2FJXkg",
-        authDomain: "jiwoo-fan.firebaseapp.com",
-        projectId: "jiwoo-fan",
-        storageBucket: "jiwoo-fan.firebasestorage.app",
-        messagingSenderId: "70224934316",
-        appId: "1:70224934316:web:2ad83d9e1c55f20e7bf609"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const postsCol = collection(db, "posts");
-
-    document.getElementById('saveBtn').onclick = async () => {
-        const content = document.getElementById('postInput').value;
-        const pw = document.getElementById('pwInput').value;
-        if (!content.trim() || !pw.trim()) { alert("내용과 비밀번호를 입력해주세요."); return; }
-        await addDoc(postsCol, { text: content, password: pw, createdAt: serverTimestamp() });
-        document.getElementById('postInput').value = "";
-        document.getElementById('pwInput').value = "";
-    };
-
-    onSnapshot(query(postsCol, orderBy("createdAt", "desc")), (snapshot) => {
-        const list = document.getElementById('post-list');
-        list.innerHTML = "";
-        snapshot.forEach((p) => {
-            const data = p.data();
-            const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString('ko-KR', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : "방금 전";
-            const card = document.createElement('div');
-            card.className = 'post-card';
-            card.innerHTML = `<p class="post-content">${data.text}</p><div class="post-info"><span>${date}</span><button class="del-btn" onclick="deleteWithPw('${p.id}', '${data.password}')">삭제</button></div>`;
-            list.appendChild(card);
-        });
-    });
-
-    window.deleteWithPw = async (id, correctPw) => {
-        const inputPw = prompt("비밀번호를 입력하세요.");
-        if (inputPw === correctPw) {
-            if(confirm("정말 삭제하시겠습니까?")) await deleteDoc(doc(db, "posts", id));
-        } else if (inputPw !== null) alert("비밀번호가 틀렸습니다.");
-    };
-</script>
 </body>
 </html>
