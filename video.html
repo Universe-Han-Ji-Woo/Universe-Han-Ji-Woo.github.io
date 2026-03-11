@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universe | Filmography</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
+            authDomain: "jiwoo-fanpage.firebaseapp.com",
+            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com", 
+            projectId: "jiwoo-fanpage",
+            storageBucket: "jiwoo-fanpage.firebasestorage.app",
+            messagingSenderId: "928634858988",
+            appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // [핵심] 주소창에서 유저 정보를 가져옵니다.
+        const urlParams = new URLSearchParams(window.location.search);
+        const user = urlParams.get('user');
+
+        // 다른 페이지 이동 시 유저 정보 유지
+        function go(page) {
+            const separator = page.includes('?') ? '&' : '?';
+            location.href = user ? `${page}${separator}user=${encodeURIComponent(user)}` : page;
+        }
+
+        function loadVideos() {
+            db.ref('videos').on('value', (snapshot) => {
+                const container = document.getElementById('videoGrid');
+                container.innerHTML = '';
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    const card = document.createElement('div');
+                    card.className = 'video-card';
+                    card.innerHTML = `
+                        <iframe src="https://www.youtube.com/embed/${data.youtubeId}" frameborder="0" allowfullscreen></iframe>
+                        <div class="video-info">
+                            <div class="video-title">${data.title}</div>
+                            ${user === 'ADMIN' ? `<button class="del-btn" onclick="deleteVideo('${child.key}')">삭제</button>` : ''}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function deleteVideo(key) {
+            if(confirm("이 영상을 삭제하시겠습니까?")) {
+                db.ref('videos/' + key).remove();
+            }
+        }
+
+        window.onload = loadVideos;
+    </script>
+
+    <style>
+        body { margin: 0; padding: 0; background: #eef2f6; font-family: 'Apple SD Gothic Neo', sans-serif; }
+        .nav { background: #1a1a1a; padding: 15px 25px; display: flex; align-items: center; justify-content: space-between; color: white; }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-btn { color: white; text-decoration: none; font-size: 13px; border: 1px solid rgba(255,255,255,0.3); padding: 5px 15px; border-radius: 20px; cursor: pointer; }
+        
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .header-title { font-size: 1.8rem; font-weight: 800; color: #8ea8c9; letter-spacing: 3px; margin-bottom: 30px; text-align: center; }
+        
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+        .video-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 10px 10px 20px #d1d9e6; transition: 0.3s; }
+        .video-card:hover { transform: translateY(-5px); }
+        .video-card iframe { width: 100%; aspect-ratio: 16/9; }
+        
+        .video-info { padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .video-title { font-weight: bold; color: #333; }
+        .del-btn { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 11px; }
+
+        @media (max-width: 600px) {
+            .video-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+        <div class="nav-links">
+            <a onclick="go('index.html')" class="nav-btn">HOME</a>
+            <a onclick="go('menu.html')" class="nav-btn">MENU</a>
+        </div>
+        <div style="font-weight: 900; letter-spacing: 2px;">FILMOGRAPHY</div>
+    </div>
+
+    <div class="container">
+        <h1 class="header-title">VIDEO ARCHIVE</h1>
+        <div class="video-grid" id="videoGrid">
+            </div>
+    </div>
+
+</body>
+</html>
