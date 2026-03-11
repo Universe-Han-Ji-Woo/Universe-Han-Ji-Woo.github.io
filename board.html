@@ -21,68 +21,139 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function writePost() {
-            const nick = sessionStorage.getItem('userNick') || '익명팬';
-            const content = document.getElementById('postContent').value;
-            if(!content) return alert("내용을 입력해주세요!");
-
-            db.ref('posts').push({
-                nickname: nick,
-                content: content,
-                timestamp: Date.now()
-            }).then(() => {
-                document.getElementById('postContent').value = '';
-                alert("한지우 유니버스에 기록되었습니다.");
-            });
+        function showView(viewName) {
+            document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
+            document.getElementById(viewName + 'View').style.display = 'block';
+            window.scrollTo(0,0);
         }
 
-        function loadPosts() {
-            db.ref('posts').on('value', (snapshot) => {
-                const board = document.getElementById('boardList');
-                board.innerHTML = '';
+        // 1. 글 등록 (이미지 주소 방식)
+        async function submitPost() {
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const imageUrl = document.getElementById('postImgUrl').value; // 사진 주소 가져오기
+            const nick = sessionStorage.getItem('userNick') || '관리자';
+
+            if(!title || !content) return alert("제목과 내용을 모두 작성해주세요!");
+
+            try {
+                await db.ref('posts_v2').push({
+                    title, content, nickname: nick, imageUrl,
+                    date: new Date().toISOString().split('T')[0],
+                    views: 0, likes: 0, timestamp: Date.now()
+                });
+                alert("등록되었습니다!");
+                location.reload();
+            } catch (e) {
+                alert("등록 실패: " + e.message);
+            }
+        }
+
+        // 2. 목록 불러오기
+        function loadList() {
+            db.ref('posts_v2').on('value', (snapshot) => {
+                const tbody = document.getElementById('postTableBody');
+                tbody.innerHTML = '';
                 const data = snapshot.val();
                 if(data) {
-                    Object.values(data).reverse().forEach(post => {
-                        const date = new Date(post.timestamp).toLocaleString();
-                        board.innerHTML += `
-                            <div class="post-card">
-                                <div class="post-info"><b>${post.nickname}</b> <span>${date}</span></div>
-                                <div class="post-text">${post.content}</div>
-                            </div>
+                    Object.keys(data).reverse().forEach(key => {
+                        const post = data[key];
+                        tbody.innerHTML += `
+                            <tr onclick="showDetail('${key}')">
+                                <td style="text-align:left; padding-left:15px;">
+                                    ${post.title} ${post.imageUrl ? '<span style="color:#8ea8c9;">🖼️</span>' : ''}
+                                </td>
+                                <td>${post.nickname}</td>
+                                <td>${post.date}</td>
+                                <td>${post.views || 0}</td>
+                            </tr>
                         `;
                     });
                 }
             });
         }
-        window.onload = loadPosts;
+
+        // 3. 상세 보기
+        function showDetail(key) {
+            db.ref('posts_v2/' + key).once('value', (snapshot) => {
+                const post = snapshot.val();
+                db.ref('posts_v2/' + key).update({ views: (post.views || 0) + 1 });
+                
+                document.getElementById('detailTitle').innerText = post.title;
+                document.getElementById('detailInfo').innerText = `${post.nickname} | ${post.date} | 조회 ${post.views + 1}`;
+                document.getElementById('detailContent').innerText = post.content;
+                
+                const imgArea = document.getElementById('detailImage');
+                imgArea.innerHTML = post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; margin:20px 0; border-radius:10px;" onerror="this.style.display='none'">` : '';
+                
+                document.getElementById('likeCount').innerText = post.likes || 0;
+                document.getElementById('likeBtn').onclick = () => {
+                    db.ref('posts_v2/' + key).transaction(p => { if(p) p.likes = (p.likes || 0) + 1; return p; });
+                };
+                showView('detail');
+            });
+        }
+
+        window.onload = loadList;
     </script>
 
     <style>
-        /* 🎨 핑크 제거! 한지우 전용 블랙 & 네이비 스타일 */
-        body { margin: 0; background: #ffffff; font-family: 'Apple SD Gothic Neo', sans-serif; }
-        .nav { padding: 20px; background: #1a1a1a; color: #fff; text-align: center; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        
-        /* 글쓰기 구역 */
-        .write-zone { background: #f4f7fa; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #eee; }
-        textarea { width: 100%; height: 90px; border: 1px solid #ddd; border-radius: 10px; padding: 15px; box-sizing: border-box; resize: none; font-size: 1rem; outline: none; }
-        .btn-post { width: 100%; padding: 15px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; margin-top: 10px; font-weight: 900; cursor: pointer; letter-spacing: 5px; }
-
-        /* 게시글 리스트 */
-        .post-card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #f0f0f0; border-left: 5px solid #1a1a1a; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .post-info { font-size: 0.8rem; color: #999; margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .post-info b { color: #1a1a1a; }
-        .post-text { font-size: 1rem; line-height: 1.6; color: #333; word-break: break-all; }
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; background: #fff; color: #1a1a1a; }
+        .nav { background: #1a1a1a; color: #fff; padding: 20px; text-align: center; font-weight: 900; letter-spacing: 2px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; border-top: 2px solid #1a1a1a; }
+        th { padding: 12px; background: #f8f9fb; border-bottom: 1px solid #ddd; font-size: 0.8rem; color: #666; }
+        td { padding: 15px 5px; border-bottom: 1px solid #eee; text-align: center; font-size: 0.9rem; cursor: pointer; }
+        .btn-write-go { float: right; padding: 8px 16px; background: #1a1a1a; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .input-box { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; font-size: 1rem; }
+        textarea { height: 250px; resize: none; }
+        .btn-main { width: 100%; padding: 16px; background: #1a1a1a; color: #fff; border: none; border-radius: 6px; font-weight: 900; cursor: pointer; }
+        .btn-sub { width: 100%; padding: 12px; background: #f0f0f0; border: none; border-radius: 6px; margin-top: 8px; cursor: pointer; }
+        .detail-header { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        .detail-content { line-height: 1.7; white-space: pre-wrap; word-break: break-all; }
+        .like-box { text-align: center; padding: 30px 0; }
+        .btn-like { background: #fff; border: 1px solid #ddd; padding: 10px 25px; border-radius: 25px; cursor: pointer; }
+        @media (max-width: 600px) {
+            th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { display: none; }
+        }
     </style>
 </head>
 <body>
     <div class="nav">UNIVERSE : FREE BOARD</div>
     <div class="container">
-        <div class="write-zone">
-            <textarea id="postContent" placeholder="지우 배우님께 따뜻한 한마디를 남겨주세요."></textarea>
-            <button class="btn-post" onclick="writePost()">POST</button>
+        
+        <div id="listView" class="view-section">
+            <button class="btn-write-go" onclick="showView('write')">글쓰기</button>
+            <table>
+                <thead>
+                    <tr><th>제목</th><th width="80">작성자</th><th width="90">날짜</th><th width="50">조회</th></tr>
+                </thead>
+                <tbody id="postTableBody"></tbody>
+            </table>
         </div>
-        <div id="boardList"></div>
+
+        <div id="writeView" class="view-section" style="display:none;">
+            <h3>게시글 작성</h3>
+            <input type="text" id="postTitle" class="input-box" placeholder="제목">
+            <textarea id="postContent" class="input-box" placeholder="내용을 입력하세요"></textarea>
+            <input type="text" id="postImgUrl" class="input-box" placeholder="이미지 주소 복사해서 넣기 (선택사항)">
+            <button class="btn-main" onclick="submitPost()">등록하기</button>
+            <button class="btn-sub" onclick="showView('list')">취소</button>
+        </div>
+
+        <div id="detailView" class="view-section" style="display:none;">
+            <div class="detail-header">
+                <h2 id="detailTitle" style="margin:0 0 10px 0;"></h2>
+                <div id="detailInfo" style="font-size:0.8rem; color:#999;"></div>
+            </div>
+            <div id="detailImage"></div>
+            <div id="detailContent" class="detail-content"></div>
+            <div class="like-box">
+                <button class="btn-like" id="likeBtn">❤️ 좋아요 <span id="likeCount">0</span></button>
+            </div>
+            <button class="btn-sub" onclick="showView('list')">목록으로 돌아가기</button>
+        </div>
+
     </div>
 </body>
 </html>
