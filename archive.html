@@ -75,7 +75,7 @@
     <div class="nav-bar">
         <div class="nav-left">
             <a href="index.html" class="home-icon">🏠</a>
-            <a href="board.html" class="menu-link">QUEST BOOK</a>
+            <a href="board.html" class="menu-link">FREE BOARD</a>
         </div>
         <div class="user-info" style="font-size: 0.75rem; color: #8ea8c9; font-weight: bold;">
             ADMIN : <span id="displayNick">관리자</span>
@@ -105,7 +105,8 @@
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             const userNick = sessionStorage.getItem('userNick');
 
-            if (isLoggedIn !== 'true' || userNick !== '관리자') {
+            // ✅ 관리자 권한 체크 로직 유지
+            if (isLoggedIn !== 'true' || (userNick !== '관리자' && userNick !== 'ADMIN')) {
                 alert("접근 권한이 없습니다. 관리자로 로그인해 주세요.");
                 location.href = "index.html";
             } else {
