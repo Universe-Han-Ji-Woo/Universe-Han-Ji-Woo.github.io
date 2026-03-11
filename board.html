@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Universe | Free Board</title>
-    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="auth.js"></script> <script>
+    <script>
+        // 파이어베이스 설정 (기존과 동일)
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             authDomain: "jiwoo-fanpage.firebaseapp.com",
@@ -19,89 +19,67 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function loadList() {
+        // [이게 핵심] 주소에서 유저 이름을 가져옴 (없으면 비로그인)
+        const user = new URLSearchParams(window.location.search).get('user');
+
+        // 다른 페이지로 이동할 때 유저 정보를 계속 들고 감
+        function go(url) {
+            location.href = user ? `${url}?user=${encodeURIComponent(user)}` : url;
+        }
+
+        // 목록 불러오기
+        function loadPosts() {
             db.ref('posts_v2').orderByChild('timestamp').on('value', (snapshot) => {
-                let allPosts = [];
-                snapshot.forEach((child) => { allPosts.push({ key: child.key, ...child.val() }); });
-                renderTable(allPosts.reverse());
+                let html = '';
+                snapshot.forEach(child => {
+                    const p = child.val();
+                    html += `<tr onclick="showDetail('${child.key}')" style="cursor:pointer;">
+                                <td>${p.title}</td><td>${p.nickname}</td>
+                             </tr>`;
+                });
+                document.getElementById('listBody').innerHTML = html;
             });
         }
 
-        function renderTable(data) {
-            const tbody = document.getElementById('postTableBody');
-            tbody.innerHTML = '';
-            data.forEach((post, index) => {
-                tbody.innerHTML += `
-                    <tr onclick="showDetail('${post.key}')">
-                        <td>${data.length - index}</td>
-                        <td style="text-align:left;">${post.title}</td>
-                        <td>${post.nickname}</td>
-                        <td>${post.date || ''}</td>
-                        <td>${post.views || 0}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        // 상세 보기 및 게시글 작성 시 auth.js의 getLoginUser()만 사용
         function showDetail(key) {
-            db.ref('posts_v2/' + key).once('value', (snapshot) => {
-                const post = snapshot.val();
-                const currentUser = getLoginUser(); // 독립 파일에서 가져옴
-                
-                document.getElementById('detailTitle').innerText = post.title;
-                document.getElementById('detailContent').innerText = post.content;
-                
-                // 관리자(사용자)일 때만 삭제 버튼 노출
-                document.getElementById('adminMenu').style.display = currentUser ? 'block' : 'none';
-                
-                document.getElementById('deleteBtn').onclick = () => {
-                    if(confirm("삭제하시겠습니까?")) { db.ref('posts_v2/' + key).remove(); showView('list'); }
-                };
-                showView('detail');
+            db.ref('posts_v2/' + key).once('value', s => {
+                const p = s.val();
+                document.getElementById('vTitle').innerText = p.title;
+                document.getElementById('vContent').innerText = p.content;
+                // 관리자일 때만 삭제 버튼 보이게
+                document.getElementById('adminArea').style.display = user ? 'block' : 'none';
+                document.getElementById('delBtn').onclick = () => { if(confirm("삭제하시겠습니까?")) { db.ref('posts_v2/'+key).remove(); location.reload(); } };
+                document.getElementById('listView').style.display = 'none';
+                document.getElementById('detailView').style.display = 'block';
             });
         }
 
-        function showView(viewName) {
-            document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
-            document.getElementById(viewName + 'View').style.display = 'block';
-        }
-
-        window.onload = loadList;
+        window.onload = loadPosts;
     </script>
-
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; }
-        .nav { background: #000; color: #fff; height: 60px; display: flex; justify-content: center; align-items: center; position: relative; }
-        .nav-buttons { position: absolute; left: 15px; display: flex; gap: 8px; }
-        .btn-nav { color: #fff; text-decoration: none; border: 1px solid #fff; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 13px; }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; border-top: 2px solid #000; margin-top: 10px; }
-        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: center; cursor: pointer; }
+        body { font-family: sans-serif; margin: 0; background: #f4f7f9; }
+        .nav { background: #333; padding: 15px; color: white; display: flex; gap: 20px; }
+        .nav a { color: white; cursor: pointer; text-decoration: none; font-size: 14px; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
     </style>
 </head>
 <body>
     <div class="nav">
-        <div class="nav-buttons">
-            <a onclick="navigateTo('index.html')" class="btn-nav">홈</a>
-            <a onclick="navigateTo('menu.html')" class="btn-nav">메뉴선택</a>
-        </div>
-        <div class="nav-title">UNIVERSE : BOARD</div>
+        <a onclick="go('index.html')">홈으로</a>
+        <a onclick="go('menu.html')">메뉴선택</a>
     </div>
-
     <div class="container">
-        <div id="listView" class="view-section">
-            <table>
-                <thead><tr><th>번호</th><th>제목</th><th>작성자</th><th>날짜</th><th>조회</th></tr></thead>
-                <tbody id="postTableBody"></tbody>
-            </table>
+        <div id="listView">
+            <h2>자유게시판</h2>
+            <table><thead><tr><th>제목</th><th>작성자</th></tr></thead><tbody id="listBody"></tbody></table>
         </div>
-
-        <div id="detailView" class="view-section" style="display:none;">
-            <h2 id="detailTitle"></h2>
-            <div id="adminMenu" style="display:none;"><button id="deleteBtn">삭제</button></div>
-            <p id="detailContent" style="white-space: pre-wrap;"></p>
-            <button onclick="showView('list')">목록으로</button>
+        <div id="detailView" style="display:none;">
+            <h2 id="vTitle"></h2>
+            <div id="adminArea" style="display:none; margin-bottom: 10px;"><button id="delBtn" style="color:red;">게시글 삭제</button></div>
+            <p id="vContent" style="white-space:pre-wrap; line-height:1.6;"></p>
+            <button onclick="location.reload()">목록으로</button>
         </div>
     </div>
 </body>
