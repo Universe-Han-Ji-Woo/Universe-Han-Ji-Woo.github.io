@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Firebase 설정 (기존 정보 유지)
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             authDomain: "jiwoo-fanpage.firebaseapp.com",
@@ -48,19 +47,21 @@
             const total = data.length;
             data.forEach((post, index) => {
                 const postNo = total - index;
+                // 목록에는 날짜만 표시 (깔끔하게)
+                const dateOnly = post.fullDate ? post.fullDate.split(' ')[0] : post.date;
                 tbody.innerHTML += `
                     <tr onclick="showDetail('${post.key}')">
                         <td>${postNo}</td>
                         <td style="text-align:left; padding-left:15px;">${post.title} ${post.imageUrl ? '🖼️' : ''}</td>
                         <td>${post.nickname}</td>
-                        <td>${post.date}</td>
+                        <td>${dateOnly}</td>
                         <td>${post.views || 0}</td>
                     </tr>
                 `;
             });
         }
 
-        // 2. 글 등록/수정
+        // 2. 글 등록/수정 (시간 데이터 생성 추가)
         async function submitPost() {
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
@@ -70,9 +71,19 @@
 
             if(!title || !content) return alert("내용을 입력해주세요!");
 
+            // 현재 날짜와 시간 생성 (예: 2026-03-11 18:30:05)
+            const now = new Date();
+            const fullDate = now.getFullYear() + '-' + 
+                             String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                             String(now.getDate()).padStart(2, '0') + ' ' + 
+                             String(now.getHours()).padStart(2, '0') + ':' + 
+                             String(now.getMinutes()).padStart(2, '0') + ':' + 
+                             String(now.getSeconds()).padStart(2, '0');
+
             const postData = {
                 title, content, nickname: nick, imageUrl,
-                date: new Date().toISOString().split('T')[0],
+                fullDate: fullDate, // 상세 시간에 표시될 데이터
+                date: fullDate.split(' ')[0], // 목록용 날짜
                 timestamp: Date.now()
             };
 
@@ -87,16 +98,18 @@
             location.reload();
         }
 
-        // 3. 상세보기 및 버튼 배치
+        // 3. 상세보기 (시간 표시 적용)
         function showDetail(key) {
             db.ref('posts_v2/' + key).once('value', (snapshot) => {
                 const post = snapshot.val();
                 db.ref('posts_v2/' + key).update({ views: (post.views || 0) + 1 });
                 
                 document.getElementById('detailTitle').innerText = post.title;
-                document.getElementById('detailInfo').innerText = `${post.nickname} | ${post.date} | 조회 ${post.views + 1}`;
-                document.getElementById('detailContent').innerText = post.content;
+                // 요기에 시간(fullDate)이 나오도록 수정했습니다!
+                const displayDate = post.fullDate || post.date;
+                document.getElementById('detailInfo').innerText = `${post.nickname} | ${displayDate} | 조회 ${post.views + 1}`;
                 
+                document.getElementById('detailContent').innerText = post.content;
                 const imgArea = document.getElementById('detailImage');
                 imgArea.innerHTML = post.imageUrl ? `<img src="${post.imageUrl}" style="max-width:100%; display:block; margin:20px 0; border-radius:10px;">` : '';
                 
@@ -105,7 +118,6 @@
                     db.ref('posts_v2/' + key).transaction(p => { if(p) p.likes = (p.likes || 0) + 1; return p; });
                 };
 
-                // 삭제/수정 버튼 기능 연결
                 document.getElementById('deleteBtn').onclick = () => deletePost(key);
                 document.getElementById('editBtn').onclick = () => prepareEdit(key, post);
 
@@ -148,25 +160,19 @@
         textarea.input-box { height: 450px; resize: none; }
         .btn-submit { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        /* 상세보기 레이아웃 (수정/삭제 우측 상단 배치) */
+        /* 상세보기 레이아웃 */
         .detail-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .detail-title { font-size: 1.8rem; font-weight: bold; flex: 1; }
         .top-admin-btns { display: flex; gap: 5px; }
         .btn-small { background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #666; }
-        .btn-small:hover { background: #f0f0f0; }
 
         .detail-info { color: #888; font-size: 0.9rem; padding-bottom: 15px; border-bottom: 1px solid #eee; margin-bottom: 20px; }
         .detail-content { min-height: 350px; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; }
 
-        /* 하단 버튼: 좋아요(좌), 목록(우) */
+        /* 하단 버튼 배치 */
         .detail-footer-btns { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid #eee; margin-top: 40px; }
         .btn-like { background: #fff; border: 1px solid #ddd; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
         .btn-list-go { background: #f8f8f8; border: 1px solid #ddd; padding: 10px 25px; border-radius: 5px; cursor: pointer; }
-
-        /* 검색/페이징 구역 */
-        .list-footer { margin-top: 30px; text-align: center; }
-        .search-box { margin-top: 15px; display: flex; justify-content: center; gap: 5px; }
-        .search-box input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 200px; }
 
         @media (max-width:600px) { th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { display: none; } }
     </style>
@@ -183,13 +189,6 @@
                 </thead>
                 <tbody id="postTableBody"></tbody>
             </table>
-            <div class="list-footer">
-                <div><button class="btn-small">이전</button> <button class="btn-small">다음</button></div>
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="검색">
-                    <button class="btn-small">검색</button>
-                </div>
-            </div>
         </div>
 
         <div id="writeView" class="view-section" style="display:none;">
