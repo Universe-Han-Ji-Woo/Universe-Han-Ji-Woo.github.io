@@ -5,75 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universe | Control Tower</title>
     <style>
-        /* 1. 기본 공간 설계 */
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background: #050a10; /* 심해 같은 우주색 */
+            overflow: hidden; background: #050a10;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 우주 분위기 배경 (성운 효과) */
         .universe-bg {
             position: absolute; width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%);
             z-index: 1;
         }
 
-        /* 2. 중앙 집중형 컨트롤 패널 (뼈대) */
+        /* 컨트롤 타워 메인 원형 */
         .control-tower {
             position: relative; z-index: 10;
-            width: 90%; max-width: 600px; height: 600px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            /* 유리 질감 효과 */
-            background: rgba(255, 255, 255, 0.03);
+            width: 500px; height: 500px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%; /* 원형으로 유니버스 느낌 강조 */
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(142, 168, 204, 0.1);
+            border-radius: 50%;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
         }
 
-        /* 중심 로고 구역 */
+        /* 중앙 코어 */
         .core-identity {
-            text-align: center; margin-bottom: 20px;
+            text-align: center; z-index: 20;
         }
 
         .univ-title {
             font-family: 'Arial Black', sans-serif;
-            font-size: 2.5rem; color: #fff; letter-spacing: 10px;
-            text-shadow: 0 0 15px rgba(255,255,255,0.5);
+            font-size: 2rem; color: #fff; letter-spacing: 8px;
+            text-shadow: 0 0 20px rgba(142, 168, 204, 0.8);
             margin: 0;
         }
 
         .user-welcome {
-            color: #8ea8c9; font-size: 0.9rem; margin-top: 10px;
-            letter-spacing: 2px; font-weight: bold;
+            color: #8ea8c9; font-size: 0.7rem; margin-top: 10px;
+            letter-spacing: 3px; font-weight: bold; text-transform: uppercase;
         }
 
-        /* 임시 안내 (다음 단계에서 버튼으로 교체 예정) */
-        .status-tag {
-            font-size: 0.7rem; color: rgba(255,255,255,0.3);
-            position: absolute; bottom: 40px; letter-spacing: 5px;
+        /* 아이콘 허브 - 버튼 배치 */
+        .icon-hub {
+            position: absolute; width: 100%; height: 100%;
+            z-index: 15;
         }
+
+        .nav-item {
+            position: absolute; width: 120px; height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+            color: #fff; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+        }
+
+        /* 십자 배치 */
+        .nav-item.top    { top: -20px; left: 50%; transform: translateX(-50%); }
+        .nav-item.bottom { bottom: -20px; left: 50%; transform: translateX(-50%); }
+        .nav-item.left   { left: -20px; top: 50%; transform: translateY(-50%); }
+        .nav-item.right  { right: -20px; top: 50%; transform: translateY(-50%); }
+
+        .nav-item:hover {
+            background: rgba(142, 168, 204, 0.2);
+            border-color: #8ea8c9;
+            box-shadow: 0 0 30px rgba(142, 168, 204, 0.4);
+            transform: scale(1.1) translate(var(--tw-x, -50%), var(--tw-y, -50%)); /* 위치 유지하며 확대 */
+        }
+        /* 개별 위치 보정용 transform 재설정 */
+        .nav-item.top:hover    { transform: translateX(-50%) scale(1.15); }
+        .nav-item.bottom:hover { transform: translateX(-50%) scale(1.15); }
+        .nav-item.left:hover   { transform: translateY(-50%) scale(1.15); }
+        .nav-item.right:hover  { transform: translateY(-50%) scale(1.15); }
+
+        .nav-label { font-size: 0.7rem; font-weight: 900; letter-spacing: 2px; text-align: center; }
+        .nav-sub { font-size: 0.5rem; color: #8ea8c9; margin-top: 5px; opacity: 0.7; }
+
     </style>
     <script>
-        // [방어 로직] 주소창 정보 확인
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
-
             if (!user) {
-                alert("권한이 없습니다. 대문으로 돌아갑니다.");
+                alert("ACCESS DENIED. RETURNING TO GATE.");
                 location.href = "index.html";
             } else {
                 document.getElementById('userName').innerText = user;
             }
         };
 
-        // 페이지 이동 공통 함수 (추후 버튼에 연결)
+        // 데이터 고속도로: 유저 정보 실어서 이동
         function go(page) {
             const user = new URLSearchParams(window.location.search).get('user');
-            location.href = `${page}?user=${encodeURIComponent(user)}`;
+            if(user) {
+                location.href = `${page}?user=${encodeURIComponent(user)}`;
+            } else {
+                location.href = "index.html";
+            }
         }
     </script>
 </head>
@@ -83,10 +116,27 @@
     <div class="control-tower">
         <div class="core-identity">
             <h1 class="univ-title">UNIVERSE</h1>
-            <div class="user-welcome">COMMANDER: <span id="userName">---</span></div>
+            <div class="user-welcome">ID: <span id="userName">---</span></div>
         </div>
         
-        <div class="status-tag">SYSTEM STABILIZED</div>
+        <div class="icon-hub">
+            <div class="nav-item top" onclick="go('video.html')">
+                <div class="nav-label">FILMOGRAPHY</div>
+                <div class="nav-sub">작품 기록소</div>
+            </div>
+            <div class="nav-item right" onclick="go('board.html')">
+                <div class="nav-label">FREE BOARD</div>
+                <div class="nav-sub">자유 게시판</div>
+            </div>
+            <div class="nav-item bottom" onclick="go('index.html')">
+                <div class="nav-label">GATE EXIT</div>
+                <div class="nav-sub">대문으로 이동</div>
+            </div>
+            <div class="nav-item left" onclick="go('#')">
+                <div class="nav-label">ARCHIVE</div>
+                <div class="nav-sub">준비 중</div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
