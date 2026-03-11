@@ -47,7 +47,6 @@
             const total = data.length;
             data.forEach((post, index) => {
                 const postNo = total - index;
-                // 목록에는 날짜만 표시 (깔끔하게)
                 const dateOnly = post.fullDate ? post.fullDate.split(' ')[0] : post.date;
                 tbody.innerHTML += `
                     <tr onclick="showDetail('${post.key}')">
@@ -61,7 +60,7 @@
             });
         }
 
-        // 2. 글 등록/수정 (시간 데이터 생성 추가)
+        // 2. 글 등록/수정 (오전/오후 시간 로직 적용)
         async function submitPost() {
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
@@ -71,19 +70,29 @@
 
             if(!title || !content) return alert("내용을 입력해주세요!");
 
-            // 현재 날짜와 시간 생성 (예: 2026-03-11 18:30:05)
+            // --- 오전/오후 시간 계산 시작 ---
             const now = new Date();
-            const fullDate = now.getFullYear() + '-' + 
-                             String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                             String(now.getDate()).padStart(2, '0') + ' ' + 
-                             String(now.getHours()).padStart(2, '0') + ':' + 
-                             String(now.getMinutes()).padStart(2, '0') + ':' + 
-                             String(now.getSeconds()).padStart(2, '0');
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? '오후' : '오전';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0시를 12시로 표시
+            const displayHours = String(hours).padStart(2, '0');
+
+            // 예: 2026-03-11 오후 06:30:05
+            const fullDate = `${year}-${month}-${day} ${ampm} ${displayHours}:${minutes}:${seconds}`;
+            // --- 오전/오후 시간 계산 끝 ---
 
             const postData = {
                 title, content, nickname: nick, imageUrl,
-                fullDate: fullDate, // 상세 시간에 표시될 데이터
-                date: fullDate.split(' ')[0], // 목록용 날짜
+                fullDate: fullDate,
+                date: fullDate.split(' ')[0],
                 timestamp: Date.now()
             };
 
@@ -98,14 +107,12 @@
             location.reload();
         }
 
-        // 3. 상세보기 (시간 표시 적용)
         function showDetail(key) {
             db.ref('posts_v2/' + key).once('value', (snapshot) => {
                 const post = snapshot.val();
                 db.ref('posts_v2/' + key).update({ views: (post.views || 0) + 1 });
                 
                 document.getElementById('detailTitle').innerText = post.title;
-                // 요기에 시간(fullDate)이 나오도록 수정했습니다!
                 const displayDate = post.fullDate || post.date;
                 document.getElementById('detailInfo').innerText = `${post.nickname} | ${displayDate} | 조회 ${post.views + 1}`;
                 
@@ -148,32 +155,22 @@
         body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
         .nav { background: #000; color: #fff; padding: 15px; text-align: center; font-weight: bold; }
         .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-
-        /* 목록 디자인 */
         table { width: 100%; border-collapse: collapse; border-top: 2px solid #000; margin-top: 10px; }
         th { background: #f9f9f9; padding: 12px; font-size: 0.85rem; border-bottom: 1px solid #ddd; }
         td { padding: 15px 5px; text-align: center; border-bottom: 1px solid #eee; cursor: pointer; font-size: 0.95rem; }
         .btn-write-trigger { float: right; background: #e91e63; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; }
-
-        /* 글쓰기 영역 디자인 (넓게) */
         .input-box { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
         textarea.input-box { height: 450px; resize: none; }
         .btn-submit { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-        /* 상세보기 레이아웃 */
         .detail-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .detail-title { font-size: 1.8rem; font-weight: bold; flex: 1; }
         .top-admin-btns { display: flex; gap: 5px; }
         .btn-small { background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #666; }
-
         .detail-info { color: #888; font-size: 0.9rem; padding-bottom: 15px; border-bottom: 1px solid #eee; margin-bottom: 20px; }
         .detail-content { min-height: 350px; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; }
-
-        /* 하단 버튼 배치 */
         .detail-footer-btns { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid #eee; margin-top: 40px; }
         .btn-like { background: #fff; border: 1px solid #ddd; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
         .btn-list-go { background: #f8f8f8; border: 1px solid #ddd; padding: 10px 25px; border-radius: 5px; cursor: pointer; }
-
         @media (max-width:600px) { th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { display: none; } }
     </style>
 </head>
@@ -195,8 +192,8 @@
             <input type="hidden" id="editKey">
             <h3>게시글 작성/수정</h3>
             <input type="text" id="postTitle" class="input-box" placeholder="제목">
-            <textarea id="postContent" class="input-box" placeholder="내용을 넓게 작성하세요"></textarea>
-            <input type="text" id="postImgUrl" class="input-box" placeholder="이미지 주소 URL">
+            <textarea id="postContent" class="input-box" placeholder="내용을 입력하세요"></textarea>
+            <input type="text" id="postImgUrl" class="input-box" placeholder="이미지 주소 URL (예: https://...jpg)"></textarea>
             <button class="btn-submit" onclick="submitPost()">등록/수정하기</button>
             <button class="btn-list-go" style="width:100%; margin-top:10px;" onclick="showView('list')">취소</button>
         </div>
@@ -210,16 +207,13 @@
                 </div>
             </div>
             <div class="detail-info" id="detailInfo"></div>
-            
             <div id="detailImage"></div>
             <div class="detail-content" id="detailContent"></div>
-            
             <div class="detail-footer-btns">
                 <button class="btn-like" id="likeBtn">❤️ 좋아요 <span id="likeCount">0</span></button>
                 <button class="btn-list-go" onclick="showView('list')">목록보기</button>
             </div>
         </div>
-
     </div>
 </body>
 </html>
