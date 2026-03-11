@@ -25,8 +25,6 @@
         .switch-box { margin-top: 25px; font-size: 0.85rem; color: #666; }
         .switch-link { color: #8ea8c9; text-decoration: underline; cursor: pointer; margin-left: 8px; font-weight: bold; }
         .close-btn { position: absolute; top: 15px; right: 25px; font-size: 2rem; cursor: pointer; color: #ddd; }
-
-        /* 🟢 가입 완료 안내 메시지 스타일 */
         #signupSuccessMsg { display: none; font-size: 0.85rem; color: #8ea8c9; font-weight: bold; margin-top: 15px; letter-spacing: 1px; }
 
         @media (min-width: 1024px) {
@@ -81,6 +79,22 @@
     </div>
 
     <script>
+        // 페이지 로딩 시 로그인 상태 즉시 체크
+        window.onload = function() {
+            checkLoginStatus();
+        };
+
+        function checkLoginStatus() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn === 'true') {
+                const mainBtn = document.getElementById('mainEntryBtn');
+                mainBtn.innerText = "ENTER ARCHIVE";
+                mainBtn.onclick = function() {
+                    location.href = "board.html";
+                };
+            }
+        }
+
         function openAuth(type) {
             const modal = document.getElementById('authModal');
             toggleAuth(type);
@@ -96,7 +110,7 @@
             const loginSide = document.getElementById('loginSection');
             const signupSide = document.getElementById('signupSection');
             const successMsg = document.getElementById('signupSuccessMsg');
-            successMsg.style.display = 'none'; // 창 전환 시 메시지 초기화
+            if(successMsg) successMsg.style.display = 'none';
             if(type === 'login') {
                 loginSide.style.display = 'block';
                 signupSide.style.display = 'none';
@@ -106,40 +120,28 @@
             }
         }
 
-        // 회원가입 활성화 + 안내 문구 로직
         function handleSignup() {
             const email = document.getElementById('signupEmail').value;
             const pw = document.getElementById('signupPw').value;
             const nick = document.getElementById('signupNick').value;
             const successMsg = document.getElementById('signupSuccessMsg');
-
             if(!email || !pw || !nick) return;
-
             localStorage.setItem(email, JSON.stringify({ email, pw, nick }));
-            
-            // "가입 완료" 문구 보여주기
             successMsg.style.display = 'block';
-            
-            // 1초 뒤에 로그인 창으로 자동 전환
-            setTimeout(() => {
-                toggleAuth('login');
-            }, 1000);
+            setTimeout(() => { toggleAuth('login'); }, 1000);
         }
 
         function handleLogin() {
             const email = document.getElementById('loginEmail').value;
             const pw = document.getElementById('loginPw').value;
             const storedData = localStorage.getItem(email);
-
             if (storedData) {
                 const user = JSON.parse(storedData);
                 if (user.pw === pw) {
                     sessionStorage.setItem('isLoggedIn', 'true');
                     sessionStorage.setItem('userNick', user.nick);
                     closeAuth();
-                    const mainBtn = document.getElementById('mainEntryBtn');
-                    mainBtn.innerText = "ENTER ARCHIVE";
-                    mainBtn.onclick = function() { location.href = "board.html"; };
+                    checkLoginStatus(); // 버튼 즉시 업데이트
                 } else {
                     alert("비밀번호 오류");
                 }
