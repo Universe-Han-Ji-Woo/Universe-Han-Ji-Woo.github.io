@@ -16,7 +16,6 @@
         .footer-btn-zone { flex: 0 0 auto; width: 100%; height: 18vh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 40; }
         .btn-stay { cursor: pointer; border: none; width: 80%; height: 55px; background: #1a1a1a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; font-size: 0.95rem; border-radius: 5px; transition: 0.4s; text-transform: uppercase; }
 
-        /* 🔒 입장 제한 안내 문구 (하얀 테두리 박스) */
         #accessDeniedMsg { 
             display: none; 
             margin-top: 15px; 
@@ -68,7 +67,7 @@
         </div>
         <div class="footer-btn-zone">
             <button class="btn-stay" id="mainEntryBtn" onclick="openAuth('login')">STAY TUNED</button>
-            <div id="accessDeniedMsg">은하가 정렬되는 중입니다. 잠시만 기다려 주세요.</div>
+            <div id="accessDeniedMsg">관리자 외에는 접근할 수 없습니다.</div>
         </div>
     </div>
 
@@ -77,29 +76,28 @@
             <span class="close-btn" onclick="closeAuth()">×</span>
             <div id="loginSection">
                 <h3>LOGIN</h3>
-                <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">WELCOME BACK</p>
-                <input type="email" class="auth-input" id="loginEmail" placeholder="이메일 주소">
+                <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">ADMIN ONLY</p>
+                <input type="email" class="auth-input" id="loginEmail" placeholder="관리자 이메일">
                 <input type="password" class="auth-input" id="loginPw" placeholder="비밀번호">
-                <button type="button" class="btn-submit" onclick="handleLogin()">로그인</button>
-                <div class="switch-box">아직 회원이 아니신가요? <span class="switch-link" onclick="toggleAuth('signup')">회원가입하기</span></div>
+                <button type="button" class="btn-submit" onclick="handleLogin()">확인</button>
+                <div class="switch-box" style="display:none;">계정이 없으신가요? <span class="switch-link" onclick="toggleAuth('signup')">회원가입</span></div>
             </div>
             <div id="signupSection" style="display: none;">
                 <h3>JOIN US</h3>
-                <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">FOR HAN JI WOO</p>
+                <p style="color:#8ea8c9; font-size:0.8rem; letter-spacing:3px; margin-top:-15px; margin-bottom:25px; font-weight:bold;">FOR ADMIN</p>
                 <input type="email" class="auth-input" id="signupEmail" placeholder="이메일 주소">
                 <input type="password" class="auth-input" id="signupPw" placeholder="비밀번호">
-                <input type="text" class="auth-input" id="signupNick" placeholder="사용할 닉네임">
-                <button type="button" class="btn-submit" id="signupBtn" onclick="handleSignup()">회원가입</button>
-                <div id="signupSuccessMsg">가입이 완료되었습니다.</div>
-                <div class="switch-box">이미 계정이 있으신가요? <span class="switch-link" onclick="toggleAuth('login')">로그인하기</span></div>
+                <input type="text" class="auth-input" id="signupNick" placeholder="닉네임 (관리자로 설정)">
+                <button type="button" class="btn-submit" onclick="handleSignup()">가입</button>
+                <div id="signupSuccessMsg">가입 완료.</div>
+                <div class="switch-box"><span class="switch-link" onclick="toggleAuth('login')">로그인으로 돌아가기</span></div>
             </div>
         </div>
     </div>
 
     <script>
-        window.onload = function() {
-            checkLoginStatus();
-        };
+        // 페이지 로드 시 상태 체크
+        window.onload = function() { checkLoginStatus(); };
 
         function checkLoginStatus() {
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
@@ -107,17 +105,11 @@
             const mainBtn = document.getElementById('mainEntryBtn');
             const deniedMsg = document.getElementById('accessDeniedMsg');
 
-            if (isLoggedIn === 'true') {
-                mainBtn.innerText = "ENTER ARCHIVE";
-                
+            if (isLoggedIn === 'true' && userNick === "관리자") {
+                mainBtn.innerText = "ENTER UNIVERSE";
                 mainBtn.onclick = function() {
-                    // 🛡️ 닉네임이 '관리자'인 경우에만 입장 허용
-                    if (userNick === "관리자") {
-                        location.href = "board.html";
-                    } else {
-                        deniedMsg.style.display = 'block';
-                        setTimeout(() => { deniedMsg.style.display = 'none'; }, 3000);
-                    }
+                    const choice = confirm("이동할 페이지를 선택하세요.\n\n[확인] : 영상 저장소\n[취소] : 방명록");
+                    location.href = choice ? "archive.html" : "board.html";
                 };
             }
         }
@@ -128,52 +120,52 @@
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
+
         function closeAuth() {
             const modal = document.getElementById('authModal');
             modal.classList.remove('active');
             setTimeout(() => modal.style.display = 'none', 300);
         }
+
         function toggleAuth(type) {
-            const loginSide = document.getElementById('loginSection');
-            const signupSide = document.getElementById('signupSection');
-            const successMsg = document.getElementById('signupSuccessMsg');
-            if(successMsg) successMsg.style.display = 'none';
-            if(type === 'login') {
-                loginSide.style.display = 'block';
-                signupSide.style.display = 'none';
-            } else {
-                loginSide.style.display = 'none';
-                signupSide.style.display = 'block';
-            }
+            document.getElementById('loginSection').style.display = type === 'login' ? 'block' : 'none';
+            document.getElementById('signupSection').style.display = type === 'signup' ? 'block' : 'none';
         }
 
         function handleSignup() {
-            const email = document.getElementById('signupEmail').value;
-            const pw = document.getElementById('signupPw').value;
-            const nick = document.getElementById('signupNick').value;
-            const successMsg = document.getElementById('signupSuccessMsg');
-            if(!email || !pw || !nick) return;
-            localStorage.setItem(email, JSON.stringify({ email, pw, nick }));
-            successMsg.style.display = 'block';
+            const email = document.getElementById('signupEmail').value.trim();
+            const pw = document.getElementById('signupPw').value.trim();
+            const nick = document.getElementById('signupNick').value.trim();
+            
+            if(!email || !pw || !nick) { alert("항목을 입력하세요."); return; }
+            
+            localStorage.setItem('user_' + email, JSON.stringify({ email, pw, nick }));
+            document.getElementById('signupSuccessMsg').style.display = 'block';
             setTimeout(() => { toggleAuth('login'); }, 1000);
         }
 
         function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const pw = document.getElementById('loginPw').value;
-            const storedData = localStorage.getItem(email);
+            const email = document.getElementById('loginEmail').value.trim();
+            const pw = document.getElementById('loginPw').value.trim();
+            const storedData = localStorage.getItem('user_' + email);
+            
             if (storedData) {
                 const user = JSON.parse(storedData);
                 if (user.pw === pw) {
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    sessionStorage.setItem('userNick', user.nick);
-                    closeAuth();
-                    checkLoginStatus(); 
+                    // 🛡️ 오직 닉네임이 '관리자'인 경우만 세션 활성화
+                    if (user.nick === "관리자") {
+                        sessionStorage.setItem('isLoggedIn', 'true');
+                        sessionStorage.setItem('userNick', user.nick);
+                        closeAuth();
+                        checkLoginStatus(); 
+                    } else {
+                        alert("관리자 권한이 없는 계정입니다.");
+                    }
                 } else {
-                    alert("비밀번호 오류");
+                    alert("비밀번호가 일치하지 않습니다.");
                 }
             } else {
-                alert("가입 정보 없음");
+                alert("등록된 관리자 정보가 없습니다.");
             }
         }
     </script>
