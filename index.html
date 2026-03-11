@@ -24,25 +24,21 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 📊 실시간 탐사 중 (접속자)
         function trackOnlineUsers() {
             const connectedRef = db.ref(".info/connected");
             const onlineRef = db.ref("online_users").push();
-
             connectedRef.on("value", (snap) => {
                 if (snap.val() === true) {
                     onlineRef.set(true);
                     onlineRef.onDisconnect().remove();
                 }
             });
-
             db.ref("online_users").on("value", (snap) => {
                 const count = snap.numChildren() || 0;
                 document.getElementById('onlineCount').innerText = `${count}명 실시간 탐사 중`;
             });
         }
 
-        // 📊 [자동화 수정] 유니버스 입성 (DB에서 실시간 가입자 수 불러오기)
         function updateTotalFans() {
             const fanCountRef = db.ref('total_fan_count');
             fanCountRef.on('value', (snapshot) => {
@@ -54,7 +50,6 @@
         window.onload = () => {
             trackOnlineUsers();
             updateTotalFans();
-            
             const nick = sessionStorage.getItem('userNick');
             if(nick) document.getElementById('nickBadge').innerText = nick;
         };
@@ -62,7 +57,6 @@
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
-            
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userNick', 'ADMIN');
@@ -78,17 +72,13 @@
             }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
-        // 📊 [자동화 수정] 회원가입 시 DB 숫자 +1 처리
         function handleSignup() {
             const email = document.getElementById('sEmail').value;
             const pw = document.getElementById('sPw').value;
-            
             auth.createUserWithEmailAndPassword(email, pw).then(() => {
-                // ✨ 가입 성공 즉시 DB 카운트 올리기
                 db.ref('total_fan_count').transaction((currentCount) => {
                     return (currentCount || 0) + 1;
                 });
-                
                 alert("지우 유니버스 입성을 환영합니다! 로그인을 진행해 주세요."); 
                 location.reload();
             }).catch((err) => alert(err.message));
@@ -110,6 +100,7 @@
         .footer-btn-zone { height: 15vh; display: flex; justify-content: center; align-items: center; }
         .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 320px; height: 55px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 8px; border-radius: 5px; text-transform: uppercase; }
 
+        /* 🏷️ 상태창 기본 디자인 (PC) */
         #statusZone { 
             display: flex; 
             position: fixed; 
@@ -121,7 +112,19 @@
         }
         .nick-box { font-size: 0.6rem; border: 1px solid #1a1a1a; padding: 2px 6px; font-weight: bold; background: #fff; margin-bottom: 6px; letter-spacing: 1px; }
         .status-msg { font-size: 0.75rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
-        .count-info { font-size: 0.65rem; color: #888; text-align: right; margin-top: 2px; }
+        .count-info { font-size: 0.65rem; color: #888; text-align: right; margin-top: 2px; line-height: 1.4; }
+
+        /* 📱 모바일 전용 반응형 (화면 폭 600px 이하) */
+        @media screen and (max-width: 600px) {
+            #statusZone { right: 15px; top: 15px; }
+            .status-msg { font-size: 0.7rem; }
+            .count-info { 
+                font-size: 0.6rem; 
+                display: block; /* 세로로 강제 줄바꿈 */
+                width: 100px; /* 폭을 좁혀서 글자가 아래로 떨어지게 함 */
+                word-break: keep-all; 
+            }
+        }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 500; opacity: 0; transition: 0.3s; }
         .modal-overlay.active { display: flex; opacity: 1; }
