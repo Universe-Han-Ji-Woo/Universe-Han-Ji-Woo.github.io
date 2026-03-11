@@ -42,17 +42,19 @@
             });
         }
 
-        // 📊 유니버스 입성 (가입자)
+        // 📊 [자동화 수정] 유니버스 입성 (DB에서 실시간 가입자 수 불러오기)
         function updateTotalFans() {
-            const totalFans = 127; // 👈 관리자님이 콘솔 보시고 가끔 수정해주세요!
-            document.getElementById('userCount').innerText = `${totalFans}명 지우 유니버스 입성`;
+            const fanCountRef = db.ref('total_fan_count');
+            fanCountRef.on('value', (snapshot) => {
+                const count = snapshot.val() || 0;
+                document.getElementById('userCount').innerText = `${count.toLocaleString()}명 지우 유니버스 입성`;
+            });
         }
 
         window.onload = () => {
             trackOnlineUsers();
             updateTotalFans();
             
-            // 만약 이미 로그인된 정보가 있다면 뱃지 업데이트
             const nick = sessionStorage.getItem('userNick');
             if(nick) document.getElementById('nickBadge').innerText = nick;
         };
@@ -76,11 +78,18 @@
             }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
+        // 📊 [자동화 수정] 회원가입 시 DB 숫자 +1 처리
         function handleSignup() {
             const email = document.getElementById('sEmail').value;
             const pw = document.getElementById('sPw').value;
+            
             auth.createUserWithEmailAndPassword(email, pw).then(() => {
-                alert("입성 성공! 로그인을 진행해 주세요."); 
+                // ✨ 가입 성공 즉시 DB 카운트 올리기
+                db.ref('total_fan_count').transaction((currentCount) => {
+                    return (currentCount || 0) + 1;
+                });
+                
+                alert("지우 유니버스 입성을 환영합니다! 로그인을 진행해 주세요."); 
                 location.reload();
             }).catch((err) => alert(err.message));
         }
@@ -101,9 +110,8 @@
         .footer-btn-zone { height: 15vh; display: flex; justify-content: center; align-items: center; }
         .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 320px; height: 55px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 8px; border-radius: 5px; text-transform: uppercase; }
 
-        /* 🏷️ 상태창 (바로 보이게 수정) */
         #statusZone { 
-            display: flex; /* 👈 바로 보이게 변경 */
+            display: flex; 
             position: fixed; 
             right: 25px; 
             top: 25px; 
@@ -134,8 +142,8 @@
     <div id="statusZone">
         <div class="nick-box" id="nickBadge">VISITOR</div>
         <div class="status-msg">오픈 준비 중</div>
-        <div class="count-info" id="userCount">0명 지우 유니버스 입성</div>
-        <div class="count-info" id="onlineCount">1명 실시간 탐사 중</div>
+        <div class="count-info" id="userCount">로딩 중...</div>
+        <div class="count-info" id="onlineCount">실시간 탐사 준비 중...</div>
     </div>
 
     <div class="modal-overlay" id="authModal">
