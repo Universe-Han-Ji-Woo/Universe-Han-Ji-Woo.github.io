@@ -3,128 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universe | Planet Hub</title>
+    <title>Universe | 컨트롤 타워</title>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #000; color: #fff;
-            font-family: 'Apple SD Gothic Neo', sans-serif;
-            overflow: hidden;
-            display: flex; flex-direction: column; align-items: center;
+            overflow: hidden; background: #050a10;
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* 1인칭 시점의 웅장한 우주 배경 */
-        .space-bg {
-            position: fixed; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
-            z-index: -1;
+        .universe-bg {
+            position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%);
+            z-index: 1;
         }
 
-        /* 별들이 쏟아지는 효과 */
-        .stars {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/stars.png') repeat;
-            opacity: 0.4; animation: moveStars 120s linear infinite;
+        /* 메인 컨트롤 타워 원형 */
+        .control-tower {
+            position: relative; z-index: 10;
+            width: 500px; height: 500px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
         }
 
-        @keyframes moveStars {
-            from { background-position: 0 0; }
-            to { background-position: 10000px 5000px; }
+        .core-identity { text-align: center; z-index: 20; }
+        .univ-title {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2.2rem; color: #fff; letter-spacing: 8px;
+            text-shadow: 0 0 20px rgba(142, 168, 204, 0.8);
+            margin: 0;
+        }
+        .user-welcome { color: #8ea8c9; font-size: 0.8rem; margin-top: 10px; letter-spacing: 2px; font-weight: bold; }
+
+        /* 메인 메뉴 스타일 */
+        .icon-hub { position: absolute; width: 100%; height: 100%; z-index: 15; }
+        .nav-item {
+            position: absolute; width: 120px; height: 120px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; color: #fff; cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .nav-item:hover { background: rgba(142, 168, 204, 0.2); border-color: #8ea8c9; box-shadow: 0 0 30px rgba(142, 168, 204, 0.4); transform: scale(1.1); }
+
+        /* 위치 설정 */
+        .nav-item.top    { top: -25px; left: 50%; transform: translateX(-50%); }
+        .nav-item.bottom { bottom: -25px; left: 50%; transform: translateX(-50%); }
+        .nav-item.left   { left: -25px; top: 50%; transform: translateY(-50%); }
+        .nav-item.right  { right: -25px; top: 50%; transform: translateY(-50%); }
+
+        /* 글자 스타일 */
+        .nav-label-en { font-size: 0.6rem; color: #8ea8c9; letter-spacing: 1px; margin-bottom: 4px; }
+        .nav-label-ko { font-size: 0.85rem; font-weight: bold; color: #fff; }
+
+        /* --- 위성 공통 스타일 (방명록 & 갤러리) --- */
+        .satellite-group { position: absolute; z-index: 25; }
+        
+        /* [우측 상단] 방명록 위성 */
+        .guestbook-pos { right: -160px; top: -40px; }
+        .line-right {
+            position: absolute; width: 130px; height: 1px;
+            background: linear-gradient(to right, rgba(255,255,255,0.6), transparent);
+            top: 55px; right: 75px; transform: rotate(-25deg);
         }
 
-        /* 중앙 시스템 메시지 (사용자 이름 제거 버전) */
-        .hub-header {
-            margin-top: 10vh; text-align: center; z-index: 10;
-        }
-        .hub-title {
-            font-size: 2.2rem; font-weight: 900; letter-spacing: 15px;
-            text-shadow: 0 0 30px rgba(255,255,255,0.5);
-            animation: fadeIn 3s ease-in;
-            text-transform: uppercase;
-        }
-        .hub-status {
-            color: #4facfe; font-size: 0.8rem; margin-top: 25px;
-            letter-spacing: 8px; opacity: 0.7;
+        /* [좌측 상단] 갤러리 위성 */
+        .gallery-pos { left: -160px; top: -40px; }
+        .line-left {
+            position: absolute; width: 130px; height: 1px;
+            background: linear-gradient(to left, rgba(255,255,255,0.6), transparent);
+            top: 55px; left: 75px; transform: rotate(25deg);
         }
 
-        /* 행성들이 떠 있는 구역 */
-        .planet-zone {
-            display: flex; justify-content: center; align-items: center;
-            gap: 80px; height: 60vh; width: 100%;
+        .satellite-node {
+            width: 85px; height: 85px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; cursor: pointer; transition: 0.3s;
         }
-
-        /* 행성 오브젝트 */
-        .planet-obj {
-            position: relative; width: 200px; height: 200px;
-            border-radius: 50%; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: inset -25px -25px 60px rgba(0,0,0,0.7);
-        }
-
-        /* 행성별 고유 색상 및 광원 */
-        .planet-gallery { background: radial-gradient(circle at 35% 35%, #5ee7ff, #0061ff); box-shadow: 0 0 50px rgba(0, 97, 255, 0.3); }
-        .planet-profile { background: radial-gradient(circle at 35% 35%, #f6d365, #fda085); box-shadow: 0 0 50px rgba(253, 160, 133, 0.3); }
-        .planet-video { background: radial-gradient(circle at 35% 35%, #ff0844, #ffb199); box-shadow: 0 0 50px rgba(255, 8, 68, 0.3); }
-
-        .planet-obj:hover {
-            transform: scale(1.25) rotate(5deg);
-            box-shadow: 0 0 80px rgba(255, 255, 255, 0.4);
-        }
-
-        .planet-obj span {
-            font-weight: bold; font-size: 1.2rem; letter-spacing: 4px;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.8);
-            pointer-events: none;
-        }
-
-        /* 웅장한 둥실거림 애니메이션 */
-        .float-1 { animation: drift 6s ease-in-out infinite; }
-        .float-2 { animation: drift 7s ease-in-out infinite 1.5s; }
-        .float-3 { animation: drift 6.5s ease-in-out infinite 0.7s; }
-
-        @keyframes drift {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(3deg); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; letter-spacing: 30px; }
-            to { opacity: 1; letter-spacing: 15px; }
-        }
+        .satellite-node:hover { background: #fff; box-shadow: 0 0 25px #fff; }
+        .satellite-node:hover .node-ko { color: #000; }
+        .satellite-node:hover .node-en { color: #555; }
+        
+        .node-en { font-size: 0.5rem; color: #8ea8c9; margin-bottom: 2px; }
+        .node-ko { font-size: 0.75rem; color: #fff; font-weight: bold; }
     </style>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const userName = urlParams.get('user') || 'Explorer';
-
-        function navigateTo(page) {
-            location.href = `${page}.html?user=${encodeURIComponent(userName)}`;
+        function go(page) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            if(user) location.href = `${page}?user=${encodeURIComponent(user)}`;
+            else location.href = "index.html";
         }
+
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            if (!user) { location.href = "index.html"; }
+            else { document.getElementById('userName').innerText = user; }
+        };
     </script>
 </head>
 <body>
-    <div class="space-bg"></div>
-    <div class="stars"></div>
+    <div class="universe-bg"></div>
 
-    <div class="hub-header">
-        <div class="hub-title">UNIVERSE HUB</div>
-        <div class="hub-status">SYSTEM ONLINE : 현재 우주의 상태는 평온합니다</div>
-    </div>
-
-    <div class="planet-zone">
-        <div class="planet-obj planet-gallery float-1" onclick="navigateTo('gallery')">
-            <span style="font-size: 2.5rem; margin-bottom: 10px;">🌌</span>
-            <span>GALLERY</span>
+    <div class="control-tower">
+        <div class="core-identity">
+            <h1 class="univ-title">UNIVERSE</h1>
+            <div class="user-welcome">탐사 대원: <span id="userName">---</span></div>
+        </div>
+        
+        <div class="icon-hub">
+            <div class="nav-item top" onclick="go('video.html')">
+                <div class="nav-label-en">FILMOGRAPHY</div>
+                <div class="nav-label-ko">작품 저장소</div>
+            </div>
+            <div class="nav-item right" onclick="go('board.html')">
+                <div class="nav-label-en">FREE BOARD</div>
+                <div class="nav-label-ko">자유 게시판</div>
+            </div>
+            <div class="nav-item bottom" onclick="go('index.html')">
+                <div class="nav-label-en">EXIT GATE</div>
+                <div class="nav-label-ko">처음으로</div>
+            </div>
+            <div class="nav-item left" onclick="go('#')">
+                <div class="nav-label-en">ARCHIVE</div>
+                <div class="nav-label-ko">기록 보관소</div>
+            </div>
         </div>
 
-        <div class="planet-obj planet-profile float-2" onclick="alert('ACCESS DENIED: 데이터 수신 중')">
-            <span style="font-size: 2.5rem; margin-bottom: 10px;">👤</span>
-            <span>PROFILE</span>
+        <div class="satellite-group gallery-pos">
+            <div class="line-left"></div>
+            <div class="satellite-node" onclick="go('gallery.html')">
+                <div class="node-en">GALAXY</div>
+                <div class="node-ko">갤러리</div>
+            </div>
         </div>
 
-        <div class="planet-obj planet-video float-3" onclick="alert('ACCESS DENIED: 경로 탐색 중')">
-            <span style="font-size: 2.5rem; margin-bottom: 10px;">🎬</span>
-            <span>VIDEO</span>
+        <div class="satellite-group guestbook-pos">
+            <div class="line-right"></div>
+            <div class="satellite-node" onclick="go('guestbook.html')">
+                <div class="node-en">GUEST BOOK</div>
+                <div class="node-ko">방명록</div>
+            </div>
         </div>
     </div>
 </body>
