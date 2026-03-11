@@ -50,27 +50,29 @@
         window.onload = () => {
             trackOnlineUsers();
             updateTotalFans();
-            const nick = sessionStorage.getItem('userNick');
-            if(nick) document.getElementById('nickBadge').innerText = nick;
+            // 주소창에 user 정보가 있으면 가져와서 표시
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            if(user) document.getElementById('nickBadge').innerText = user;
         };
 
+        // [핵심 수정] 로그인 성공 시 URL에 닉네임을 포함하여 menu.html로 보냄
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
+
+            // 관리자 계정 체크
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userNick', 'ADMIN');
-                // ✅ 관리자 로그인 시 게시판으로 이동 (confirm 취소 시에도 게시판 이동으로 통일 가능)
-                location.href = confirm("관리자님 환영합니다!") ? "board.html" : "board.html";
+                alert("관리자님 환영합니다!");
+                // 저장소에만 담지 않고 주소창에 직접 박아서 보냅니다.
+                location.href = "menu.html?user=" + encodeURIComponent("ADMIN");
                 return;
             }
+
+            // 일반 팬 로그인
             auth.signInWithEmailAndPassword(email, pw).then(() => {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userNick', 'FAN');
-                document.getElementById('nickBadge').innerText = "FAN";
-                closeAuth();
-                // ✅ 로그인 성공 시 바로 자유게시판으로 이동
-                location.href = "board.html";
+                // 팬 로그인 시에도 주소창에 닉네임 박아서 이동
+                location.href = "menu.html?user=" + encodeURIComponent("FAN");
             }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
@@ -102,7 +104,6 @@
         .footer-btn-zone { height: 15vh; display: flex; justify-content: center; align-items: center; }
         .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 320px; height: 55px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 8px; border-radius: 5px; text-transform: uppercase; }
 
-        /* 🏷️ 상태창 디자인 (우측 상단 고정) */
         #statusZone { 
             display: flex; 
             position: fixed; 
@@ -116,14 +117,13 @@
         .status-msg { font-size: 0.75rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
         .count-info { font-size: 0.65rem; color: #888; text-align: right; margin-top: 2px; line-height: 1.4; }
 
-        /* 📱 모바일 전용 반응형 (가독성 개선: 세로 줄바꿈) */
         @media screen and (max-width: 600px) {
             #statusZone { right: 15px; top: 15px; }
             .status-msg { font-size: 0.7rem; }
             .count-info { 
                 font-size: 0.6rem; 
                 display: block; 
-                width: 110px; /* 글자가 겹치지 않게 폭 조정 */
+                width: 110px; 
                 word-break: keep-all; 
                 margin-top: 5px;
             }
