@@ -2,14 +2,13 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Universe | 배우 한지우 팬페이지</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script>
-        // 관리자님의 서버 설정
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             authDomain: "jiwoo-fanpage.firebaseapp.com",
@@ -18,8 +17,6 @@
             messagingSenderId: "928634858988",
             appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
         };
-        
-        // 서버 초기화
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
@@ -27,13 +24,13 @@
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
-
-            // 🚨 관리자 비상문
+            
+            // 🚨 관리자 비상문 (언제나 통과)
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userNick', '관리자');
-                alert("관리자님 환영합니다!");
-                location.href = confirm("확인: 아카이브 / 취소: 게시판") ? "archive.html" : "board.html";
+                const choice = confirm("관리자 로그인 성공!\n\n[확인] 아카이브 / [취소] 게시판");
+                location.href = choice ? "archive.html" : "board.html";
                 return;
             }
 
@@ -41,10 +38,10 @@
                 .then(() => {
                     sessionStorage.setItem('isLoggedIn', 'true');
                     sessionStorage.setItem('userNick', '팬');
-                    document.getElementById('authModal').style.display = 'none';
-                    document.getElementById('deniedMsg').style.display = 'block';
+                    closeAuth();
+                    document.getElementById('accessDeniedMsg').style.display = 'block';
                 })
-                .catch((err) => alert("정보가 없습니다: " + err.message));
+                .catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
         // 회원가입 로직
@@ -52,50 +49,103 @@
             const email = document.getElementById('sEmail').value;
             const pw = document.getElementById('sPw').value;
             auth.createUserWithEmailAndPassword(email, pw)
-                .then(() => { alert("가입 성공! 로그인을 해주세요."); location.reload(); })
+                .then(() => { alert("가입 성공! 이제 로그인 해주세요."); location.reload(); })
                 .catch((err) => alert("가입 오류: " + err.message));
+        }
+
+        function openAuth() { 
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+        function closeAuth() {
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 400);
         }
     </script>
 
     <style>
-        /* 💡 메인 화면이 안 보일 수 없도록 배경색과 레이아웃 고정 */
-        body { margin: 0; padding: 0; background-color: #ffffff !important; color: #000; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .main-content { text-align: center; }
-        h1 { font-size: 3rem; margin-bottom: 20px; font-weight: 900; color: #1a1a1a; }
-        .btn-entry { padding: 20px 60px; font-size: 1.2rem; background: #000; color: #fff; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; }
+        /* 👑 이미지 1번의 웅장한 디자인 그대로 복구 */
+        body { margin: 0; padding: 0; background: #ffffff; height: 100vh; font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; }
+        .liquid-bg { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); z-index: 1; }
         
-        /* 모달 스타일 */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; }
-        .card { background: #fff; padding: 40px; border-radius: 15px; width: 300px; text-align: center; }
-        input { width: 90%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; }
-        #deniedMsg { display: none; margin-top: 20px; font-weight: bold; color: red; padding: 15px; border: 1px solid red; }
+        .main-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        
+        /* 헤더 텍스트: 이미지 1번의 그 느낌 */
+        .header-text { flex: 0 0 auto; width: 100%; padding-top: 8vh; text-align: center; z-index: 30; }
+        .univ-title { font-family: 'Arial Black', sans-serif; font-size: 3.8rem; font-weight: 900; color: #1a1a1a; line-height: 0.9; letter-spacing: -2px; text-transform: uppercase; margin: 0; }
+        .coming-soon-label { font-size: 1.2rem; color: #8ea8c9; letter-spacing: 5px; margin-top: 10px; font-weight: 900; text-transform: uppercase; }
+
+        /* 히어로 존: 배우님 사진 애니메이션 */
+        .hero-photo-zone { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; z-index: 20; }
+        .main-img { height: 85%; width: auto; object-fit: contain; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); }
+        
+        /* 푸터 버튼 존 */
+        .footer-btn-zone { flex: 0 0 auto; width: 100%; height: 18vh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 40; }
+        .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 380px; height: 55px; background: #1a1a1a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; font-size: 0.95rem; border-radius: 5px; transition: 0.4s; text-transform: uppercase; }
+        
+        #accessDeniedMsg { display: none; margin-top: 15px; padding: 10px 25px; border: 1px solid #1a1a1a; background: white; color: #1a1a1a; font-size: 0.75rem; letter-spacing: 1px; font-weight: bold; border-radius: 50px; }
+
+        /* 모달: 세련된 블러 효과 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .auth-card { width: 85%; max-width: 420px; padding: 45px 10px; background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(142, 168, 201, 0.3); border-radius: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.1); text-align: center; }
+        .auth-input { width: 85%; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 1rem; outline: none; background: #fcfcfc; }
+        .btn-submit { width: 85%; padding: 18px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-weight: 900; font-size: 1.1rem; cursor: pointer; letter-spacing: 4px; margin-top: 15px; }
+
+        /* 데스크탑 최적화: 이미지 1번의 그 배치 */
+        @media (min-width: 1024px) {
+            .main-container { flex-direction: row; }
+            .header-text { flex: 1; text-align: left; padding-left: 8%; padding-top: 0; }
+            .univ-title { font-size: 11rem; }
+            .hero-photo-zone { flex: 1.5; justify-content: flex-end; }
+            .main-img { height: 95%; }
+            .footer-btn-zone { position: absolute; bottom: 8vh; left: 8%; width: auto; align-items: flex-start; }
+            .btn-stay { width: 380px; height: 75px; font-size: 1.2rem; }
+        }
+
+        @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.04); } }
     </style>
 </head>
 <body>
 
-    <div class="main-content">
-        <h1>UNIVERSE ARCHIVE</h1>
-        <button class="btn-entry" onclick="document.getElementById('authModal').style.display='flex'">STAY TUNED</button>
-        <div id="deniedMsg">은하가 정렬 중입니다. 오픈을 기다려 주세요!</div>
+    <div class="liquid-bg"></div>
+
+    <div class="main-container">
+        <div class="header-text">
+            <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
+            <h2 class="coming-soon-label">COMING SOON</h2>
+        </div>
+        
+        <div class="hero-photo-zone">
+            <img src="jiwoo_profile3.png" alt="Han Ji Woo" class="main-img">
+        </div>
+
+        <div class="footer-btn-zone">
+            <button class="btn-stay" onclick="openAuth()">STAY TUNED</button>
+            <div id="accessDeniedMsg">은하가 정렬 중입니다. 오픈을 기다려 주세요!</div>
+        </div>
     </div>
 
-    <div class="modal" id="authModal">
-        <div class="card">
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-card">
             <div id="loginBox">
-                <h3>LOGIN</h3>
-                <input type="email" id="lEmail" placeholder="이메일">
-                <input type="password" id="lPw" placeholder="비밀번호">
-                <button style="width:100%; padding:10px; background:#000; color:#fff;" onclick="handleLogin()">로그인</button>
-                <p style="font-size:0.8rem; margin-top:15px; cursor:pointer; color:blue;" onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';">회원가입</p>
+                <h3 style="font-size:2rem; margin-bottom:20px;">LOGIN</h3>
+                <input type="email" id="lEmail" class="auth-input" placeholder="이메일 주소">
+                <input type="password" id="lPw" class="auth-input" placeholder="비밀번호">
+                <button class="btn-submit" onclick="handleLogin()">로그인</button>
+                <p style="margin-top:25px; font-size:0.85rem; color:#666;">계정이 없으신가요? <span onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';" style="color:#8ea8c9; cursor:pointer; font-weight:bold; text-decoration:underline;">회원가입</span></p>
             </div>
+            
             <div id="signBox" style="display:none;">
-                <h3>JOIN US</h3>
-                <input type="email" id="sEmail" placeholder="이메일">
-                <input type="password" id="sPw" placeholder="비밀번호">
-                <button style="width:100%; padding:10px; background:#000; color:#fff;" onclick="handleSignup()">가입하기</button>
-                <p style="font-size:0.8rem; margin-top:15px; cursor:pointer;" onclick="document.getElementById('signBox').style.display='none'; document.getElementById('loginBox').style.display='block';">돌아가기</p>
+                <h3 style="font-size:2rem; margin-bottom:20px;">JOIN US</h3>
+                <input type="email" id="sEmail" class="auth-input" placeholder="이메일 주소">
+                <input type="password" id="sPw" class="auth-input" placeholder="비밀번호">
+                <button class="btn-submit" onclick="handleSignup()">가입하기</button>
+                <p style="margin-top:25px; font-size:0.85rem; cursor:pointer;" onclick="document.getElementById('signBox').style.display='none'; document.getElementById('loginBox').style.display='block';">로그인으로 돌아가기</p>
             </div>
-            <button style="margin-top:20px; border:none; background:none; cursor:pointer; text-decoration:underline;" onclick="document.getElementById('authModal').style.display='none'">닫기</button>
+            <button style="margin-top:25px; background:none; border:none; text-decoration:underline; cursor:pointer; color:#999;" onclick="closeAuth()">창 닫기</button>
         </div>
     </div>
 
