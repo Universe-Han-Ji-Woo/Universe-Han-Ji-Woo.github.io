@@ -1,1 +1,0 @@
-document.querySelector('.nav-bar').innerHTML = `<a href="index.html" class="home-icon">🏠</a>`;
