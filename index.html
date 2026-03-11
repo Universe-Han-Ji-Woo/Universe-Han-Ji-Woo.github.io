@@ -1,167 +1,154 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Universe | 배우 한지우 팬페이지</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // 관리자님이 주신 설정값 적용
+        const firebaseConfig = {
+            apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
+            authDomain: "jiwoo-fanpage.firebaseapp.com",
+            projectId: "jiwoo-fanpage",
+            storageBucket: "jiwoo-fanpage.firebasestorage.app",
+            messagingSenderId: "928634858988",
+            appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // 전역 함수로 등록하여 HTML에서 호출 가능하게 설정
+        window.handleSignup = (email, pw, nick) => {
+            createUserWithEmailAndPassword(auth, email, pw)
+                .then((userCredential) => {
+                    alert("가입 성공! 이제 로그인 해주세요.");
+                    location.reload();
+                })
+                .catch((error) => alert("가입 실패: " + error.message));
+        };
+
+        window.handleLogin = (email, pw) => {
+            // 🚨 관리자 비상문 (DB 통신 없이 즉시 통과)
+            if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
+                sessionStorage.setItem('userNick', '관리자');
+                sessionStorage.setItem('isLoggedIn', 'true');
+                checkAdminStatus();
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, email, pw)
+                .then((userCredential) => {
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('userNick', '팬'); // 일반 팬은 닉네임 기본값 설정
+                    checkAdminStatus();
+                })
+                .catch((error) => alert("정보가 없습니다. 이메일/비번을 확인하거나 새로 가입하세요."));
+        };
+
+        function checkAdminStatus() {
+            const nick = sessionStorage.getItem('userNick');
+            const mainBtn = document.getElementById('mainEntryBtn');
+            const modal = document.getElementById('authModal');
+            
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                modal.style.display = 'none';
+                mainBtn.innerText = "ENTER ARCHIVE";
+                mainBtn.onclick = function() {
+                    if (nick === "관리자") {
+                        const choice = confirm("이동할 페이지 선택\n\n확인: 아카이브 / 취소: 게시판");
+                        location.href = choice ? "archive.html" : "board.html";
+                    } else {
+                        const msg = document.getElementById('accessDeniedMsg');
+                        msg.style.display = 'block';
+                        setTimeout(() => { msg.style.display = 'none'; }, 3000);
+                    }
+                };
+            }
+        }
+    </script>
     <style>
-        body { margin: 0; padding: 0; background: #ffffff; height: 100vh; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; overflow: hidden; display: flex; flex-direction: column; }
-        .liquid-bg { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); z-index: 1; }
-        .main-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        .header-text { flex: 0 0 auto; width: 100%; padding-top: 8vh; text-align: center; z-index: 30; }
-        .univ-title { font-family: 'Arial Black', sans-serif; font-size: 3.8rem; font-weight: 900; color: #1a1a1a; line-height: 0.9; letter-spacing: -2px; text-transform: uppercase; margin: 0; }
-        .coming-soon-label { font-size: 1.2rem; color: #8ea8c9; letter-spacing: 5px; margin-top: 10px; font-weight: 900; text-transform: uppercase; }
-        .hero-photo-zone { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; z-index: 20; }
-        .main-img { height: 80%; width: auto; object-fit: contain; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); }
-        .footer-btn-zone { flex: 0 0 auto; width: 100%; height: 18vh; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 40; }
-        .btn-stay { cursor: pointer; border: none; width: 80%; height: 55px; background: #1a1a1a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; letter-spacing: 10px; font-size: 0.95rem; border-radius: 5px; transition: 0.4s; text-transform: uppercase; }
+        body { margin: 0; padding: 0; background: #000; height: 100vh; font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; }
+        
+        /* 🎥 인트로 영상 레이어 */
+        #introContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        #introVideo { width: 100%; height: 100%; object-fit: cover; }
 
-        #accessDeniedMsg { 
-            display: none; margin-top: 15px; padding: 8px 20px; border: 1px solid #1a1a1a; background: white; color: #1a1a1a; font-size: 0.75rem; letter-spacing: 1px; font-weight: bold; border-radius: 50px; animation: fadeIn 0.5s ease;
-        }
+        /* 🏠 메인 컨텐츠 (영상 끝나면 보임) */
+        .main-ui { display: none; opacity: 0; transition: 2s; background: #fff; height: 100vh; position: relative; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .univ-title { font-size: 4rem; font-weight: 900; color: #1a1a1a; margin: 0; letter-spacing: -2px; }
+        .btn-stay { margin-top: 30px; cursor: pointer; border: none; width: 280px; height: 60px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 5px; border-radius: 5px; }
+        #accessDeniedMsg { display: none; margin-top: 15px; color: #1a1a1a; font-weight: bold; border: 1px solid #000; padding: 10px 20px; border-radius: 50px; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 100; opacity: 0; transition: 0.3s; }
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .auth-card { width: 85%; max-width: 420px; padding: 40px 10px; background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(142, 168, 201, 0.3); border-radius: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.1); text-align: center; position: relative; }
-        .auth-card h3 { font-size: 2rem; margin-bottom: 20px; color: #1a1a1a; letter-spacing: -1px; }
-        .auth-input { width: 85%; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 1rem; outline: none; transition: 0.3s; background: #fcfcfc; }
-        .btn-submit { width: 85%; padding: 18px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-weight: 900; font-size: 1.1rem; cursor: pointer; letter-spacing: 4px; margin-top: 15px; }
-        .switch-box { margin-top: 25px; font-size: 0.85rem; color: #666; }
-        .switch-link { color: #8ea8c9; text-decoration: underline; cursor: pointer; margin-left: 8px; font-weight: bold; }
-        .close-btn { position: absolute; top: 15px; right: 25px; font-size: 2rem; cursor: pointer; color: #ddd; }
-        #signupSuccessMsg { display: none; font-size: 0.85rem; color: #8ea8c9; font-weight: bold; margin-top: 15px; letter-spacing: 1px; }
-
-        @media (min-width: 1024px) {
-            .main-container { flex-direction: row; }
-            .header-text { flex: 1; text-align: left; padding-left: 8%; padding-top: 0; }
-            .univ-title { font-size: 11rem; }
-            .hero-photo-zone { flex: 1.5; justify-content: flex-end; }
-            .main-img { height: 95%; }
-            .footer-btn-zone { position: absolute; bottom: 8vh; left: 8%; width: auto; height: auto; align-items: flex-start; }
-            .btn-stay { width: 380px; height: 75px; font-size: 1.2rem; }
-            #accessDeniedMsg { margin-top: 20px; margin-left: 10px; }
-        }
-        @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.04); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* 🔒 모달 스타일 (동일) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 500; }
+        .auth-card { width: 90%; max-width: 400px; padding: 40px 20px; background: white; border: 1px solid #ddd; border-radius: 20px; text-align: center; }
+        .auth-input { width: 80%; padding: 15px; margin-bottom: 10px; border: 1px solid #eee; border-radius: 8px; }
+        .btn-submit { width: 85%; padding: 15px; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; font-weight: 900; }
     </style>
 </head>
 <body>
-    <div class="liquid-bg"></div>
-    <div class="main-container">
-        <div class="header-text">
-            <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
-            <h2 class="coming-soon-label">COMING SOON</h2>
-        </div>
-        <div class="hero-photo-zone">
-            <img src="jiwoo_profile3.png" alt="배우 한지우" class="main-img">
-        </div>
-        <div class="footer-btn-zone">
-            <button class="btn-stay" id="mainEntryBtn" onclick="openAuth('login')">STAY TUNED</button>
-            <div id="accessDeniedMsg">은하가 정렬되는 중입니다. 잠시만 기다려 주세요.</div>
-        </div>
+
+    <div id="introContainer">
+        <video id="introVideo" muted playsinline>
+            <source src="한지우 팬페이지 인트로 완성본.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="main-ui" id="mainUI">
+        <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
+        <button class="btn-stay" id="mainEntryBtn" onclick="openAuth('login')">STAY TUNED</button>
+        <div id="accessDeniedMsg">은하가 정렬 중입니다. 오픈을 기다려 주세요!</div>
     </div>
 
     <div class="modal-overlay" id="authModal">
         <div class="auth-card">
-            <span class="close-btn" onclick="closeAuth()">×</span>
             <div id="loginSection">
                 <h3>LOGIN</h3>
-                <input type="email" class="auth-input" id="loginEmail" placeholder="이메일 주소">
-                <input type="password" class="auth-input" id="loginPw" placeholder="비밀번호">
-                <button type="button" class="btn-submit" onclick="handleLogin()">로그인</button>
-                <div class="switch-box">계정이 없으신가요? <span class="switch-link" onclick="toggleAuth('signup')">회원가입</span></div>
+                <input type="email" id="lEmail" class="auth-input" placeholder="이메일">
+                <input type="password" id="lPw" class="auth-input" placeholder="비밀번호">
+                <button class="btn-submit" onclick="window.handleLogin(document.getElementById('lEmail').value, document.getElementById('lPw').value)">로그인</button>
+                <p style="font-size:0.8rem; margin-top:20px;">계정이 없나요? <span onclick="toggleAuth('signup')" style="color:blue; cursor:pointer;">회원가입</span></p>
             </div>
-            <div id="signupSection" style="display: none;">
+            <div id="signupSection" style="display:none;">
                 <h3>JOIN US</h3>
-                <input type="email" class="auth-input" id="signupEmail" placeholder="이메일 주소">
-                <input type="password" class="auth-input" id="signupPw" placeholder="비밀번호">
-                <input type="text" class="auth-input" id="signupNick" placeholder="닉네임">
-                <button type="button" class="btn-submit" onclick="handleSignup()">가입</button>
-                <div id="signupSuccessMsg">가입 완료!</div>
-                <div class="switch-box"><span class="switch-link" onclick="toggleAuth('login')">로그인으로 돌아가기</span></div>
+                <input type="email" id="sEmail" class="auth-input" placeholder="이메일">
+                <input type="password" id="sPw" class="auth-input" placeholder="비밀번호">
+                <input type="text" id="sNick" class="auth-input" placeholder="닉네임">
+                <button class="btn-submit" onclick="window.handleSignup(document.getElementById('sEmail').value, document.getElementById('sPw').value, document.getElementById('sNick').value)">가입하기</button>
+                <p style="font-size:0.8rem; margin-top:20px;" onclick="toggleAuth('login')">로그인으로 돌아가기</p>
             </div>
         </div>
     </div>
 
     <script>
-        window.onload = function() { checkLoginStatus(); };
+        const video = document.getElementById('introVideo');
+        const intro = document.getElementById('introContainer');
+        const mainUI = document.getElementById('mainUI');
 
-        function checkLoginStatus() {
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-            const userNick = sessionStorage.getItem('userNick');
-            const mainBtn = document.getElementById('mainEntryBtn');
-            const deniedMsg = document.getElementById('accessDeniedMsg');
-
-            if (isLoggedIn === 'true') {
-                mainBtn.innerText = "ENTER ARCHIVE";
-                mainBtn.onclick = function() {
-                    if (userNick === "관리자") {
-                        const choice = confirm("이동할 페이지를 선택하세요.\n\n[확인] : 아카이브\n[취소] : 게시판");
-                        location.href = choice ? "archive.html" : "board.html";
-                    } else {
-                        deniedMsg.style.display = 'block';
-                        setTimeout(() => { deniedMsg.style.display = 'none'; }, 3000);
-                    }
-                };
-            }
-        }
+        // 영상 자동 재생 및 종료 후 메인 전환
+        window.onclick = () => { video.play(); }; // 브라우저 정책상 클릭 시 재생 시작
+        
+        video.onended = () => {
+            intro.style.transition = "1s";
+            intro.style.opacity = "0";
+            setTimeout(() => {
+                intro.style.display = "none";
+                mainUI.style.display = "flex";
+                setTimeout(() => { mainUI.style.opacity = "1"; }, 100);
+            }, 1000);
+        };
 
         function openAuth(type) {
-            const modal = document.getElementById('authModal');
+            document.getElementById('authModal').style.display = 'flex';
             toggleAuth(type);
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-        function closeAuth() {
-            const modal = document.getElementById('authModal');
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 300);
         }
         function toggleAuth(type) {
             document.getElementById('loginSection').style.display = type === 'login' ? 'block' : 'none';
             document.getElementById('signupSection').style.display = type === 'signup' ? 'block' : 'none';
-        }
-
-        function handleSignup() {
-            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
-            const pw = document.getElementById('signupPw').value.trim();
-            const nick = document.getElementById('signupNick').value.trim();
-            if(!email || !pw || !nick) return;
-
-            try {
-                localStorage.setItem("USER_" + email, JSON.stringify({ email, pw, nick }));
-                document.getElementById('signupSuccessMsg').style.display = 'block';
-                setTimeout(() => { toggleAuth('login'); }, 1000);
-            } catch(e) {
-                alert("브라우저 저장소가 차단되었습니다. 하지만 관리자 로그인은 가능합니다.");
-                toggleAuth('login');
-            }
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-            const pw = document.getElementById('loginPw').value.trim();
-            
-            // 🚨 [무적 비상문] 크롬/시크릿모드 어디서든 이 정보만 맞으면 통과!
-            if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('userNick', '관리자');
-                closeAuth();
-                checkLoginStatus();
-                return;
-            }
-
-            // 일반 유저용 저장소 로직
-            const storedData = localStorage.getItem("USER_" + email);
-            if (storedData) {
-                const user = JSON.parse(storedData);
-                if (user.pw === pw) {
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    sessionStorage.setItem('userNick', user.nick);
-                    closeAuth();
-                    checkLoginStatus(); 
-                } else { alert("비밀번호 불일치"); }
-            } else { alert("가입 정보가 없습니다. 관리자 계정이 아니라면 새로 가입해주세요."); }
         }
     </script>
 </body>
