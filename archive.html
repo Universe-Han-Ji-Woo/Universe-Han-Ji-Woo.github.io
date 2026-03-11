@@ -30,7 +30,7 @@
         .archive-container { width: 92%; max-width: 1000px; margin: 20px auto; padding-bottom: 50px; }
         .archive-header { text-align: center; margin-bottom: 40px; }
         .archive-title { font-family: 'Arial Black', sans-serif; font-size: 2rem; letter-spacing: 8px; color: #1a1a1a; margin-bottom: 10px; }
-        .archive-subtitle { font-size: 0.8rem; color: #a5b8d0; letter-spacing: 3px; font-weight: bold; }
+        .archive-subtitle { font-size: 0.85rem; color: #a5b8d0; letter-spacing: 2px; font-weight: bold; }
 
         .video-grid { 
             display: grid; 
@@ -85,7 +85,7 @@
     <div class="archive-container">
         <div class="archive-header">
             <h1 class="archive-title">ARCHIVE</h1>
-            <p class="archive-subtitle">은하의 기록 : 배우 한지우의 모든 순간</p>
+            <p class="archive-subtitle">배우 한지우 영상 저장소</p>
         </div>
 
         <div class="video-grid" id="videoGrid">
@@ -106,7 +106,7 @@
             const userNick = sessionStorage.getItem('userNick');
 
             if (isLoggedIn !== 'true' || userNick !== '관리자') {
-                alert("은하의 접근 권한이 없습니다. 관리자로 로그인해 주세요.");
+                alert("접근 권한이 없습니다. 관리자로 로그인해 주세요.");
                 location.href = "index.html";
             } else {
                 document.getElementById('displayNick').innerText = userNick;
