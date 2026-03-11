@@ -94,9 +94,11 @@
     </div>
 
     <script>
+        // 페이지 로드 시 상태 확인
         window.onload = function() { checkLoginStatus(); };
 
         function checkLoginStatus() {
+            // sessionStorage는 브라우저 탭 세션동안 유지됨 (시크릿 모드에서도 해당 탭에서는 유효)
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             const userNick = sessionStorage.getItem('userNick');
             const mainBtn = document.getElementById('mainEntryBtn');
@@ -105,10 +107,12 @@
             if (isLoggedIn === 'true') {
                 mainBtn.innerText = "ENTER ARCHIVE";
                 mainBtn.onclick = function() {
+                    // 🔒 로그인 성공 후 버튼 눌렀을 때 2차 검증
                     if (userNick === "관리자") {
                         const choice = confirm("이동할 페이지를 선택하세요.\n\n[확인] : 아카이브\n[취소] : 게시판");
                         location.href = choice ? "archive.html" : "board.html";
                     } else {
+                        // 관리자가 아니면 무조건 "정렬 중" 메시지 노출
                         deniedMsg.style.display = 'block';
                         setTimeout(() => { deniedMsg.style.display = 'none'; }, 3000);
                     }
@@ -134,59 +138,58 @@
             document.getElementById('signupSection').style.display = type === 'signup' ? 'block' : 'none';
         }
 
-        // 🛠️ 크롬 대응 강화: 가입 로직
+        // 🛠️ 크롬/시크릿모드 철벽 대응: 가입 로직
         function handleSignup() {
-            const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+            const emailInput = document.getElementById('signupEmail').value.trim();
             const pw = document.getElementById('signupPw').value.trim();
             const nick = document.getElementById('signupNick').value.trim();
             
-            if(!email || !pw || !nick) {
-                alert("항목을 모두 입력해주세요.");
+            if(!emailInput || !pw || !nick) {
+                alert("정보를 모두 입력해주세요.");
                 return;
             }
+
+            // 크롬 대소문자 이슈 방지: 키값 자체를 소문자로 통일
+            const email = emailInput.toLowerCase();
+            const userData = { email: email, pw: pw, nick: nick };
             
-            // 키 충돌을 방지하기 위해 특수 키 사용
-            const userKey = "JIWOO_USER_" + email;
-            const userData = { email, pw, nick };
-            
+            // 저장 방식 강화: 깃허브 도메인에서도 꼬이지 않게 고유 키 사용
             try {
-                localStorage.setItem(userKey, JSON.stringify(userData));
+                localStorage.setItem("FANPAGE_USER_" + email, JSON.stringify(userData));
                 document.getElementById('signupSuccessMsg').style.display = 'block';
                 setTimeout(() => { toggleAuth('login'); }, 1000);
-            } catch (e) {
-                alert("브라우저 저장소 오류입니다. 쿠키 설정을 확인해주세요.");
+            } catch(e) {
+                alert("브라우저 보안 설정으로 인해 가입 정보를 저장할 수 없습니다.");
             }
         }
 
-        // 🛠️ 크롬 대응 강화: 로그인 로직
+        // 🛠️ 크롬/시크릿모드 철벽 대응: 로그인 로직
         function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const emailInput = document.getElementById('loginEmail').value.trim();
             const pw = document.getElementById('loginPw').value.trim();
             
-            if(!email || !pw) {
+            if(!emailInput || !pw) {
                 alert("이메일과 비밀번호를 입력해주세요.");
                 return;
             }
 
-            const userKey = "JIWOO_USER_" + email;
-            const storedData = localStorage.getItem(userKey);
+            const email = emailInput.toLowerCase();
+            const storedData = localStorage.getItem("FANPAGE_USER_" + email);
             
             if (storedData) {
-                try {
-                    const user = JSON.parse(storedData);
-                    if (user.pw === pw) {
-                        sessionStorage.setItem('isLoggedIn', 'true');
-                        sessionStorage.setItem('userNick', user.nick);
-                        closeAuth();
-                        checkLoginStatus(); 
-                    } else {
-                        alert("비밀번호가 틀렸습니다.");
-                    }
-                } catch (e) {
-                    alert("데이터 로드 오류입니다.");
+                const user = JSON.parse(storedData);
+                if (user.pw === pw) {
+                    // 로그인 상태를 세션에 기록 (탭 닫기 전까지 유지)
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('userNick', user.nick);
+                    closeAuth();
+                    checkLoginStatus(); // 버튼 상태 즉시 업데이트
+                } else {
+                    alert("비밀번호가 일치하지 않습니다.");
                 }
             } else {
-                alert("가입 정보가 없습니다. 이메일을 다시 확인하거나 새로 가입해주세요.");
+                // 이 부분이 뜨면 100% 저장된 키가 없다는 뜻 (가입을 다시 해야 함)
+                alert("가입 정보가 없습니다. 이메일을 확인하거나 새로 가입해주세요.");
             }
         }
     </script>
