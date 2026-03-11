@@ -60,7 +60,8 @@
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userNick', 'ADMIN');
-                location.href = confirm("관리자님 환영합니다!") ? "archive.html" : "board.html";
+                // ✅ 관리자 로그인 시 게시판으로 이동 (confirm 취소 시에도 게시판 이동으로 통일 가능)
+                location.href = confirm("관리자님 환영합니다!") ? "board.html" : "board.html";
                 return;
             }
             auth.signInWithEmailAndPassword(email, pw).then(() => {
@@ -68,7 +69,8 @@
                 sessionStorage.setItem('userNick', 'FAN');
                 document.getElementById('nickBadge').innerText = "FAN";
                 closeAuth();
-                alert("로그인되었습니다. 오픈까지 조금만 기다려주세요!");
+                // ✅ 로그인 성공 시 바로 자유게시판으로 이동
+                location.href = "board.html";
             }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
@@ -100,7 +102,7 @@
         .footer-btn-zone { height: 15vh; display: flex; justify-content: center; align-items: center; }
         .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 320px; height: 55px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 8px; border-radius: 5px; text-transform: uppercase; }
 
-        /* 🏷️ 상태창 기본 디자인 (PC) */
+        /* 🏷️ 상태창 디자인 (우측 상단 고정) */
         #statusZone { 
             display: flex; 
             position: fixed; 
@@ -114,15 +116,16 @@
         .status-msg { font-size: 0.75rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
         .count-info { font-size: 0.65rem; color: #888; text-align: right; margin-top: 2px; line-height: 1.4; }
 
-        /* 📱 모바일 전용 반응형 (화면 폭 600px 이하) */
+        /* 📱 모바일 전용 반응형 (가독성 개선: 세로 줄바꿈) */
         @media screen and (max-width: 600px) {
             #statusZone { right: 15px; top: 15px; }
             .status-msg { font-size: 0.7rem; }
             .count-info { 
                 font-size: 0.6rem; 
-                display: block; /* 세로로 강제 줄바꿈 */
-                width: 100px; /* 폭을 좁혀서 글자가 아래로 떨어지게 함 */
+                display: block; 
+                width: 110px; /* 글자가 겹치지 않게 폭 조정 */
                 word-break: keep-all; 
+                margin-top: 5px;
             }
         }
 
@@ -139,7 +142,9 @@
     <div class="main-container">
         <div class="header-text"><h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1><h2 class="coming-soon-label">COMING SOON</h2></div>
         <div class="hero-photo-zone"><img src="jiwoo_profile3.png" alt="Han Ji Woo" class="main-img"></div>
-        <div class="footer-btn-zone"><button class="btn-stay" onclick="openAuth()">STAY TUNED</button></div>
+        <div class="footer-btn-zone">
+            <button class="btn-stay" onclick="openAuth()">STAY TUNED</button>
+        </div>
     </div>
 
     <div id="statusZone">
