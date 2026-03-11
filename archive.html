@@ -7,7 +7,6 @@
     <style>
         body { margin: 0; background-color: #f8f9fa; font-family: 'Apple SD Gothic Neo', sans-serif; color: #333; }
         
-        /* 상단 네비게이션 */
         .nav-bar { 
             display: flex; 
             justify-content: space-between; 
@@ -28,13 +27,11 @@
         }
         .menu-link:hover { color: #1a1a1a; }
 
-        /* 메인 컨테이너 */
         .archive-container { width: 92%; max-width: 1000px; margin: 20px auto; padding-bottom: 50px; }
         .archive-header { text-align: center; margin-bottom: 40px; }
         .archive-title { font-family: 'Arial Black', sans-serif; font-size: 2rem; letter-spacing: 8px; color: #1a1a1a; margin-bottom: 10px; }
         .archive-subtitle { font-size: 0.8rem; color: #a5b8d0; letter-spacing: 3px; font-weight: bold; }
 
-        /* 영상 그리드 레이아웃 */
         .video-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
@@ -49,7 +46,6 @@
         }
         .video-card:hover { transform: translateY(-8px); }
         
-        /* 🎥 영상 플레이어 스타일 (포스터/썸네일 적용) */
         video {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -58,21 +54,15 @@
             object-fit: cover;
         }
         
-        .video-info { padding: 20px; border-top: 1px solid #f1f1f1; }
+        .video-info { padding: 20px; border-top: 1px solid #f1f1f1; text-align: center; }
         .video-name { 
-            font-size: 1rem; 
+            font-size: 0.95rem; 
             font-weight: 800; 
             color: #222; 
             margin: 0; 
             line-height: 1.4;
-            letter-spacing: -0.5px;
-        }
-        .video-desc {
-            font-size: 0.75rem;
-            color: #8ea8c9;
-            margin-top: 8px;
-            line-height: 1.5;
-            font-weight: 500;
+            letter-spacing: 0px;
+            text-transform: uppercase;
         }
 
         @media (max-width: 768px) {
@@ -102,19 +92,15 @@
             <div class="video-card">
                 <video controls poster="thumbnail1.png">
                     <source src="온앤오프3 홍보 티져.mp4" type="video/mp4">
-                    브라우저가 영상을 지원하지 않습니다.
                 </video>
                 <div class="video-info">
-                    <p class="video-name">ON & OFF SEASON 3 : <br>The Beginning of Universe</p>
-                    <p class="video-desc">팬들의 진심을 담아 제작된 8초의 전율, <br>배우 한지우의 새로운 시작을 알리는 프로모션 티저입니다.</p>
+                    <p class="video-name">ON & OFF SEASON 3<br>Fan-made Instant Teaser</p>
                 </div>
             </div>
-
-            </div>
+        </div>
     </div>
 
     <script>
-        // 🛡️ 보안 로직: 관리자 닉네임이 아니면 추방
         window.addEventListener('DOMContentLoaded', () => {
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             const userNick = sessionStorage.getItem('userNick');
