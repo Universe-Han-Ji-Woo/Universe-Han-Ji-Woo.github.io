@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>JIWOO ARCHIVE</title>
+    <style>
+        body { margin: 0; background-color: #f8f9fa; font-family: 'Apple SD Gothic Neo', sans-serif; color: #333; }
+        
+        /* 상단 네비게이션 */
+        .nav-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 20px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+        .nav-left { display: flex; align-items: center; gap: 20px; }
+        .home-icon { font-size: 1.5rem; text-decoration: none; cursor: pointer; }
+        .menu-link { 
+            text-decoration: none; 
+            color: #a5b8d0; 
+            font-size: 0.85rem; 
+            font-weight: bold; 
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .menu-link:hover { color: #1a1a1a; }
+
+        /* 메인 컨테이너 */
+        .archive-container { width: 92%; max-width: 1000px; margin: 20px auto; padding-bottom: 50px; }
+        .archive-header { text-align: center; margin-bottom: 40px; }
+        .archive-title { font-family: 'Arial Black', sans-serif; font-size: 2rem; letter-spacing: 8px; color: #1a1a1a; margin-bottom: 10px; }
+        .archive-subtitle { font-size: 0.8rem; color: #a5b8d0; letter-spacing: 3px; font-weight: bold; }
+
+        /* 영상 그리드 레이아웃 */
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+        }
+        .video-card { 
+            background: white; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03); 
+            transition: transform 0.3s;
+        }
+        .video-card:hover { transform: translateY(-5px); }
+        
+        /* 영상 임시 썸네일/플레이어 영역 */
+        .video-player { 
+            width: 100%; 
+            aspect-ratio: 16 / 9; 
+            background: #eee; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: #ccc;
+            font-size: 0.8rem;
+        }
+        
+        .video-info { padding: 15px; }
+        .video-tag { font-size: 0.65rem; color: #8ea8c9; font-weight: bold; margin-bottom: 5px; display: block; }
+        .video-name { font-size: 0.9rem; font-weight: bold; color: #444; margin: 0; }
+
+        /* 하단 업로드 안내 (관리자용) */
+        .admin-notice { 
+            margin-top: 50px; 
+            text-align: center; 
+            padding: 20px; 
+            border: 1px dashed #a5b8d0; 
+            border-radius: 15px; 
+            color: #a5b8d0; 
+            font-size: 0.8rem; 
+        }
+
+        @media (max-width: 768px) {
+            .video-grid { grid-template-columns: 1fr; }
+            .archive-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-left">
+            <a href="index.html" class="home-icon">🏠</a>
+            <a href="board.html" class="menu-link">QUEST BOOK</a>
+        </div>
+        <div class="user-info" style="font-size: 0.75rem; color: #8ea8c9; font-weight: bold;">
+            ADMIN : <span id="displayNick">관리자</span>
+        </div>
+    </div>
+
+    <div class="archive-container">
+        <div class="archive-header">
+            <h1 class="archive-title">ARCHIVE</h1>
+            <p class="archive-subtitle">배우 한지우 영상 저장소</p>
+        </div>
+
+        <div class="video-grid" id="videoGrid">
+            <div class="video-card">
+                <div class="video-player">VIDEO 01 (준비중)</div>
+                <div class="video-info">
+                    <span class="video-tag">#DRAMA #ONnOFF3</span>
+                    <p class="video-name">온앤오프 시즌3 하이라이트</p>
+                </div>
+            </div>
+
+            <div class="video-card">
+                <div class="video-player">VIDEO 02 (준비중)</div>
+                <div class="video-info">
+                    <span class="video-tag">#FAN_MEETING</span>
+                    <p class="video-name">지우 배우님 첫 팬미팅 스케치</p>
+                </div>
+            </div>
+
+            <div class="video-card">
+                <div class="video-player">VIDEO 03 (준비중)</div>
+                <div class="video-info">
+                    <span class="video-tag">#INTERVIEW</span>
+                    <p class="video-name">잡지 촬영 현장 비하인드</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-notice">
+            영상을 추가하시려면 소스 코드의 'videoGrid' 부분에 새 카드를 추가해 주세요.<br>
+            (추후 관리자용 업로드 기능을 구현할 수 있습니다)
+        </div>
+    </div>
+
+    <script>
+        // 🛡️ 보안 로직: 관리자 닉네임이 아니면 추방
+        window.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const userNick = sessionStorage.getItem('userNick');
+
+            if (isLoggedIn !== 'true' || userNick !== '관리자') {
+                alert("은하의 접근 권한이 없습니다. 관리자로 로그인해 주세요.");
+                location.href = "index.html";
+            } else {
+                document.getElementById('displayNick').innerText = userNick;
+            }
+        });
+    </script>
+</body>
+</html>
