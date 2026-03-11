@@ -24,7 +24,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 📊 실시간 접속자 추적 (실시간 탐사 중)
+        // 📊 실시간 탐사 중 (접속자)
         function trackOnlineUsers() {
             const connectedRef = db.ref(".info/connected");
             const onlineRef = db.ref("online_users").push();
@@ -42,20 +42,25 @@
             });
         }
 
-        // 📊 누적 가입자 표시 (지우 유니버스 입성)
+        // 📊 유니버스 입성 (가입자)
         function updateTotalFans() {
-            const totalFans = 127; // 👈 여기 숫자만 관리자님이 가끔 수정해 주세요!
+            const totalFans = 127; // 👈 관리자님이 콘솔 보시고 가끔 수정해주세요!
             document.getElementById('userCount').innerText = `${totalFans}명 지우 유니버스 입성`;
         }
 
         window.onload = () => {
             trackOnlineUsers();
             updateTotalFans();
+            
+            // 만약 이미 로그인된 정보가 있다면 뱃지 업데이트
+            const nick = sessionStorage.getItem('userNick');
+            if(nick) document.getElementById('nickBadge').innerText = nick;
         };
 
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
+            
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userNick', 'ADMIN');
@@ -65,17 +70,18 @@
             auth.signInWithEmailAndPassword(email, pw).then(() => {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userNick', 'FAN');
-                closeAuth();
-                document.getElementById('statusZone').style.display = 'flex';
                 document.getElementById('nickBadge').innerText = "FAN";
-            }).catch(() => alert("정보가 틀렸습니다."));
+                closeAuth();
+                alert("로그인되었습니다. 오픈까지 조금만 기다려주세요!");
+            }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
         function handleSignup() {
             const email = document.getElementById('sEmail').value;
             const pw = document.getElementById('sPw').value;
             auth.createUserWithEmailAndPassword(email, pw).then(() => {
-                alert("가입 성공!"); location.reload();
+                alert("입성 성공! 로그인을 진행해 주세요."); 
+                location.reload();
             }).catch((err) => alert(err.message));
         }
 
@@ -95,9 +101,9 @@
         .footer-btn-zone { height: 15vh; display: flex; justify-content: center; align-items: center; }
         .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 320px; height: 55px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 8px; border-radius: 5px; text-transform: uppercase; }
 
-        /* 🏷️ 우측 상단 상태창 (배우님 얼굴 안 가리게) */
+        /* 🏷️ 상태창 (바로 보이게 수정) */
         #statusZone { 
-            display: none; 
+            display: flex; /* 👈 바로 보이게 변경 */
             position: fixed; 
             right: 25px; 
             top: 25px; 
@@ -105,9 +111,9 @@
             align-items: flex-end; 
             z-index: 100;
         }
-        .nick-box { font-size: 0.6rem; border: 1px solid #1a1a1a; padding: 2px 6px; font-weight: bold; margin-bottom: 8px; background: #fff; letter-spacing: 1px; }
+        .nick-box { font-size: 0.6rem; border: 1px solid #1a1a1a; padding: 2px 6px; font-weight: bold; background: #fff; margin-bottom: 6px; letter-spacing: 1px; }
         .status-msg { font-size: 0.75rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
-        .count-info { font-size: 0.65rem; color: #888; text-align: right; margin-top: 2px; letter-spacing: -0.2px; }
+        .count-info { font-size: 0.65rem; color: #888; text-align: right; margin-top: 2px; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 500; opacity: 0; transition: 0.3s; }
         .modal-overlay.active { display: flex; opacity: 1; }
@@ -126,7 +132,7 @@
     </div>
 
     <div id="statusZone">
-        <div class="nick-box" id="nickBadge">FAN</div>
+        <div class="nick-box" id="nickBadge">VISITOR</div>
         <div class="status-msg">오픈 준비 중</div>
         <div class="count-info" id="userCount">0명 지우 유니버스 입성</div>
         <div class="count-info" id="onlineCount">1명 실시간 탐사 중</div>
