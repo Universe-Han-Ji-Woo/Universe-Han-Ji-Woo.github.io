@@ -62,19 +62,23 @@
         .nav-label-en { font-size: 0.6rem; color: #8ea8c9; letter-spacing: 1px; margin-bottom: 4px; }
         .nav-label-ko { font-size: 0.85rem; font-weight: bold; color: #fff; }
 
-        /* --- 방명록 위성 & 실선 --- */
-        .guestbook-satellite {
-            position: absolute;
-            right: -160px; top: -40px;
-            z-index: 25;
+        /* --- 위성 공통 스타일 (방명록 & 갤러리) --- */
+        .satellite-group { position: absolute; z-index: 25; }
+        
+        /* [우측 상단] 방명록 위성 */
+        .guestbook-pos { right: -160px; top: -40px; }
+        .line-right {
+            position: absolute; width: 130px; height: 1px;
+            background: linear-gradient(to right, rgba(255,255,255,0.6), transparent);
+            top: 55px; right: 75px; transform: rotate(-25deg);
         }
 
-        .link-line {
-            position: absolute;
-            width: 130px; height: 1px;
-            background: linear-gradient(to right, rgba(255,255,255,0.6), transparent);
-            top: 55px; right: 75px;
-            transform: rotate(-25deg);
+        /* [좌측 상단] 갤러리 위성 */
+        .gallery-pos { left: -160px; top: -40px; }
+        .line-left {
+            position: absolute; width: 130px; height: 1px;
+            background: linear-gradient(to left, rgba(255,255,255,0.6), transparent);
+            top: 55px; left: 75px; transform: rotate(25deg);
         }
 
         .satellite-node {
@@ -94,13 +98,15 @@
     </style>
     <script>
         function go(page) {
-            const user = new URLSearchParams(window.location.search).get('user');
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
             if(user) location.href = `${page}?user=${encodeURIComponent(user)}`;
             else location.href = "index.html";
         }
 
         window.onload = () => {
-            const user = new URLSearchParams(window.location.search).get('user');
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
             if (!user) { location.href = "index.html"; }
             else { document.getElementById('userName').innerText = user; }
         };
@@ -134,8 +140,16 @@
             </div>
         </div>
 
-        <div class="guestbook-satellite">
-            <div class="link-line"></div>
+        <div class="satellite-group gallery-pos">
+            <div class="line-left"></div>
+            <div class="satellite-node" onclick="go('gallery.html')">
+                <div class="node-en">GALAXY</div>
+                <div class="node-ko">갤러리</div>
+            </div>
+        </div>
+
+        <div class="satellite-group guestbook-pos">
+            <div class="line-right"></div>
             <div class="satellite-node" onclick="go('guestbook.html')">
                 <div class="node-en">GUEST BOOK</div>
                 <div class="node-ko">방명록</div>
