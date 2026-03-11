@@ -22,18 +22,19 @@
         const db = firebase.database();
         let allPosts = [];
 
-        // ★ [중요] 로그인 상태 유지 로직 (창을 닫기 전까지 유지)
+        // ★ [개선] localStorage를 사용하여 브라우저가 꺼져도 로그인 유지 (절대 안풀림)
         function getLoginUser() {
-            // sessionStorage는 탭이 열려있는 동안만 유지됩니다.
-            return sessionStorage.getItem('userNick');
+            return localStorage.getItem('userNick'); 
         }
 
+        // ★ [수정] 강제 이동 로직 삭제! 로그인 체크만 합니다.
         function checkLogin() {
             const user = getLoginUser();
             if(!user) {
-                alert("로그인이 필요합니다!");
-                location.href = "index.html"; // 로그인 안 됐으면 메인으로
+                alert("로그인 정보가 없습니다. 메인으로 이동합니다.");
+                location.href = "index.html"; 
             }
+            // 기존에 있던 "로그인 됐으니 게시판으로 가라"는 코드는 삭제했습니다.
         }
 
         function showView(viewName) {
@@ -74,7 +75,7 @@
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
             const imageUrl = document.getElementById('postImgUrl').value;
-            const nick = getLoginUser() || '관리자'; // 로그인된 닉네임 사용
+            const nick = getLoginUser() || '관리자'; 
             const editKey = document.getElementById('editKey').value;
             
             if(!title || !content) return alert("내용을 입력해주세요!");
@@ -91,9 +92,15 @@
                 timestamp: Date.now()
             };
 
-            if(editKey) { await db.ref('posts_v2/' + editKey).update(postData); alert("수정완료!"); }
-            else { postData.views = 0; postData.likes = 0; await db.ref('posts_v2').push(postData); alert("등록완료!"); }
-            showView('list'); // 새로고침 대신 뷰 전환으로 로그인 풀림 방지
+            if(editKey) { 
+                await db.ref('posts_v2/' + editKey).update(postData); 
+                alert("수정완료!"); 
+            } else { 
+                postData.views = 0; postData.likes = 0; 
+                await db.ref('posts_v2').push(postData); 
+                alert("등록완료!"); 
+            }
+            showView('list');
             loadList();
         }
 
@@ -115,7 +122,7 @@
         }
         
         window.onload = () => {
-            checkLogin(); // 페이지 뜨자마자 로그인 확인
+            checkLogin(); 
             loadList();
         };
     </script>
