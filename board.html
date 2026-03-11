@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // Firebase 설정 (기존 정보 유지)
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             authDomain: "jiwoo-fanpage.firebaseapp.com",
@@ -47,7 +48,6 @@
             const total = data.length;
             data.forEach((post, index) => {
                 const postNo = total - index;
-                // 목록에는 날짜만 (03. 11. 형식)
                 const dateOnly = post.fullDate ? post.fullDate.split(' ')[0].substring(5).replace('-', '. ') + '.' : post.date;
                 tbody.innerHTML += `
                     <tr onclick="showDetail('${post.key}')">
@@ -61,7 +61,7 @@
             });
         }
 
-        // 2. 글 등록/수정 (★오전/오후 로직 강화)
+        // 2. 글 등록/수정 (시간 포함)
         async function submitPost() {
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
@@ -71,27 +71,22 @@
 
             if(!title || !content) return alert("내용을 입력해주세요!");
 
-            // 오전/오후 시간 문자열 생성
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
-            
             let hours = now.getHours();
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const ampm = hours >= 12 ? '오후' : '오전';
-            
-            hours = hours % 12;
-            hours = hours ? hours : 12; // 0시를 12시로 표시
+            hours = hours % 12 || 12;
             const displayHours = String(hours).padStart(2, '0');
 
-            // 최종 형태: 2026. 03. 11. 오전 10:30
             const fullDateString = `${year}. ${month}. ${day}. ${ampm} ${displayHours}:${minutes}`;
 
             const postData = {
                 title, content, nickname: nick, imageUrl,
-                fullDate: fullDateString, // 이 값이 상세페이지에 나옵니다
-                date: `${month}. ${day}.`, // 목록용
+                fullDate: fullDateString,
+                date: `${month}. ${day}.`,
                 timestamp: Date.now()
             };
 
@@ -106,30 +101,23 @@
             location.reload();
         }
 
-        // 3. 상세보기 (★시간 출력 확정)
+        // 3. 상세보기
         function showDetail(key) {
             db.ref('posts_v2/' + key).once('value', (snapshot) => {
                 const post = snapshot.val();
                 db.ref('posts_v2/' + key).update({ views: (post.views || 0) + 1 });
-                
                 document.getElementById('detailTitle').innerText = post.title;
-                
-                // 데이터에 fullDate가 없으면(옛날글) 기본 date라도 표시
                 const timeInfo = post.fullDate ? post.fullDate : post.date;
                 document.getElementById('detailInfo').innerText = `${post.nickname}  ${timeInfo}  조회 ${post.views + 1}`;
-                
                 document.getElementById('detailContent').innerText = post.content;
                 const imgArea = document.getElementById('detailImage');
                 imgArea.innerHTML = post.imageUrl ? `<img src="${post.imageUrl}" style="max-width:100%; display:block; margin:20px 0; border-radius:10px;">` : '';
-                
                 document.getElementById('likeCount').innerText = post.likes || 0;
                 document.getElementById('likeBtn').onclick = () => {
                     db.ref('posts_v2/' + key).transaction(p => { if(p) p.likes = (p.likes || 0) + 1; return p; });
                 };
-
                 document.getElementById('deleteBtn').onclick = () => deletePost(key);
                 document.getElementById('editBtn').onclick = () => prepareEdit(key, post);
-
                 showView('detail');
             });
         }
@@ -155,42 +143,57 @@
 
     <style>
         body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
-        .nav { background: #000; color: #fff; padding: 15px; text-align: center; font-weight: bold; }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-
-        /* 목록 테이블 */
-        table { width: 100%; border-collapse: collapse; border-top: 2px solid #000; margin-top: 10px; }
-        th { background: #f9f9f9; padding: 12px; font-size: 0.85rem; border-bottom: 1px solid #ddd; color: #777; }
-        td { padding: 15px 5px; text-align: center; border-bottom: 1px solid #eee; cursor: pointer; font-size: 0.95rem; }
         
+        /* 네비게이션 바 수정 */
+        .nav { 
+            background: #000; 
+            color: #fff; 
+            padding: 15px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative;
+        }
+        .nav-home { 
+            position: absolute; 
+            left: 20px; 
+            color: #fff; 
+            text-decoration: none; 
+            font-size: 0.9rem; 
+            font-weight: normal; 
+            border: 1px solid #555;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        .nav-title { font-weight: bold; letter-spacing: 1px; }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; border-top: 2px solid #000; margin-top: 10px; }
+        th { background: #f9f9f9; padding: 12px; font-size: 0.85rem; border-bottom: 1px solid #ddd; }
+        td { padding: 15px 5px; text-align: center; border-bottom: 1px solid #eee; cursor: pointer; font-size: 0.95rem; }
         .btn-write-trigger { float: right; background: #e91e63; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; font-weight: bold; }
-
-        /* 글쓰기 */
         .input-box { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
-        textarea.input-box { height: 450px; resize: none; font-size: 1rem; }
-        .btn-submit { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
-
-        /* 상세보기 (수정/삭제 상단 우측) */
+        textarea.input-box { height: 450px; resize: none; }
+        .btn-submit { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .detail-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
         .detail-title { font-size: 1.8rem; font-weight: bold; flex: 1; margin: 10px 0; }
         .top-admin-btns { display: flex; gap: 5px; margin-top: 10px; }
         .btn-small { background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #666; }
-
         .detail-info { color: #999; font-size: 0.85rem; padding-bottom: 15px; border-bottom: 1px solid #eee; margin-bottom: 25px; }
-        .detail-content { min-height: 400px; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; padding: 10px 0; }
-
-        /* 하단 버튼 배치 */
+        .detail-content { min-height: 400px; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; }
         .detail-footer-btns { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid #eee; margin-top: 40px; }
-        .btn-like { background: #fff; border: 1px solid #ddd; padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .btn-list-go { background: #f8f8f8; border: 1px solid #ddd; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-
+        .btn-like { background: #fff; border: 1px solid #ddd; padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold; }
+        .btn-list-go { background: #f8f8f8; border: 1px solid #ddd; padding: 10px 25px; border-radius: 5px; cursor: pointer; }
         @media (max-width:600px) { th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { display: none; } }
     </style>
 </head>
 <body>
-    <div class="nav">UNIVERSE : FREE BOARD</div>
+    <div class="nav">
+        <a href="index.html" class="nav-home">홈으로</a>
+        <div class="nav-title">UNIVERSE : FREE BOARD</div>
+    </div>
+
     <div class="container">
-        
         <div id="listView" class="view-section">
             <button class="btn-write-trigger" onclick="document.getElementById('editKey').value=''; showView('write')">글쓰기</button>
             <table>
@@ -220,16 +223,13 @@
                 </div>
             </div>
             <div class="detail-info" id="detailInfo"></div>
-            
             <div id="detailImage"></div>
             <div class="detail-content" id="detailContent"></div>
-            
             <div class="detail-footer-btns">
                 <button class="btn-like" id="likeBtn">❤️ 좋아요 <span id="likeCount">0</span></button>
                 <button class="btn-list-go" onclick="showView('list')">목록보기</button>
             </div>
         </div>
-
     </div>
 </body>
 </html>
