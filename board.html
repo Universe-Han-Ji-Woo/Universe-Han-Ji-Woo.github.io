@@ -2,13 +2,11 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universe | Free Board</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-    <script>
+    <script src="auth.js"></script> <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             authDomain: "jiwoo-fanpage.firebaseapp.com",
@@ -20,183 +18,90 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let allPosts = [];
-
-        // ★ [개선] localStorage를 사용하여 브라우저가 꺼져도 로그인 유지 (절대 안풀림)
-        function getLoginUser() {
-            return localStorage.getItem('userNick'); 
-        }
-
-        // ★ [수정] 강제 이동 로직 삭제! 로그인 체크만 합니다.
-        function checkLogin() {
-            const user = getLoginUser();
-            if(!user) {
-                alert("로그인 정보가 없습니다. 메인으로 이동합니다.");
-                location.href = "index.html"; 
-            }
-            // 기존에 있던 "로그인 됐으니 게시판으로 가라"는 코드는 삭제했습니다.
-        }
-
-        function showView(viewName) {
-            document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
-            document.getElementById(viewName + 'View').style.display = 'block';
-            window.scrollTo(0,0);
-        }
 
         function loadList() {
             db.ref('posts_v2').orderByChild('timestamp').on('value', (snapshot) => {
-                allPosts = [];
+                let allPosts = [];
                 snapshot.forEach((child) => { allPosts.push({ key: child.key, ...child.val() }); });
-                allPosts.reverse();
-                renderTable(allPosts);
+                renderTable(allPosts.reverse());
             });
         }
 
         function renderTable(data) {
             const tbody = document.getElementById('postTableBody');
             tbody.innerHTML = '';
-            const total = data.length;
             data.forEach((post, index) => {
-                const postNo = total - index;
-                const dateOnly = post.fullDate ? post.fullDate.split(' ')[0].substring(5).replace('-', '. ') + '.' : post.date;
                 tbody.innerHTML += `
                     <tr onclick="showDetail('${post.key}')">
-                        <td>${postNo}</td>
-                        <td style="text-align:left; padding-left:15px;">${post.title} ${post.imageUrl ? '🖼️' : ''}</td>
+                        <td>${data.length - index}</td>
+                        <td style="text-align:left;">${post.title}</td>
                         <td>${post.nickname}</td>
-                        <td>${dateOnly}</td>
+                        <td>${post.date || ''}</td>
                         <td>${post.views || 0}</td>
                     </tr>
                 `;
             });
         }
 
-        async function submitPost() {
-            const title = document.getElementById('postTitle').value;
-            const content = document.getElementById('postContent').value;
-            const imageUrl = document.getElementById('postImgUrl').value;
-            const nick = getLoginUser() || '관리자'; 
-            const editKey = document.getElementById('editKey').value;
-            
-            if(!title || !content) return alert("내용을 입력해주세요!");
-
-            const now = new Date();
-            const ampm = now.getHours() >= 12 ? '오후' : '오전';
-            let hours = now.getHours() % 12 || 12;
-            const fullDateString = `${now.getFullYear()}. ${String(now.getMonth()+1).padStart(2,'0')}. ${String(now.getDate()).padStart(2,'0')}. ${ampm} ${String(hours).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-
-            const postData = {
-                title, content, nickname: nick, imageUrl,
-                fullDate: fullDateString,
-                date: `${String(now.getMonth()+1).padStart(2,'0')}. ${String(now.getDate()).padStart(2,'0')}.`,
-                timestamp: Date.now()
-            };
-
-            if(editKey) { 
-                await db.ref('posts_v2/' + editKey).update(postData); 
-                alert("수정완료!"); 
-            } else { 
-                postData.views = 0; postData.likes = 0; 
-                await db.ref('posts_v2').push(postData); 
-                alert("등록완료!"); 
-            }
-            showView('list');
-            loadList();
-        }
-
+        // 상세 보기 및 게시글 작성 시 auth.js의 getLoginUser()만 사용
         function showDetail(key) {
             db.ref('posts_v2/' + key).once('value', (snapshot) => {
                 const post = snapshot.val();
-                db.ref('posts_v2/' + key).update({ views: (post.views || 0) + 1 });
+                const currentUser = getLoginUser(); // 독립 파일에서 가져옴
+                
                 document.getElementById('detailTitle').innerText = post.title;
-                document.getElementById('detailInfo').innerText = `${post.nickname}  ${post.fullDate || post.date}  조회 ${post.views + 1}`;
                 document.getElementById('detailContent').innerText = post.content;
-                const imgArea = document.getElementById('detailImage');
-                imgArea.innerHTML = post.imageUrl ? `<img src="${post.imageUrl}" style="max-width:100%; display:block; margin:20px 0; border-radius:10px;">` : '';
-                document.getElementById('likeCount').innerText = post.likes || 0;
-                document.getElementById('likeBtn').onclick = () => { db.ref('posts_v2/' + key).transaction(p => { if(p) p.likes = (p.likes || 0) + 1; return p; }); };
-                document.getElementById('deleteBtn').onclick = () => { if(confirm("삭제하시겠습니까?")) { db.ref('posts_v2/' + key).remove(); showView('list'); } };
-                document.getElementById('editBtn').onclick = () => { document.getElementById('editKey').value = key; document.getElementById('postTitle').value = post.title; document.getElementById('postContent').value = post.content; showView('write'); };
+                
+                // 관리자(사용자)일 때만 삭제 버튼 노출
+                document.getElementById('adminMenu').style.display = currentUser ? 'block' : 'none';
+                
+                document.getElementById('deleteBtn').onclick = () => {
+                    if(confirm("삭제하시겠습니까?")) { db.ref('posts_v2/' + key).remove(); showView('list'); }
+                };
                 showView('detail');
             });
         }
-        
-        window.onload = () => {
-            checkLogin(); 
-            loadList();
-        };
+
+        function showView(viewName) {
+            document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
+            document.getElementById(viewName + 'View').style.display = 'block';
+        }
+
+        window.onload = loadList;
     </script>
 
     <style>
-        body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
+        body { font-family: sans-serif; margin: 0; padding: 0; }
         .nav { background: #000; color: #fff; height: 60px; display: flex; justify-content: center; align-items: center; position: relative; }
         .nav-buttons { position: absolute; left: 15px; display: flex; gap: 8px; }
-        .btn-nav { color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: bold; border: 1.5px solid #fff; padding: 5px 12px; border-radius: 20px; transition: 0.2s; cursor: pointer; }
-        .btn-nav:hover { background: #fff; color: #000; }
-        .nav-title { font-weight: bold; letter-spacing: 1px; font-size: 1.1rem; }
+        .btn-nav { color: #fff; text-decoration: none; border: 1px solid #fff; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 13px; }
         .container { max-width: 900px; margin: 0 auto; padding: 20px; }
         table { width: 100%; border-collapse: collapse; border-top: 2px solid #000; margin-top: 10px; }
-        th { background: #f9f9f9; padding: 12px; font-size: 0.85rem; border-bottom: 1px solid #ddd; }
-        td { padding: 15px 5px; text-align: center; border-bottom: 1px solid #eee; cursor: pointer; font-size: 0.95rem; }
-        .btn-write-trigger { float: right; background: #e91e63; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 10px; font-weight: bold; }
-        .input-box { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
-        textarea.input-box { height: 450px; resize: none; }
-        .btn-submit { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .detail-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
-        .detail-title { font-size: 1.8rem; font-weight: bold; flex: 1; margin: 10px 0; }
-        .top-admin-btns { display: flex; gap: 5px; margin-top: 10px; }
-        .btn-small { background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #666; }
-        .detail-info { color: #999; font-size: 0.85rem; padding-bottom: 15px; border-bottom: 1px solid #eee; margin-bottom: 25px; }
-        .detail-content { min-height: 400px; line-height: 1.8; font-size: 1.05rem; white-space: pre-wrap; }
-        .detail-footer-btns { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid #eee; margin-top: 40px; }
-        .btn-like { background: #fff; border: 1px solid #ddd; padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold; }
-        .btn-list-go { background: #f8f8f8; border: 1px solid #ddd; padding: 10px 25px; border-radius: 5px; cursor: pointer; }
-        @media (max-width:600px) { th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { display: none; } }
+        th, td { padding: 15px; border-bottom: 1px solid #eee; text-align: center; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="nav">
         <div class="nav-buttons">
-            <a href="index.html" class="btn-nav">홈</a>
-            <a href="menu.html" class="btn-nav">메뉴선택</a>
+            <a onclick="navigateTo('index.html')" class="btn-nav">홈</a>
+            <a onclick="navigateTo('menu.html')" class="btn-nav">메뉴선택</a>
         </div>
-        <div class="nav-title">UNIVERSE : FREE BOARD</div>
+        <div class="nav-title">UNIVERSE : BOARD</div>
     </div>
 
     <div class="container">
         <div id="listView" class="view-section">
-            <button class="btn-write-trigger" onclick="document.getElementById('editKey').value=''; showView('write')">글쓰기</button>
             <table>
-                <thead><tr><th width="60">번호</th><th>제목</th><th width="100">작성자</th><th width="100">날짜</th><th width="60">조회</th></tr></thead>
+                <thead><tr><th>번호</th><th>제목</th><th>작성자</th><th>날짜</th><th>조회</th></tr></thead>
                 <tbody id="postTableBody"></tbody>
             </table>
         </div>
 
-        <div id="writeView" class="view-section" style="display:none;">
-            <input type="hidden" id="editKey">
-            <h3>게시글 작성/수정</h3>
-            <input type="text" id="postTitle" class="input-box" placeholder="제목">
-            <textarea id="postContent" class="input-box" placeholder="내용을 입력하세요"></textarea>
-            <input type="text" id="postImgUrl" class="input-box" placeholder="이미지 URL (선택)">
-            <button class="btn-submit" onclick="submitPost()">등록/수정하기</button>
-            <button class="btn-list-go" style="width:100%; margin-top:10px;" onclick="showView('list')">취소</button>
-        </div>
-
         <div id="detailView" class="view-section" style="display:none;">
-            <div class="detail-header-row">
-                <div class="detail-title" id="detailTitle"></div>
-                <div class="top-admin-btns">
-                    <button class="btn-small" id="editBtn">수정</button>
-                    <button class="btn-small" id="deleteBtn">삭제</button>
-                </div>
-            </div>
-            <div class="detail-info" id="detailInfo"></div>
-            <div id="detailImage"></div>
-            <div class="detail-content" id="detailContent"></div>
-            <div class="detail-footer-btns">
-                <button class="btn-like" id="likeBtn">❤️ 좋아요 <span id="likeCount">0</span></button>
-                <button class="btn-list-go" onclick="showView('list')">목록보기</button>
-            </div>
+            <h2 id="detailTitle"></h2>
+            <div id="adminMenu" style="display:none;"><button id="deleteBtn">삭제</button></div>
+            <p id="detailContent" style="white-space: pre-wrap;"></p>
+            <button onclick="showView('list')">목록으로</button>
         </div>
     </div>
 </body>
