@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universe | Control Tower</title>
+    <style>
+        /* 1. 기본 공간 설계 */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: #050a10; /* 심해 같은 우주색 */
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 우주 분위기 배경 (성운 효과) */
+        .universe-bg {
+            position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%);
+            z-index: 1;
+        }
+
+        /* 2. 중앙 집중형 컨트롤 패널 (뼈대) */
+        .control-tower {
+            position: relative; z-index: 10;
+            width: 90%; max-width: 600px; height: 600px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            /* 유리 질감 효과 */
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%; /* 원형으로 유니버스 느낌 강조 */
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(142, 168, 204, 0.1);
+        }
+
+        /* 중심 로고 구역 */
+        .core-identity {
+            text-align: center; margin-bottom: 20px;
+        }
+
+        .univ-title {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 2.5rem; color: #fff; letter-spacing: 10px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.5);
+            margin: 0;
+        }
+
+        .user-welcome {
+            color: #8ea8c9; font-size: 0.9rem; margin-top: 10px;
+            letter-spacing: 2px; font-weight: bold;
+        }
+
+        /* 임시 안내 (다음 단계에서 버튼으로 교체 예정) */
+        .status-tag {
+            font-size: 0.7rem; color: rgba(255,255,255,0.3);
+            position: absolute; bottom: 40px; letter-spacing: 5px;
+        }
+    </style>
+    <script>
+        // [방어 로직] 주소창 정보 확인
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+
+            if (!user) {
+                alert("권한이 없습니다. 대문으로 돌아갑니다.");
+                location.href = "index.html";
+            } else {
+                document.getElementById('userName').innerText = user;
+            }
+        };
+
+        // 페이지 이동 공통 함수 (추후 버튼에 연결)
+        function go(page) {
+            const user = new URLSearchParams(window.location.search).get('user');
+            location.href = `${page}?user=${encodeURIComponent(user)}`;
+        }
+    </script>
+</head>
+<body>
+    <div class="universe-bg"></div>
+
+    <div class="control-tower">
+        <div class="core-identity">
+            <h1 class="univ-title">UNIVERSE</h1>
+            <div class="user-welcome">COMMANDER: <span id="userName">---</span></div>
+        </div>
+        
+        <div class="status-tag">SYSTEM STABILIZED</div>
+    </div>
+</body>
+</html>
