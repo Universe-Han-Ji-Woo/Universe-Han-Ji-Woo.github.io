@@ -8,35 +8,32 @@
         :root { --main-red: #ff2d55; --bg-dark: #050a10; --text-gray: #8ea8c9; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; }
         .universe-bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%); z-index: -1; }
-        
-        /* 게시판 너비를 850px로 제한해서 시인성 확보 */
         .container { max-width: 850px; margin: 0 auto; padding: 60px 20px; position: relative; z-index: 10; }
         
         .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 2px solid var(--main-red); padding-bottom: 10px; }
-        .board-header h1 { margin: 0; font-size: 1.5rem; letter-spacing: -1px; }
-
-        .btn { background: var(--main-red); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .btn { background: var(--main-red); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn-sub { background: #333; color: #ccc; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; }
 
-        /* 목록 테이블: 높이를 줄여서 컴팩트하게 */
         table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; }
         th { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-gray); font-size: 0.85rem; background: rgba(255,255,255,0.05); }
         td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); text-align: center; font-size: 0.9rem; }
-        .td-title { text-align: left; cursor: pointer; padding-left: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
-        .td-title:hover { color: var(--main-red); }
+        .td-title { text-align: left; cursor: pointer; padding-left: 20px; }
 
-        /* 본문 및 글쓰기 영역 */
-        .content-box { display: none; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 12px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
-        .w-textarea { height: 350px; resize: none; line-height: 1.6; }
-
+        .content-box { display: none; background: rgba(255, 255, 255, 0.05); padding: 35px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         .view-title { font-size: 1.6rem; margin-bottom: 10px; color: var(--main-red); font-weight: bold; }
         .view-info { font-size: 0.85rem; color: var(--text-gray); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
-        .view-body { min-height: 200px; line-height: 1.7; white-space: pre-wrap; font-size: 1rem; color: #ddd; }
+        .view-body { min-height: 250px; line-height: 1.7; white-space: pre-wrap; font-size: 1rem; color: #ddd; }
 
-        /* 페이징 */
+        /* 좋아요 버튼 스타일 */
+        .like-container { display: flex; align-items: center; gap: 8px; margin-top: 30px; }
+        .btn-like { background: none; border: 1px solid var(--main-red); color: var(--main-red); padding: 6px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-like:hover { background: var(--main-red); color: white; }
+        .btn-like.clicked { background: var(--main-red); color: white; transform: scale(1.1); }
+
+        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 12px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
+        .w-textarea { height: 350px; resize: none; }
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
-        .page-btn { background: none; border: 1px solid #333; color: var(--text-gray); padding: 4px 10px; cursor: pointer; font-size: 0.8rem; }
+        .page-btn { background: none; border: 1px solid #333; color: var(--text-gray); padding: 4px 10px; cursor: pointer; }
         .page-btn.active { background: var(--main-red); color: white; border-color: var(--main-red); }
     </style>
 </head>
@@ -51,7 +48,7 @@
             </div>
             <table>
                 <thead>
-                    <tr><th width="60">NO</th><th>TITLE</th><th width="100">USER</th><th width="100">DATE</th></tr>
+                    <tr><th width="60">NO</th><th>TITLE</th><th width="100">USER</th><th width="60">LIKE</th></tr>
                 </thead>
                 <tbody id="boardBody"></tbody>
             </table>
@@ -62,7 +59,11 @@
             <div id="viewTitle" class="view-title"></div>
             <div id="viewInfo" class="view-info"></div>
             <div id="viewBody" class="view-body"></div>
-            <div style="text-align: right; margin-top: 20px;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div class="like-container">
+                    <button id="likeBtn" class="btn-like" onclick="handleLike()">❤️ 추천 <span id="likeCount">0</span></button>
+                </div>
                 <button class="btn-sub" onclick="closeView()">목록으로</button>
             </div>
         </div>
@@ -82,7 +83,8 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbwgMzQi8ib58Qkld2aUED-cnuaQQ9wWwd8Z1b-ym96o3hfKRP59yes3GnwgC-7LQEkk7w/exec";
         let allPosts = [];
         let currentPage = 1;
-        const postsPerPage = 12; // 12개씩 끊어서 컴팩트하게
+        let currentPostIdx = -1;
+        const postsPerPage = 12;
 
         async function loadPosts() {
             const res = await fetch(API_URL);
@@ -98,26 +100,56 @@
             tbody.innerHTML = currentPosts.map((p, i) => {
                 const title = p.Title || p.title || "제목 없음";
                 const user = p.User || p.user || "익명";
-                const date = (p.Date || p.date || "").split('T')[0];
+                const likes = p.Likes || p.likes || 0;
                 const realIndex = allPosts.length - 1 - (start + i);
 
                 return `<tr>
                     <td>${allPosts.length - (start + i)}</td>
                     <td class="td-title" onclick="viewPost(${realIndex})">${title}</td>
                     <td>${user}</td>
-                    <td><span style="font-size:0.8rem; color:#666;">${date}</span></td>
+                    <td style="color:var(--main-red); font-weight:bold;">${likes}</td>
                 </tr>`;
             }).join('');
             renderPagination();
         }
 
         function viewPost(idx) {
+            currentPostIdx = idx;
             const p = allPosts[idx];
             document.getElementById('listPage').style.display = 'none';
             document.getElementById('viewPage').style.display = 'block';
             document.getElementById('viewTitle').innerText = p.Title || p.title;
             document.getElementById('viewInfo').innerText = `BY ${p.User || '익명'} | ${p.Date || ''}`;
             document.getElementById('viewBody').innerText = p.Content || p.content;
+            document.getElementById('likeCount').innerText = p.Likes || p.likes || 0;
+            
+            // 버튼 상태 초기화
+            document.getElementById('likeBtn').classList.remove('clicked');
+        }
+
+        // 좋아요 클릭 핸들러
+        async function handleLike() {
+            const btn = document.getElementById('likeBtn');
+            if(btn.classList.contains('clicked')) return alert("이미 추천하셨습니다!");
+            
+            const countSpan = document.getElementById('likeCount');
+            let currentLikes = parseInt(countSpan.innerText);
+            
+            // 화면에서 즉시 반영
+            countSpan.innerText = currentLikes + 1;
+            btn.classList.add('clicked');
+
+            // 서버 전송 (시트의 Likes 열에 저장 시도)
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'like',
+                        id: allPosts[currentPostIdx].ID || allPosts[currentPostIdx].id,
+                        index: currentPostIdx
+                    })
+                });
+            } catch(e) { console.log("좋아요 저장 실패 (서버 설정 확인 필요)"); }
         }
 
         function closeView() { document.getElementById('viewPage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; }
@@ -128,8 +160,6 @@
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
             if(!title || !content) return alert("빈칸을 채워주세요!");
-            
-            document.getElementById('submitBtn').innerText = "SENDING...";
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({ title, content, tag: '수다', user: '관리자' }) });
             location.reload();
         }
