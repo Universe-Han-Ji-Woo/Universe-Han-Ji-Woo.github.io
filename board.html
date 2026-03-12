@@ -5,35 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universe | Free Board</title>
     <style>
-        /* [기존 디자인 스타일 유지] */
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #050a10; color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #050a10; color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; overflow-x: hidden; }
         .universe-bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%); z-index: -1; }
         .container { max-width: 1000px; margin: 0 auto; padding: 50px 20px; position: relative; z-index: 10; }
         .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #8ea8c9; padding-bottom: 15px; }
         .btn-write-trigger { background: #ff2d55; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .board-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.02); }
         .board-table th { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.2); color: #8ea8c9; font-size: 0.9rem; background: rgba(142,168,204,0.05); }
-        .board-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; font-size: 0.85rem; }
+        .board-table td { padding: 15px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; font-size: 0.85rem; }
         .td-title { text-align: left !important; padding-left: 20px !important; color: #e0e0e0; cursor: pointer; }
-        .tag { font-weight: bold; margin-right: 6px; }
-        .tag-공지 { color: #ff5252; } .tag-수다 { color: #8ea8c9; } .tag-정보 { color: #4caf50; }
-        
-        /* [작성 화면] */
+        .tag { font-weight: bold; margin-right: 6px; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; }
+        .tag-공지 { background: rgba(255, 82, 82, 0.2); color: #ff5252; }
+        .tag-수다 { background: rgba(142, 168, 204, 0.2); color: #8ea8c9; }
+        .tag-정보 { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
         #writePage { display: none; background: rgba(255,255,255,0.05); padding: 40px; border-radius: 15px; backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 12px; border-radius: 4px; box-sizing: border-box; outline: none; margin-bottom: 10px; }
-        .w-textarea { height: 350px; resize: none; }
-        .write-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
-        .btn-group { display: flex; gap: 10px; }
-        .btn-base { padding: 10px 25px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; }
-        .btn-submit { background: #ff2d55; color: #fff; }
-        
-        .loading { text-align: center; padding: 20px; color: #8ea8c9; font-style: italic; }
-        .back-btn { position: fixed; top: 30px; left: 30px; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; cursor: pointer; color: #fff; font-size: 0.7rem; background: rgba(0,0,0,0.3); z-index: 100; }
+        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 12px; border-radius: 4px; box-sizing: border-box; outline: none; margin-bottom: 15px; }
+        .w-textarea { height: 300px; resize: none; }
+        .loading { text-align: center; padding: 40px; color: #8ea8c9; font-size: 1.1rem; }
+        .back-btn { position: fixed; top: 30px; left: 30px; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; cursor: pointer; color: #fff; font-size: 0.75rem; background: rgba(0,0,0,0.3); z-index: 100; text-decoration: none; }
     </style>
 </head>
 <body>
     <div class="universe-bg"></div>
-    <div class="back-btn" onclick="location.href='menu.html'+location.search">← HUB로 복귀</div>
+    <a href="menu.html" class="back-btn">← HUB로 복귀</a>
 
     <div class="container">
         <div id="listPage">
@@ -41,7 +35,7 @@
                 <h1>자유게시판</h1>
                 <button class="btn-write-trigger" onclick="openWrite()">글쓰기</button>
             </div>
-            <div id="loadingStatus" class="loading">데이터 수신 중...</div>
+            <div id="loadingStatus" class="loading">✨ 우주 데이터 수신 중...</div>
             <table class="board-table">
                 <thead>
                     <tr>
@@ -57,7 +51,7 @@
         </div>
 
         <div id="writePage">
-            <h2 style="color:#ff2d55;">글쓰기</h2>
+            <h2 style="color:#ff2d55;">글 작성하기</h2>
             <select id="postTag" class="w-input" style="width: 120px;">
                 <option value="수다">수다</option>
                 <option value="정보">정보</option>
@@ -65,31 +59,26 @@
             </select>
             <input type="text" id="postTitle" class="w-input" placeholder="제목을 입력하세요">
             <textarea id="postContent" class="w-input w-textarea" placeholder="내용을 입력하세요"></textarea>
-            <div class="write-footer">
-                <div style="color:#ff2d55; font-weight:bold;">♥ 좋아요</div>
-                <div class="btn-group">
-                    <button class="btn-base" onclick="closeWrite()">취소</button>
-                    <button id="submitBtn" class="btn-base btn-submit" onclick="submitPost()">등록하기</button>
-                </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn-write-trigger" style="background:#555;" onclick="closeWrite()">취소</button>
+                <button id="submitBtn" class="btn-write-trigger" onclick="submitPost()">등록하기</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 관리자님의 마법 통로 주소
-        const API_URL = "https://script.google.com/macros/s/AKfycbxSdoLf-AO2gVxujjRZp_UKuZvBbIfQoQNA0gjOkfoAPkvK5DDYRpXbJWnCG6qR77zySw/exec";
+        // 관리자님이 새로 주신 주소 적용
+        const API_URL = "https://script.google.com/macros/s/AKfycbyrGuUugv38NIT_RTU-W8zvtIe_viNb46qpkhEVRlYt6ryxLdU06y_odo8T3ADF1YFn_g/exec";
         const urlParams = new URLSearchParams(window.location.search);
-        const currentUser = urlParams.get('user') || "Unknown";
+        const currentUser = urlParams.get('user') || "Admin";
 
-        // 1. 목록 가져오기
         async function loadPosts() {
-            document.getElementById('loadingStatus').style.display = 'block';
             try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
+                const res = await fetch(API_URL);
+                const data = await res.json();
                 renderBoard(data);
             } catch (e) {
-                console.error("데이터 로드 실패", e);
+                document.getElementById('loadingStatus').innerText = "데이터 연결 실패! 시트 헤더를 확인해주세요.";
             } finally {
                 document.getElementById('loadingStatus').style.display = 'none';
             }
@@ -97,24 +86,28 @@
 
         function renderBoard(posts) {
             const tbody = document.getElementById('boardBody');
+            if (posts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="padding:50px;">첫 게시글을 남겨보세요!</td></tr>';
+                return;
+            }
+            // 시트 헤더가 Title, Tag, User 등 대문자로 시작한다고 가정합니다.
             tbody.innerHTML = posts.map((p, idx) => `
                 <tr>
-                    <td>${posts.length - idx}</td>
-                    <td class="td-title"><span class="tag tag-${p.Tag}">[${p.Tag}]</span> ${p.Title}</td>
-                    <td>${p.User}</td>
-                    <td>${p.Date}</td>
-                    <td>${p.Views}</td>
+                    <td>${idx + 1}</td>
+                    <td class="td-title"><span class="tag tag-${p.Tag}">[${p.Tag}]</span> ${p.Title || '제목 없음'}</td>
+                    <td>${p.User || '익명'}</td>
+                    <td>${p.Date || '-'}</td>
+                    <td>${p.Views || 0}</td>
                 </tr>
-            `).reverse().join(''); // 최신글이 위로 오도록
+            `).reverse().join('');
         }
 
-        // 2. 글 등록하기
         async function submitPost() {
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
             const tag = document.getElementById('postTag').value;
 
-            if(!title || !content) return alert("내용을 채워주세요!");
+            if(!title || !content) return alert("빈칸을 채워주세요!");
 
             const btn = document.getElementById('submitBtn');
             btn.innerText = "전송 중...";
@@ -125,17 +118,17 @@
                     method: 'POST',
                     body: JSON.stringify({ title, content, tag, user: currentUser })
                 });
-                alert("등록 성공!");
-                location.reload(); // 새로고침하여 목록 갱신
+                alert("우주로 전송 완료!");
+                location.reload();
             } catch (e) {
-                alert("등록 실패!");
+                alert("전송 실패!");
                 btn.disabled = false;
                 btn.innerText = "등록하기";
             }
         }
 
         function openWrite() { document.getElementById('listPage').style.display = 'none'; document.getElementById('writePage').style.display = 'block'; }
-        function closeWrite() { document.getElementById('writePage').style.display = 'block'; document.getElementById('writePage').style.display = 'none'; }
+        function closeWrite() { document.getElementById('writePage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; }
 
         window.onload = loadPosts;
     </script>
