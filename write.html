@@ -4,16 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIVERSE | 글쓰기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; background-color: #f5f6f8; font-family: sans-serif; }
-        .write-container { max-width: 850px; margin: 30px auto; background: white; padding: 40px; border: 1px solid #ddd; border-radius: 8px; }
+        body { margin: 0; background-color: #f5f6f8; font-family: 'Noto Sans KR', sans-serif; }
+        .write-container { max-width: 850px; margin: 30px auto; background: white; padding: 40px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
-        .info-row { margin-bottom: 20px; font-size: 14px; color: #666; }
+        .info-row { margin-bottom: 20px; font-size: 14px; color: #666; display: flex; gap: 20px; align-items: center; }
+        
+        .category-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        .category-select:focus { border-color: #03c75a; }
+
         input[type="text"] { width: 100%; padding: 15px 0; border: none; border-bottom: 1px solid #eee; font-size: 24px; font-weight: bold; outline: none; margin-bottom: 20px; }
         textarea { width: 100%; min-height: 400px; border: none; font-size: 16px; line-height: 1.6; outline: none; resize: none; }
         .footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
         .btn { padding: 10px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; border: 1px solid #ddd; }
-        .btn-submit { background-color: #03c75a; color: white; border: none; }
+        .btn-submit { background-color: #03c75a; color: white; border: none; transition: 0.2s; }
+        .btn-submit:hover { background-color: #02a84d; }
     </style>
 </head>
 <body>
@@ -22,7 +36,18 @@
             <h2 style="margin:0;">카페 글쓰기</h2>
             <button class="btn btn-submit" id="saveBtn">등록</button>
         </div>
-        <div class="info-row">작성자: <span id="writerName">로드 중...</span></div>
+
+        <div class="info-row">
+            <div>
+                말머리: 
+                <select id="category" class="category-select">
+                    <option value="수다">수다</option>
+                    <option value="지우">지우</option>
+                    </select>
+            </div>
+            <div>작성자: <span id="writerName" style="font-weight: bold; color: #333;">로드 중...</span></div>
+        </div>
+
         <input type="text" id="title" placeholder="제목을 입력하세요">
         <textarea id="content" placeholder="내용을 입력하세요"></textarea>
     </div>
@@ -39,21 +64,42 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 작성자 설정
+        // 작성자 및 관리자 권한 설정
         const urlParams = new URLSearchParams(window.location.search);
         const user = urlParams.get('user') || "익명";
         document.getElementById('writerName').innerText = user;
 
+        // 🛡️ 관리자 권한 체크 (이름이 '관리자' 혹은 '한지우'인 경우)
+        const isAdmin = (user === "관리자" || user === "한지우");
+        const categorySelect = document.getElementById('category');
+
+        if (isAdmin) {
+            const adminOption = document.createElement('option');
+            adminOption.value = "공지";
+            adminOption.innerText = "공지";
+            categorySelect.appendChild(adminOption);
+            // 관리자라면 자동으로 공지가 먼저 선택되게 하고 싶다면 아래 주석 해제
+            // categorySelect.value = "공지";
+        }
+
         document.getElementById('saveBtn').onclick = async () => {
+            const category = categorySelect.value;
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
 
             if(!title || !content) return alert("제목과 내용을 입력해주세요.");
 
+            // 🛡️ 2차 보안 체크: 일반 유저가 '공지'로 등록 시도할 경우 차단
+            if (category === "공지" && !isAdmin) {
+                alert("공지 말머리는 관리자 전용입니다.");
+                return;
+            }
+
             const postsRef = ref(db, 'posts_v2');
             const newPostRef = push(postsRef);
             
             await set(newPostRef, {
+                category: category,
                 title: title,
                 content: content,
                 writer: user,
