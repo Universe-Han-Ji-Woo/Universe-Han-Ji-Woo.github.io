@@ -20,7 +20,7 @@
             overflow-x: hidden;
         }
 
-        /* ✨ 배경 별무리 효과 (컨트롤 타워와 동일) */
+        /* ✨ 배경 별무리 효과 */
         .universe-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, #1a253a 0%, #0b111e 80%);
@@ -59,7 +59,7 @@
             display: flex; gap: 20px; align-items: center; 
         }
         
-        /* ♎ 말머리 드롭다운 우주 스타일 */
+        /* 말머리 드롭다운 스타일 */
         .category-select {
             padding: 8px 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -74,7 +74,7 @@
         .category-select:hover { border-color: #ff2d55; }
         .category-select option { background-color: #1a253a; color: white; }
 
-        /* ✍️ 입력창 스타일 */
+        /* 입력창 스타일 */
         input[type="text"] { 
             width: 100%; padding: 15px 0; 
             border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
@@ -90,9 +90,8 @@
             font-size: 17px; line-height: 1.8; outline: none; resize: none; 
             background: transparent; color: rgba(255, 255, 255, 0.8);
         }
-        textarea::placeholder { color: rgba(255, 255, 255, 0.2); }
 
-        /* 🚀 버튼 스타일 */
+        /* 🚀 버튼 스타일 (등록으로 수정) */
         .btn-submit { 
             background-color: #ff2d55; color: white; border: none; 
             padding: 12px 35px; border-radius: 25px; font-weight: bold;
@@ -112,7 +111,7 @@
     <div class="write-container">
         <div class="header">
             <h2>기록 스테이션</h2>
-            <button class="btn-submit" id="saveBtn">임무 완료 (등록)</button>
+            <button class="btn-submit" id="saveBtn">등록</button>
         </div>
 
         <div class="info-row">
@@ -126,8 +125,8 @@
             <div>기록관: <span id="writerName" style="font-weight: bold; color: #fff;">로드 중...</span></div>
         </div>
 
-        <input type="text" id="title" placeholder="무엇을 기록하시겠습니까?">
-        <textarea id="content" placeholder="우주 깊은 곳의 이야기를 남겨주세요..."></textarea>
+        <input type="text" id="title" placeholder="제목을 입력하세요">
+        <textarea id="content"></textarea>
     </div>
 
     <script type="module">
@@ -146,7 +145,6 @@
         const user = urlParams.get('user') || "익명";
         document.getElementById('writerName').innerText = user;
 
-        // 🛡️ 관리자 권한 체크 및 별 생성
         const isAdmin = (user === "관리자" || user === "한지우");
         const categorySelect = document.getElementById('category');
 
@@ -157,7 +155,6 @@
             categorySelect.appendChild(adminOption);
         }
 
-        // ✨ 배경 별 생성 함수
         function createStars() {
             const container = document.getElementById('starContainer');
             for (let i = 0; i < 100; i++) {
@@ -198,7 +195,7 @@
                 likes: 0
             });
 
-            alert("기록이 유니버스에 성공적으로 저장되었습니다.");
+            alert("성공적으로 등록되었습니다.");
             location.href = `board.html?user=${encodeURIComponent(user)}`;
         };
     </script>
