@@ -34,7 +34,6 @@
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
         .page-btn { background: none; border: 1px solid #333; color: var(--text-gray); padding: 5px 12px; cursor: pointer; border-radius: 4px; }
         .page-btn.active { background: var(--main-red); color: white; border-color: var(--main-red); }
-        
         .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 15px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; font-size: 1rem; }
         .w-textarea { height: 400px; resize: none; }
     </style>
@@ -54,7 +53,8 @@
                         <th width="50">번호</th>
                         <th>제목</th>
                         <th width="90">작성자</th>
-                        <th width="110">날짜</th> <th width="60">조회수</th>
+                        <th width="110">날짜</th>
+                        <th width="60">조회수</th>
                     </tr>
                 </thead>
                 <tbody id="boardBody"></tbody>
@@ -93,19 +93,19 @@
         let currentPostIdx = -1;
         const postsPerPage = 12;
 
-        // [본문용] 상세 시간 (오전/오후 포함)
-        function formatFullTime(dateStr) {
+        function formatTime(dateStr, showDetail) {
             if(!dateStr) return "-";
             const d = new Date(dateStr);
             if(isNaN(d)) return dateStr;
-            const y = d.getFullYear();
-            const m = d.getMonth() + 1;
-            const day = d.getDate();
-            let hh = d.getHours();
-            const mm = d.getMinutes().toString().padStart(2, '0');
-            const ampm = hh >= 12 ? '오후' : '오전';
-            hh = hh % 12 || 12;
-            return `${y}.${m}.${day} ${ampm} ${hh}:${mm}`;
+
+            if(showDetail) {
+                return d.toLocaleString('ko-KR', { 
+                    year: 'numeric', month: 'numeric', day: 'numeric', 
+                    hour: 'numeric', minute: 'numeric', hour12: true 
+                });
+            } else {
+                return d.toLocaleDateString('ko-KR');
+            }
         }
 
         async function loadPosts() {
@@ -122,60 +122,68 @@
             const currentPosts = allPosts.slice().reverse().slice(start, start + postsPerPage);
 
             tbody.innerHTML = currentPosts.map((p, i) => {
-                const title = p.Title || p.title || "제목 없음";
-                const user = p.User || p.user || "관리자";
-                // [목록]에는 날짜만 표시 (예: 2026.3.12)
-                const simpleDate = (p.Date || p.date || "").split('T')[0].replace(/-/g, '.') || "-";
-                const views = p.Views || p.views || 0;
                 const realIndex = allPosts.length - 1 - (start + i);
-
                 return `<tr>
                     <td>${allPosts.length - (start + i)}</td>
-                    <td class="td-title" onclick="viewPost(${realIndex})">${title}</td>
-                    <td>${user}</td>
-                    <td style="color:#777;">${simpleDate}</td>
-                    <td>${views}</td>
+                    <td class="td-title" onclick="viewPost(${realIndex})">${p.title || p.Title}</td>
+                    <td>${p.user || p.User || '관리자'}</td>
+                    <td style="color:#777;">${formatTime(p.date || p.Date, false)}</td>
+                    <td>${p.views || p.Views || 0}</td>
                 </tr>`;
             }).join('');
             renderPagination();
         }
 
-        function viewPost(idx) {
+        async function viewPost(idx) {
             currentPostIdx = idx;
             const p = allPosts[idx];
+            
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'view', id: p.id || p.ID })
+            });
+
             document.getElementById('listPage').style.display = 'none';
             document.getElementById('viewPage').style.display = 'block';
             
-            document.getElementById('viewTitle').innerText = p.Title || p.title;
-            // [본문 확인 시]에만 오전/오후 시간 노출
-            const detailedTime = formatFullTime(p.Date || p.date);
-            document.getElementById('viewInfo').innerText = `작성자: ${p.User || '관리자'} | ${detailedTime} | 조회수: ${p.Views || 0}`;
-            document.getElementById('viewBody').innerText = p.Content || p.content;
-            document.getElementById('likeCount').innerText = p.Likes || p.likes || 0;
+            document.getElementById('viewTitle').innerText = p.title || p.Title;
+            const detailedTime = formatTime(p.date || p.Date, true);
+            document.getElementById('viewInfo').innerText = `작성자: ${p.user || p.User || '관리자'} | ${detailedTime} | 조회수: ${(Number(p.views || p.Views || 0) + 1)}`;
+            document.getElementById('viewBody').innerText = p.content || p.Content;
+            document.getElementById('likeCount').innerText = p.likes || p.Likes || 0;
+            
             document.getElementById('likeBtn').classList.remove('clicked');
         }
 
         async function handleLike() {
             const btn = document.getElementById('likeBtn');
             if(btn.classList.contains('clicked')) return alert("이미 좋아요를 누르셨습니다.");
+            
+            const p = allPosts[currentPostIdx];
             const countSpan = document.getElementById('likeCount');
-            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+            countSpan.innerText = Number(countSpan.innerText) + 1;
             btn.classList.add('clicked');
-            try {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'like', id: allPosts[currentPostIdx].ID || allPosts[currentPostIdx].id })});
-            } catch(e) {}
+
+            await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'like', id: p.id || p.ID })
+            });
         }
 
-        function closeView() { document.getElementById('viewPage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; }
+        function closeView() { document.getElementById('viewPage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; loadPosts(); }
         function openWrite() { document.getElementById('listPage').style.display = 'none'; document.getElementById('writePage').style.display = 'block'; }
-        function closeWrite() { location.reload(); }
+        function closeWrite() { document.getElementById('writePage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; }
 
         async function submitPost() {
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
             if(!title || !content) return alert("빈칸을 채워주세요!");
+
             document.getElementById('submitBtn').innerText = "등록 중...";
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ title, content, tag: '수다', user: '관리자' }) });
+            await fetch(API_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ title, content, tag: '수다', user: '관리자' }) 
+            });
             location.reload();
         }
 
