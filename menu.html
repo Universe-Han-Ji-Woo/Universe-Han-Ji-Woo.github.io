@@ -8,34 +8,27 @@
     <script src="config.js"></script>
 
     <style>
+        /* CSS 부분은 운영자님의 아름다운 디자인을 그대로 유지합니다 */
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
             overflow: hidden; background: #050a10;
             font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
             display: flex; align-items: center; justify-content: center;
         }
-
-        /* 🌌 배경 설정 및 별들이 박힐 캔버스 영역 */
         .universe-bg {
             position: absolute; width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%);
-            z-index: 1;
-            overflow: hidden;
+            z-index: 1; overflow: hidden;
         }
-
-        /* ✨ 세하얀 별 스타일 */
         .star {
             position: absolute; background: #ffffff; border-radius: 50%; opacity: 0;
             pointer-events: none; animation: twinkle var(--duration) infinite ease-in-out;
             filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
         }
-
         @keyframes twinkle {
             0%, 100% { opacity: var(--min-opacity); transform: scale(1); }
             50% { opacity: 1; transform: scale(1.2); }
         }
-
-        /* 🛸 메인 컨트롤 타워 원형 */
         .control-tower {
             position: relative; z-index: 10;
             width: 500px; height: 500px;
@@ -48,12 +41,10 @@
             animation: pulse 4s infinite ease-in-out;
             transition: transform 0.3s ease;
         }
-
         @keyframes pulse {
             0%, 100% { box-shadow: 0 0 80px rgba(142, 168, 204, 0.1); }
             50% { box-shadow: 0 0 120px rgba(142, 168, 204, 0.3); }
         }
-
         .core-identity { text-align: center; z-index: 20; }
         .univ-title {
             font-family: 'Arial Black', sans-serif;
@@ -62,8 +53,6 @@
             margin: 0;
         }
         .user-welcome { color: #8ea8c9; font-size: 0.8rem; margin-top: 10px; letter-spacing: 2px; font-weight: bold; }
-
-        /* 메인 메뉴 스타일 */
         .icon-hub { position: absolute; width: 100%; height: 100%; z-index: 15; }
         .nav-item {
             position: absolute; width: 120px; height: 120px;
@@ -80,17 +69,12 @@
             box-shadow: 0 0 30px rgba(142, 168, 204, 0.6); 
             transform: scale(1.1);
         }
-
-        /* 메뉴 위치 */
         .nav-item.top    { top: -25px; left: 50%; transform: translateX(-50%); }
         .nav-item.bottom { bottom: -25px; left: 50%; transform: translateX(-50%); }
         .nav-item.left   { left: -25px; top: 50%; transform: translateY(-50%); }
         .nav-item.right  { right: -25px; top: 50%; transform: translateY(-50%); }
-
         .nav-label-en { font-size: 0.6rem; color: #8ea8c9; letter-spacing: 1px; margin-bottom: 4px; }
         .nav-label-ko { font-size: 0.85rem; font-weight: bold; color: #fff; }
-
-        /* 위성 공통 스타일 */
         .satellite-group { position: absolute; z-index: 25; }
         .guestbook-pos { right: -160px; top: -40px; }
         .line-right {
@@ -104,7 +88,6 @@
             background: linear-gradient(to left, rgba(142, 168, 204, 0.8), transparent);
             top: 55px; left: 75px; transform: rotate(25deg);
         }
-
         .satellite-node {
             width: 85px; height: 85px;
             background: rgba(255, 255, 255, 0.05);
@@ -121,7 +104,6 @@
         .node-en { font-size: 0.5rem; color: #8ea8c9; margin-bottom: 2px; }
         .node-ko { font-size: 0.75rem; color: #fff; font-weight: bold; }
 
-        /* 📱 모바일 대응 */
         @media (max-width: 768px) {
             .control-tower { width: 320px; height: 320px; }
             .univ-title { font-size: 1.5rem; letter-spacing: 4px; }
@@ -140,27 +122,20 @@
             .line-right, .line-left { display: none; }
         }
     </style>
-    <script>
-        // 🎯 [수정 핵심] 모든 이동 시 user 정보를 강제로 포함시킵니다.
-        function go(target) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const user = urlParams.get('user');
 
-            if (!user && target !== 'index.html') {
-                UniverseNav.goToIndex();
+    <script>
+        // 🎯 [수정 핵심] Universe 표준 함수 사용
+        function go(pageName) {
+            if (pageName === 'index') {
+                location.href = UNIVERSE_PATHS.INDEX;
                 return;
             }
-
-            if (target === 'guestbook.html') {
-                UniverseNav.goToGuestbook();
-            } else if (target === 'index.html') {
-                UniverseNav.goToIndex();
-            } else if (target === '#') {
+            if (pageName === 'archive') {
                 alert("준비 중인 구역입니다.");
-            } else {
-                // 일반 페이지 이동 시에도 user 파라미터 유지
-                location.href = `${target}?user=${encodeURIComponent(user)}`;
+                return;
             }
+            // 유저 정보를 포함하여 안전하게 이동
+            Universe.navigateTo(pageName);
         }
 
         function createStars() {
@@ -187,12 +162,11 @@
         }
 
         window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const user = urlParams.get('user');
+            const user = Universe.getUser();
             
-            if (!user) { 
+            if (user === "Unknown") { 
                 // 유저 정보 없으면 즉시 퇴출
-                UniverseNav.goToIndex(); 
+                location.href = UNIVERSE_PATHS.INDEX;
             } else { 
                 document.getElementById('userName').innerText = user; 
                 createStars();
@@ -210,19 +184,19 @@
         </div>
         
         <div class="icon-hub">
-            <div class="nav-item top" onclick="go('video.html')">
+            <div class="nav-item top" onclick="go('#')">
                 <div class="nav-label-en">FILMOGRAPHY</div>
                 <div class="nav-label-ko">작품 저장소</div>
             </div>
-            <div class="nav-item right" onclick="go('board.html')">
+            <div class="nav-item right" onclick="go('board')">
                 <div class="nav-label-en">FREE BOARD</div>
                 <div class="nav-label-ko">자유 게시판</div>
             </div>
-            <div class="nav-item bottom" onclick="go('index.html')">
+            <div class="nav-item bottom" onclick="go('index')">
                 <div class="nav-label-en">EXIT GATE</div>
                 <div class="nav-label-ko">처음으로</div>
             </div>
-            <div class="nav-item left" onclick="go('#')">
+            <div class="nav-item left" onclick="go('archive')">
                 <div class="nav-label-en">ARCHIVE</div>
                 <div class="nav-label-ko">기록 보관소</div>
             </div>
@@ -230,7 +204,7 @@
 
         <div class="satellite-group gallery-pos">
             <div class="line-left"></div>
-            <div class="satellite-node" onclick="go('gallery.html')">
+            <div class="satellite-node" onclick="go('gallery')">
                 <div class="node-en">GALAXY</div>
                 <div class="node-ko">갤러리</div>
             </div>
@@ -238,7 +212,7 @@
 
         <div class="satellite-group guestbook-pos">
             <div class="line-right"></div>
-            <div class="satellite-node" onclick="go('guestbook.html')">
+            <div class="satellite-node" onclick="go('guestbook')">
                 <div class="node-en">GUEST BOOK</div>
                 <div class="node-ko">방명록</div>
             </div>
