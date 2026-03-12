@@ -8,63 +8,50 @@
     <style>
         body { margin: 0; padding: 0; background-color: #0b111e; color: white; font-family: 'Noto Sans KR', sans-serif; overflow-x: hidden; }
         
-        /* 🌌 깊은 우주 배경 */
+        /* 🌌 우주 배경 효과 */
         body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a253a 0%, #0b111e 70%); z-index: -1; opacity: 0.6; }
 
-        /* ♎ 천칭자리 우주정거장 관문 (별자리 형태 컨셉) */
-        .universe-path { width: 100%; padding: 50px 0 30px 0; display: flex; justify-content: center; align-items: center; }
+        /* ♎ 천칭자리 우주정거장 관문 (이미지 레이아웃 재현) */
+        .universe-path { width: 100%; padding: 45px 0 25px 0; display: flex; justify-content: center; align-items: center; }
         .constellation-tower { text-decoration: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.5s; position: relative; }
         
-        /* 🚩 [수정 완료] 인터넷 참고: 세하얀 천칭자리 별자리 형태 구현 */
-        .libra-constellation { position: relative; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; transition: 0.5s; z-index: 2; }
-
-        /* 각 별자리 지점 (세하얀 별) */
-        .star { position: absolute; background: #fff; border-radius: 50%; box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.7); transition: 0.5s; }
-
-        /* 별자리 연결선 (투명한 세하얀 선) */
-        .line { position: absolute; background: rgba(255, 255, 255, 0.1); transition: 0.5s; }
-
-        /* 천칭자리 별 지점 및 연결선 배치 (인터넷 참고) */
-        /* 베타 라이브래 (가장 밝은 별, 꼭대기) */
-        .beta { width: 6px; height: 6px; top: 0; left: 32px; box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.9); }
-        /* 알파 라이브래 (두 번째 별) */
-        .alpha { width: 4px; height: 4px; top: 30px; left: 10px; }
-        /* 감마 라이브래 (세 번째 별) */
-        .gamma { width: 4px; height: 4px; top: 30px; left: 55px; }
-        /* 요타 라이브래 (네 번째 별, 하단) */
-        .iota { width: 3px; height: 3px; top: 60px; left: 32px; }
-
-        /* 별자리 연결선 배치 */
-        /* 베타 <-> 알파 */
-        .line-1 { width: 1px; height: 32px; top: 5px; left: 20px; transform: rotate(-35deg); }
-        /* 베타 <-> 감마 */
-        .line-2 { width: 1px; height: 32px; top: 5px; right: 20px; transform: rotate(35deg); }
-        /* 알파 <-> 요타 */
-        .line-3 { width: 1px; height: 32px; top: 35px; left: 20px; transform: rotate(35deg); }
-        /* 감마 <-> 요타 */
-        .line-4 { width: 1px; height: 32px; top: 35px; right: 20px; transform: rotate(-35deg); }
-
-        /* '우주정거장으로 귀환' 문구 */
-        .tower-guide { font-size: 10px; color: rgba(255, 255, 255, 0.4); letter-spacing: 2.5px; margin-top: 15px; font-weight: 300; transition: 0.5s; }
-
-        /* 하단 텍스트 */
-        .logo-text { font-size: 11px; color: rgba(255, 255, 255, 0.5); letter-spacing: 4px; margin-top: 5px; text-transform: uppercase; font-weight: 300; transition: 0.3s; }
-
-        /* ✨ 호버 애니메이션 (세하얀 별자리 글로우) */
-        @keyframes constellationGlow { 
-            0%, 100% { box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.9), 0 0 10px 2px rgba(255, 255, 255, 0.7); transform: scale(1); } 
-            50% { box-shadow: 0 0 25px 6px rgba(255, 255, 255, 1), 0 0 20px 4px rgba(255, 255, 255, 0.8); transform: scale(1.05); } 
-        }
+        /* ✨ 이미지 모양을 그대로 본뜬 SVG 컨테이너 */
+        .libra-svg-wrapper { position: relative; width: 80px; height: 80px; display: flex; justify-content: center; align-items: center; }
         
-        .constellation-tower:hover .beta, .constellation-tower:hover .alpha, .constellation-tower:hover .gamma, .constellation-tower:hover .iota { animation: constellationGlow 1s infinite ease-in-out; background: #fff; }
-        .constellation-tower:hover .line { background: rgba(255, 255, 255, 0.3); }
-        .constellation-tower:hover .tower-guide { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 1); }
-        .constellation-tower:hover .logo-text { color: rgba(255, 255, 255, 0.9); }
+        /* 별빛 입자 (이미지의 별 위치 재현) */
+        .star-dot { position: absolute; background: #fff; border-radius: 50%; box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.9); z-index: 3; transition: 0.4s; }
+        .s1 { top: 0%; left: 55%; width: 6px; height: 6px; }   /* 상단 꼭대기 별 */
+        .s2 { top: 40%; left: 5%; width: 4px; height: 4px; }   /* 왼쪽 끝 별 */
+        .s3 { top: 35%; right: 5%; width: 5px; height: 5px; }  /* 오른쪽 높은 별 */
+        .s4 { top: 65%; right: 25%; width: 4px; height: 4px; } /* 오른쪽 낮은 별 */
+        .s5 { bottom: 0%; left: 45%; width: 5px; height: 5px; } /* 하단 중앙 별 */
 
-        /* 게시판 스타일 유지 */
+        /* 별을 연결하는 세하얀 선 (이미지 곡선/직선 느낌 재현) */
+        .libra-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; overflow: visible; }
+        .libra-lines line { stroke: rgba(255, 255, 255, 0.25); stroke-width: 1.2; transition: 0.5s; }
+
+        /* 배경에 은은하게 흐르는 별가루 */
+        .falling-stars { position: absolute; width: 140%; height: 140%; pointer-events: none; }
+        .dust { position: absolute; background: #fff; border-radius: 50%; opacity: 0; animation: starFall 4s infinite linear; }
+        @keyframes starFall {
+            0% { transform: translateY(-20px) opacity: 0; }
+            20% { opacity: 0.4; }
+            100% { transform: translateY(60px) opacity: 0; }
+        }
+
+        /* 호버 상호작용 */
+        .constellation-tower:hover .star-dot { box-shadow: 0 0 20px 8px rgba(255, 255, 255, 1); transform: scale(1.3); }
+        .constellation-tower:hover .libra-lines line { stroke: rgba(255, 255, 255, 0.7); stroke-width: 1.5; }
+        .constellation-tower:hover .tower-guide { color: #fff; text-shadow: 0 0 12px #fff; transform: translateY(-2px); }
+
+        /* 문구 스타일 */
+        .tower-guide { font-size: 11px; color: rgba(255, 255, 255, 0.4); letter-spacing: 3px; margin-top: 18px; font-weight: 300; transition: 0.5s; }
+        .logo-text { font-size: 12px; color: rgba(255, 255, 255, 0.6); letter-spacing: 5px; margin-top: 5px; text-transform: uppercase; font-weight: 400; }
+
+        /* 게시판 본체 스타일 */
         .board-container { max-width: 950px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
         .board-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 30px; }
-        .header-title { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #fff; margin: 0; }
+        .header-title { font-size: 24px; font-weight: 700; color: #fff; margin: 0; }
         .write-btn { background-color: #ff2d55; color: white; padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .write-btn:hover { background-color: #fff; color: #ff2d55; box-shadow: 0 0 20px #ff2d55; }
         
@@ -79,16 +66,22 @@
 <body>
 
     <div class="universe-path">
-        <div class="constellation-tower" onclick="goBack()" title="우주정거장으로 이동"> 
-            <div class="libra-constellation">
-                <div class="star beta"></div>
-                <div class="star alpha"></div>
-                <div class="star gamma"></div>
-                <div class="star iota"></div>
-                <div class="line line-1"></div>
-                <div class="line line-2"></div>
-                <div class="line line-3"></div>
-                <div class="line line-4"></div>
+        <div class="constellation-tower" onclick="goBack()">
+            <div class="libra-svg-wrapper">
+                <div class="falling-stars">
+                    <div class="dust" style="top:10%; left:10%; width:1px; height:1px; animation-delay:0.5s;"></div>
+                    <div class="dust" style="top:40%; left:85%; width:2px; height:2px; animation-delay:1.5s;"></div>
+                    <div class="dust" style="top:70%; left:25%; width:1px; height:1px; animation-delay:2.5s;"></div>
+                </div>
+                
+                <div class="star-dot s1"></div>
+                <div class="star-dot s2"></div>
+                <div class="star-dot s3"></div>
+                <div class="star-dot s4"></div>
+                <div class="star-dot s5"></div>
+
+                <svg class="libra-lines" viewBox="0 0 80 80">
+                    <line x1="55%" y1="0%" x2="5%" y2="40%" />   <line x1="55%" y1="0%" x2="95%" y2="35%" />  <line x1="5%" y1="40%" x2="45%" y2="100%" /> <line x1="95%" y1="35%" x2="75%" y2="65%" /> <line x1="75%" y1="65%" x2="45%" y2="100%" /> </svg>
             </div>
             <span class="tower-guide">우주정거장으로 귀환</span>
             <span class="logo-text">Space Station</span>
@@ -118,7 +111,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // ✅ 파이어베이스 설정 유지
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
@@ -135,15 +127,13 @@
             const data = snapshot.val();
             if (data) {
                 const items = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); 
+                items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                 let no = items.length;
                 items.forEach((post) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${no--}</td>
-                        <td class="title-cell">
-                            <span class="category">[${post.category || '일반'}]</span> ${post.title || '제목 없음'}
-                        </td>
+                        <td class="title-cell"><span class="category">[${post.category || '일반'}]</span> ${post.title || '제목 없음'}</td>
                         <td>${post.writer || '익명'}</td>
                         <td style="color:#8a94a6; font-size:13px;">${post.date || '-'}</td>
                         <td>${post.views || 0}</td>
@@ -153,6 +143,8 @@
                     };
                     boardContent.appendChild(row);
                 });
+            } else {
+                boardContent.innerHTML = "<tr><td colspan='5' style='padding:50px; color:#8a94a6;'>게시글이 우주 어딘가에 있나 봅니다...</td></tr>";
             }
         });
 
@@ -165,7 +157,6 @@
             return urlParams.get('user') || "Unknown";
         };
 
-        // 🛡️ 우주정거장 허브(menu.html)로 연결 유지
         window.goBack = function() {
             location.href = `menu.html?user=${encodeURIComponent(getUserName())}`;
         };
