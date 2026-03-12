@@ -24,7 +24,6 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 실시간 접속자 및 토탈 팬 카운트 (기존 로직 유지)
         function trackOnlineUsers() {
             const connectedRef = db.ref(".info/connected");
             const onlineRef = db.ref("online_users").push();
@@ -47,15 +46,34 @@
             });
         }
 
+        // 🎯 [신규] 엔터 키 감지 리스너
+        function setupEnterKey() {
+            // 로그인 박스 엔터 감지
+            const loginInputs = ['lEmail', 'lPw'];
+            loginInputs.forEach(id => {
+                document.getElementById(id).addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleLogin();
+                });
+            });
+
+            // 회원가입 박스 엔터 감지
+            const signupInputs = ['sEmail', 'sPw'];
+            signupInputs.forEach(id => {
+                document.getElementById(id).addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleSignup();
+                });
+            });
+        }
+
         window.onload = () => {
             trackOnlineUsers();
             updateTotalFans();
+            setupEnterKey(); // 페이지 로드 시 엔터 키 감지 활성화
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
             if(user) document.getElementById('nickBadge').innerText = user;
         };
 
-        // 🎯 [중심 컨트롤 타워 연결] 로그인 로직
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
@@ -67,7 +85,7 @@
             }
 
             auth.signInWithEmailAndPassword(email, pw).then((userCredential) => {
-                const userEmail = userCredential.user.email.split('@')[0]; // 이메일 앞자리 닉네임화
+                const userEmail = userCredential.user.email.split('@')[0];
                 alert("지우 유니버스에 오신 것을 환영합니다!");
                 location.href = `menu.html?user=${encodeURIComponent(userEmail)}`;
             }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
@@ -109,8 +127,6 @@
             position: relative; width: 100%; height: 100vh; 
             display: flex; flex-direction: column; align-items: center; z-index: 10; 
         }
-        
-        /* 텍스트 반응형 조절 */
         .header-text { padding-top: 8vh; text-align: center; }
         .univ-title { 
             font-family: 'Arial Black', sans-serif; font-size: clamp(2.5rem, 10vw, 3.8rem); 
@@ -121,8 +137,6 @@
             font-size: clamp(0.9rem, 4vw, 1.2rem); 
             color: #ff2d55; letter-spacing: 5px; margin-top: 15px; font-weight: 900; 
         }
-
-        /* 이미지 반응형 최적화 */
         .hero-photo-zone { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
             overflow: hidden; width: 100%;
@@ -133,7 +147,6 @@
             animation: softPulse 6s infinite alternate ease-in-out; 
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); 
         }
-
         .footer-btn-zone { height: 15vh; width: 100%; display: flex; justify-content: center; align-items: center; }
         .btn-stay { 
             cursor: pointer; border: none; width: 85%; max-width: 320px; height: 60px; 
@@ -143,7 +156,6 @@
         }
         .btn-stay:hover { transform: translateY(-3px); background: #000; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
 
-        /* 상태창 반응형 */
         #statusZone { 
             position: fixed; right: 25px; top: 25px; 
             display: flex; flex-direction: column; align-items: flex-end; z-index: 100;
@@ -152,7 +164,6 @@
         .status-msg { font-size: 0.8rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 2px solid #ff2d55; }
         .count-info { font-size: 0.7rem; color: #888; text-align: right; line-height: 1.5; }
 
-        /* 모바일 대응 미디어 쿼리 */
         @media screen and (max-width: 600px) {
             #statusZone { right: 15px; top: 15px; }
             .main-img { max-height: 60vh; }
@@ -160,7 +171,6 @@
             .univ-title { line-height: 1.1; }
         }
 
-        /* 인증 모달 */
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); 
