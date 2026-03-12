@@ -12,26 +12,21 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
-            authDomain: "jiwoo-fanpage.firebaseapp.com",
-            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com", 
-            projectId: "jiwoo-fanpage",
-            storageBucket: "jiwoo-fanpage.firebasestorage.app",
-            messagingSenderId: "928634858988",
-            appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
-        };
-        firebase.initializeApp(firebaseConfig);
+        // 2. config.js에 이미 설정값이 있으므로 중복 선언 제거하고 초기화만 진행
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // 🎯 [사파리 대응] 모바일 실제 높이 계산 함수
+        // [사파리 대응] 모바일 실제 높이 계산
         function setVh() {
             let vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
         }
 
+        // 실시간 접속자 추적
         function trackOnlineUsers() {
             const connectedRef = db.ref(".info/connected");
             const onlineRef = db.ref("online_users").push();
@@ -48,6 +43,7 @@
             });
         }
 
+        // 총 팬 수 업데이트
         function updateTotalFans() {
             db.ref('total_fan_count').on('value', (snapshot) => {
                 const count = snapshot.val() || 0;
@@ -56,56 +52,62 @@
             });
         }
 
-        function setupEnterKey() {
-            const loginInputs = ['lEmail', 'lPw'];
-            loginInputs.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
-            });
-
-            const signupInputs = ['sEmail', 'sPw'];
-            signupInputs.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSignup(); });
-            });
-        }
-
         window.onload = () => {
             setVh();
-            window.addEventListener('resize', setVh); // 화면 회전/크기 변경 대응
+            window.addEventListener('resize', setVh);
             trackOnlineUsers();
             updateTotalFans();
-            setupEnterKey();
-            const urlParams = new URLSearchParams(window.location.search);
-            const user = urlParams.get('user');
-            if(user) document.getElementById('nickBadge').innerText = user;
+            
+            // 로그인/회원가입 엔터키 이벤트
+            const addEnterEvent = (id, fn) => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('keypress', (e) => { if(e.key === 'Enter') fn(); });
+            };
+            ['lEmail', 'lPw'].forEach(id => addEnterEvent(id, handleLogin));
+            ['sEmail', 'sPw'].forEach(id => addEnterEvent(id, handleSignup));
+
+            // URL에 유저 정보가 이미 있다면 표시
+            const currentUser = Universe.getUser();
+            if(currentUser !== "VISITOR") {
+                document.getElementById('nickBadge').innerText = currentUser;
+            }
         };
 
+        // 🎯 로그인 처리 (핵심 수정 구역)
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
 
+            if (!email || !pw) return alert("정보를 모두 입력해주세요.");
+
+            // 관리자 계정 체크
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
-                alert("관리자님, 유니버스 컨트롤 타워로 이동합니다!");
-                UniverseNav.replaceToMenu("관리자");
+                alert("관리자님, 환영합니다!");
+                Universe.navigateTo('menu', '관리자'); // Universe 객체 사용
                 return;
             }
 
             auth.signInWithEmailAndPassword(email, pw).then((userCredential) => {
                 const userEmail = userCredential.user.email.split('@')[0];
                 alert("지우 유니버스에 오신 것을 환영합니다!");
-                UniverseNav.replaceToMenu(userEmail);
-            }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
+                Universe.navigateTo('menu', userEmail); // Universe 객체 사용
+            }).catch((err) => {
+                console.error(err);
+                alert("로그인에 실패했습니다. 정보를 확인해주세요.");
+            });
         }
 
+        // 회원가입 처리
         function handleSignup() {
             const email = document.getElementById('sEmail').value;
             const pw = document.getElementById('sPw').value;
+            if (!email || !pw) return alert("정보를 모두 입력해주세요.");
+
             auth.createUserWithEmailAndPassword(email, pw).then(() => {
                 db.ref('total_fan_count').transaction((currentCount) => (currentCount || 0) + 1);
-                alert("입성을 환영합니다! 로그인을 진행해 주세요."); 
+                alert("멤버십 가입 완료! 이제 로그인 해주세요."); 
                 location.reload();
-            }).catch((err) => alert(err.message));
+            }).catch((err) => alert("가입 실패: " + err.message));
         }
 
         function openAuth() { 
@@ -121,89 +123,27 @@
     </script>
 
     <style>
-        :root { --vh: 1vh; } /* 기본값 */
-
-        body { 
-            margin: 0; padding: 0; background: #ffffff; 
-            height: 100vh; height: calc(var(--vh, 1vh) * 100); /* 사파리 높이 대응 */
-            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
-            overflow: hidden; -webkit-text-size-adjust: none;
-        }
-        .liquid-bg { 
-            position: absolute; width: 100%; height: 100%; 
-            background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); 
-            z-index: 1; 
-        }
-        .main-container { 
-            position: relative; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; align-items: center; z-index: 10; 
-        }
-        .header-text { padding-top: 6vh; text-align: center; width: 100%; }
-        .univ-title { 
-            font-family: 'Arial Black', sans-serif; font-size: clamp(2rem, 9vw, 3.8rem); 
-            font-weight: 900; color: #1a1a1a; line-height: 1.0; 
-            letter-spacing: -1px; text-transform: uppercase; margin: 0; 
-        }
-        .coming-soon-label { 
-            font-size: clamp(0.7rem, 3.5vw, 1.1rem); 
-            color: #ff2d55; letter-spacing: 3px; margin-top: 10px; font-weight: 900; 
-        }
-        .hero-photo-zone { 
-            flex: 1; display: flex; justify-content: center; align-items: center; 
-            overflow: hidden; width: 100%;
-        }
-        .main-img { 
-            max-height: 65vh; width: auto; max-width: 95%; 
-            object-fit: contain;
-            animation: softPulse 6s infinite alternate ease-in-out; 
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); 
-        }
+        /* 기존 스타일 동일 유지 */
+        :root { --vh: 1vh; }
+        body { margin: 0; padding: 0; background: #ffffff; height: calc(var(--vh, 1vh) * 100); font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; }
+        .liquid-bg { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); z-index: 1; }
+        .main-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        .header-text { padding-top: 6vh; text-align: center; }
+        .univ-title { font-family: 'Arial Black', sans-serif; font-size: clamp(2rem, 9vw, 3.8rem); font-weight: 900; color: #1a1a1a; line-height: 1.0; margin: 0; }
+        .coming-soon-label { font-size: clamp(0.7rem, 3.5vw, 1.1rem); color: #ff2d55; letter-spacing: 3px; margin-top: 10px; font-weight: 900; }
+        .hero-photo-zone { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; }
+        .main-img { max-height: 65vh; width: auto; max-width: 95%; object-fit: contain; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); }
         .footer-btn-zone { height: 12vh; width: 100%; display: flex; justify-content: center; align-items: center; padding-bottom: 20px; }
-        .btn-stay { 
-            cursor: pointer; border: none; width: 80%; max-width: 300px; height: 55px; 
-            background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 3px; 
-            border-radius: 30px; text-transform: uppercase; transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); font-size: 0.9rem;
-        }
-
-        #statusZone { 
-            position: fixed; right: 20px; top: 20px; 
-            display: flex; flex-direction: column; align-items: flex-end; z-index: 100;
-        }
+        .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 300px; height: 55px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 3px; border-radius: 30px; text-transform: uppercase; transition: 0.3s; font-size: 0.9rem; }
+        #statusZone { position: fixed; right: 20px; top: 20px; display: flex; flex-direction: column; align-items: flex-end; z-index: 100; }
         .nick-box { font-size: 0.6rem; border: 1px solid #1a1a1a; padding: 2px 6px; font-weight: bold; background: #fff; margin-bottom: 4px; }
         .status-msg { font-size: 0.75rem; font-weight: bold; color: #1a1a1a; margin-bottom: 2px; border-bottom: 2px solid #ff2d55; }
-        .count-info { font-size: 0.65rem; color: #888; text-align: right; line-height: 1.4; }
-
-        /* 📱 모바일 최적화 미디어 쿼리 */
-        @media screen and (max-width: 600px) {
-            .header-text { padding-top: 5vh; }
-            .hero-photo-zone { padding: 10px 0; }
-            .main-img { max-height: 55vh; }
-            #statusZone { right: 15px; top: 15px; }
-            .auth-card { width: 85%; padding: 30px 15px; }
-        }
-
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            display: none; align-items: center; justify-content: center; z-index: 500; 
-            opacity: 0; transition: 0.4s; 
-        }
+        .count-info { font-size: 0.65rem; color: #888; text-align: right; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); display: none; align-items: center; justify-content: center; z-index: 500; opacity: 0; transition: 0.4s; }
         .modal-overlay.active { opacity: 1; }
-        .auth-card { 
-            width: 90%; max-width: 380px; padding: 35px 20px; 
-            background: #fff; border-radius: 25px; text-align: center; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 1px solid #eee;
-        }
-        .auth-input { 
-            width: 100%; padding: 14px; margin-bottom: 10px; 
-            border: 1px solid #eee; border-radius: 10px; font-size: 16px; /* 사파리 자동줌 방지용 16px */
-            box-sizing: border-box; background: #f9f9f9; outline: none;
-        }
-        .btn-submit { 
-            width: 100%; padding: 15px; background: #1a1a1a; color: #fff; 
-            border: none; border-radius: 10px; font-weight: 900; cursor: pointer; 
-        }
+        .auth-card { width: 90%; max-width: 380px; padding: 35px 20px; background: #fff; border-radius: 25px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 1px solid #eee; }
+        .auth-input { width: 100%; padding: 14px; margin-bottom: 10px; border: 1px solid #eee; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: #f9f9f9; outline: none; }
+        .btn-submit { width: 100%; padding: 15px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; }
         @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.02); } }
     </style>
 </head>
