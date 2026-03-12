@@ -7,29 +7,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; background-color: #0b111e; color: white; font-family: 'Noto Sans KR', sans-serif; }
-        
-        /* 🌌 컨트롤 타워 복귀 로고 (디자인 유지) */
         .universe-path { width: 100%; padding: 30px 0 10px 0; display: flex; justify-content: center; align-items: center; }
-        .universe-logo { text-decoration: none; display: flex; flex-direction: column; align-items: center; transition: 0.5s; cursor: pointer; }
+        .universe-logo { text-decoration: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .logo-icon { width: 45px; height: 45px; fill: none; stroke: #ff2d55; stroke-width: 1.2; transition: 0.5s; filter: drop-shadow(0 0 8px rgba(255, 45, 85, 0.4)); }
         .universe-logo:hover .logo-icon { transform: rotate(180deg) scale(1.1); stroke: #ffffff; filter: drop-shadow(0 0 15px #fff); }
-        .logo-text { font-size: 10px; color: #ff2d55; letter-spacing: 4px; margin-top: 10px; text-transform: uppercase; transition: 0.5s; }
-        .universe-logo:hover .logo-text { color: #fff; letter-spacing: 6px; }
+        .logo-text { font-size: 10px; color: #ff2d55; letter-spacing: 4px; margin-top: 10px; text-transform: uppercase; }
 
-        /* [게시판 레이아웃] */
         .board-container { max-width: 950px; margin: 0 auto; padding: 20px; }
         .board-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff2d55; padding-bottom: 15px; margin-bottom: 30px; }
-        .write-btn { background-color: #ff2d55; color: white; padding: 8px 20px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .write-btn { background-color: #ff2d55; color: white; padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .write-btn:hover { background-color: #fff; color: #ff2d55; box-shadow: 0 0 15px #ff2d55; }
         
         table { width: 100%; border-collapse: collapse; background-color: #161d2a; border-radius: 12px; overflow: hidden; }
         th, td { padding: 18px 10px; text-align: center; border-bottom: 1px solid #242d3c; }
         th { color: #8a94a6; font-size: 13px; background-color: #1c2535; }
-        
-        .category { color: #ff2d55; font-weight: bold; margin-right: 5px; font-size: 0.9em; }
-        .title-cell { text-align: left; cursor: pointer; padding-left: 20px; transition: 0.2s; }
+        .category { color: #ff2d55; font-weight: bold; margin-right: 5px; }
+        .title-cell { text-align: left; cursor: pointer; padding-left: 20px; }
         .title-cell:hover { color: #ff2d55; text-decoration: underline; }
-        .like-tag { color: #ff2d55; font-size: 12px; margin-left: 5px; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -37,9 +31,7 @@
     <div class="universe-path">
         <a href="#" class="universe-logo" onclick="goBack()"> 
             <svg class="logo-icon" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke-dasharray="2 2" />
-                <circle cx="12" cy="12" r="4" fill="#ff2d55" />
-                <path d="M12 2L12 6M12 18L12 22M2 12L6 12M18 12L22 12" />
+                <circle cx="12" cy="12" r="10" stroke-dasharray="2 2" /><circle cx="12" cy="12" r="4" fill="#ff2d55" /><path d="M12 2L12 6M12 18L12 22M2 12L6 12M18 12L22 12" />
             </svg>
             <span class="logo-text">Control Tower</span>
         </a>
@@ -48,9 +40,8 @@
     <div class="board-container">
         <div class="board-header">
             <h2 style="font-weight: 400; letter-spacing: 2px;">FREE BOARD</h2>
-            <button class="write-btn" onclick="goToWrite()">글쓰기</button>
+            <button type="button" class="write-btn" onclick="goToWrite()">글쓰기</button>
         </div>
-
         <table>
             <thead>
                 <tr>
@@ -61,82 +52,62 @@
                     <th style="width: 80px;">조회수</th>
                 </tr>
             </thead>
-            <tbody id="boardContent">
-                </tbody>
+            <tbody id="boardContent"></tbody>
         </table>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // 관리자님의 Firebase 설정
+        // 캡처해주신 Realtime Database 정보 반영
         const firebaseConfig = {
-            apiKey: "AIzaSy...", 
-            authDomain: "universe-han-ji-woo.firebaseapp.com",
-            projectId: "universe-han-ji-woo",
-            storageBucket: "universe-han-ji-woo.appspot.com",
-            messagingSenderId: "8472...",
-            appId: "1:8472..."
+            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
+            projectId: "jiwoo-fanpage"
+            // ※ 여기에 관리자님의 실제 apiKey, appId 등을 추가해서 쓰시면 더 확실합니다.
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getDatabase(app);
 
-        // 🔥 실시간 목록 업데이트 (말머리, 제목클릭, 좋아요 표시 포함)
-        const q = query(collection(db, "freeboard"), orderBy("timestamp", "desc"));
-        onSnapshot(q, (querySnapshot) => {
+        // 실시간 데이터 가져오기 (posts_v2 기준)
+        const postsRef = ref(db, 'posts_v2');
+        onValue(postsRef, (snapshot) => {
+            const data = snapshot.val();
             const boardContent = document.getElementById('boardContent');
             boardContent.innerHTML = "";
-            let totalDocs = querySnapshot.size;
+            
+            if (data) {
+                const keys = Object.keys(data).reverse(); // 최신순
+                let no = keys.length;
 
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                
-                // 날짜 형식 (YYYY. MM. DD.)
-                let dateStr = "-";
-                if (data.timestamp) {
-                    const d = new Date(data.timestamp.seconds * 1000);
-                    dateStr = `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}.`;
-                }
-                
-                // 좋아요 표시
-                const likeMarkup = data.likes > 0 ? `<span class="like-tag">❤️ ${data.likes}</span>` : "";
-                
-                const row = `
-                    <tr>
-                        <td>${totalDocs--}</td>
-                        <td class="title-cell" onclick="location.href='view.html?id=${doc.id}&user=${encodeURIComponent(getUserName())}'">
-                            <span class="category">[${data.category || '일반'}]</span> 
-                            <span>${data.title}</span>
-                            ${likeMarkup}
-                        </td>
-                        <td>${data.writer}</td>
-                        <td style="color:#8a94a6; font-size:13px;">${dateStr}</td>
-                        <td>${data.views || 0}</td>
-                    </tr>
-                `;
-                boardContent.innerHTML += row;
-            });
+                keys.forEach((key) => {
+                    const post = data[key];
+                    const date = post.date || "-";
+                    const row = `
+                        <tr>
+                            <td>${no--}</td>
+                            <td class="title-cell" onclick="location.href='view.html?id=${key}&user=${encodeURIComponent(getUserName())}'">
+                                <span class="category">[${post.category || '일반'}]</span> ${post.title}
+                            </td>
+                            <td>${post.author || post.writer || '익명'}</td>
+                            <td style="color:#8a94a6; font-size:13px;">${date}</td>
+                            <td>${post.views || 0}</td>
+                        </tr>
+                    `;
+                    boardContent.innerHTML += row;
+                });
+            }
         });
     </script>
 
     <script>
-        // 사용자 이름 가져오기 파라미터 함수
         function getUserName() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('user') || "Unknown";
         }
-
-        // 🌌 컨트롤 타워 복귀 경로
-        function goBack() { 
-            location.href = `menu.html?user=${encodeURIComponent(getUserName())}`; 
-        }
-
-        // ✍️ 글쓰기 이동 경로
-        function goToWrite() {
-            location.href = `write.html?user=${encodeURIComponent(getUserName())}`;
-        }
+        function goBack() { location.href = `menu.html?user=${encodeURIComponent(getUserName())}`; }
+        function goToWrite() { location.href = `write.html?user=${encodeURIComponent(getUserName())}`; }
     </script>
 </body>
 </html>
