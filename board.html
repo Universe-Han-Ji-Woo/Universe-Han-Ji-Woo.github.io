@@ -97,21 +97,25 @@
             if(!dateStr) return "-";
             const d = new Date(dateStr);
             if(isNaN(d)) return dateStr;
-
-            if(showDetail) {
-                return d.toLocaleString('ko-KR', { 
-                    year: 'numeric', month: 'numeric', day: 'numeric', 
-                    hour: 'numeric', minute: 'numeric', hour12: true 
-                });
-            } else {
-                return d.toLocaleDateString('ko-KR');
-            }
+            return showDetail 
+                ? d.toLocaleString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })
+                : d.toLocaleDateString('ko-KR');
         }
 
         async function loadPosts() {
             try {
                 const res = await fetch(API_URL);
-                allPosts = await res.json();
+                const data = await res.json();
+                // 서버 데이터 구조 강제 통일 (ID/Title 등 대소문자 혼용 방지)
+                allPosts = data.map(p => ({
+                    id: p.id || p.ID,
+                    title: p.title || p.Title,
+                    content: p.content || p.Content,
+                    user: p.user || p.User,
+                    date: p.date || p.Date,
+                    likes: Number(p.likes || p.Likes || 0),
+                    views: Number(p.views || p.Views || 0)
+                }));
                 renderBoard();
             } catch(e) { console.error("데이터 로드 실패"); }
         }
@@ -125,10 +129,10 @@
                 const realIndex = allPosts.length - 1 - (start + i);
                 return `<tr>
                     <td>${allPosts.length - (start + i)}</td>
-                    <td class="td-title" onclick="viewPost(${realIndex})">${p.title || p.Title}</td>
-                    <td>${p.user || p.User || '관리자'}</td>
-                    <td style="color:#777;">${formatTime(p.date || p.Date, false)}</td>
-                    <td>${p.views || p.Views || 0}</td>
+                    <td class="td-title" onclick="viewPost(${realIndex})">${p.title}</td>
+                    <td>${p.user}</td>
+                    <td style="color:#777;">${formatTime(p.date, false)}</td>
+                    <td>${p.views}</td>
                 </tr>`;
             }).join('');
             renderPagination();
@@ -138,20 +142,16 @@
             currentPostIdx = idx;
             const p = allPosts[idx];
             
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'view', id: p.id || p.ID })
-            });
+            // 조회수 서버 업데이트 (응답을 기다리지 않고 UI 먼저 업데이트)
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'view', id: p.id }) });
+            p.views += 1; 
 
             document.getElementById('listPage').style.display = 'none';
             document.getElementById('viewPage').style.display = 'block';
-            
-            document.getElementById('viewTitle').innerText = p.title || p.Title;
-            const detailedTime = formatTime(p.date || p.Date, true);
-            document.getElementById('viewInfo').innerText = `작성자: ${p.user || p.User || '관리자'} | ${detailedTime} | 조회수: ${(Number(p.views || p.Views || 0) + 1)}`;
-            document.getElementById('viewBody').innerText = p.content || p.Content;
-            document.getElementById('likeCount').innerText = p.likes || p.Likes || 0;
-            
+            document.getElementById('viewTitle').innerText = p.title;
+            document.getElementById('viewInfo').innerText = `작성자: ${p.user} | ${formatTime(p.date, true)} | 조회수: ${p.views}`;
+            document.getElementById('viewBody').innerText = p.content;
+            document.getElementById('likeCount').innerText = p.likes;
             document.getElementById('likeBtn').classList.remove('clicked');
         }
 
@@ -160,17 +160,22 @@
             if(btn.classList.contains('clicked')) return alert("이미 좋아요를 누르셨습니다.");
             
             const p = allPosts[currentPostIdx];
-            const countSpan = document.getElementById('likeCount');
-            countSpan.innerText = Number(countSpan.innerText) + 1;
             btn.classList.add('clicked');
-
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'like', id: p.id || p.ID })
-            });
+            
+            // 서버에 좋아요 요청 전송
+            try {
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'like', id: p.id }) });
+                p.likes += 1;
+                document.getElementById('likeCount').innerText = p.likes;
+            } catch(e) { alert("처리 중 오류가 발생했습니다."); btn.classList.remove('clicked'); }
         }
 
-        function closeView() { document.getElementById('viewPage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; loadPosts(); }
+        function closeView() { 
+            document.getElementById('viewPage').style.display = 'none'; 
+            document.getElementById('listPage').style.display = 'block'; 
+            renderBoard(); // 목록 새로고침 (이미 받아온 데이터로 반영)
+        }
+        
         function openWrite() { document.getElementById('listPage').style.display = 'none'; document.getElementById('writePage').style.display = 'block'; }
         function closeWrite() { document.getElementById('writePage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; }
 
@@ -180,11 +185,9 @@
             if(!title || !content) return alert("빈칸을 채워주세요!");
 
             document.getElementById('submitBtn').innerText = "등록 중...";
-            await fetch(API_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ title, content, tag: '수다', user: '관리자' }) 
-            });
-            location.reload();
+            // 글쓰기 시에는 action 없이 데이터만 전송
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ title, content, user: '관리자' }) });
+            location.reload(); 
         }
 
         function renderPagination() {
