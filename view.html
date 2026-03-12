@@ -8,28 +8,18 @@
     <style>
         body { margin: 0; background-color: #0b111e; color: white; font-family: 'Noto Sans KR', sans-serif; }
         .view-container { max-width: 850px; margin: 50px auto; background: #161d2a; padding: 40px; border-radius: 12px; position: relative; border: 1px solid #242d3c; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        /* 상단 관리 버튼 (수정/삭제) */
         .admin-btns { position: absolute; top: 40px; right: 40px; display: flex; gap: 8px; }
         .btn-sm { background: none; border: 1px solid #3d4655; color: #8a94a6; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: 0.2s; }
         .btn-sm:hover { border-color: #ff2d55; color: #ff2d55; }
         .btn-del:hover { background: #ff2d55; color: white; border-color: #ff2d55; }
-
-        /* 헤더 섹션 */
         .post-header { border-bottom: 1px solid #242d3c; padding-bottom: 25px; margin-bottom: 30px; }
         .post-title { font-size: 32px; font-weight: 700; margin-bottom: 20px; color: #fff; line-height: 1.4; }
         .post-info { display: flex; align-items: center; font-size: 14px; color: #8a94a6; }
         .writer-badge { color: #ff2d55; font-weight: bold; margin-right: 15px; }
-
-        /* 본문 섹션 */
         .content-area { min-height: 350px; line-height: 1.8; font-size: 17px; color: #cbd5e0; white-space: pre-wrap; word-break: break-all; }
-
-        /* 하단 컨트롤 섹션 (좋아요 & 목록) */
         .post-footer { border-top: 1px solid #242d3c; padding-top: 30px; display: flex; justify-content: space-between; align-items: center; }
-        
         .like-btn { cursor: pointer; border: 1px solid #3d4655; padding: 10px 20px; border-radius: 25px; background: rgba(255, 45, 85, 0.1); color: #ff2d55; display: flex; align-items: center; gap: 8px; font-weight: bold; transition: 0.3s; }
         .like-btn:hover { background: #ff2d55; color: white; transform: scale(1.05); }
-
         .list-btn { background: #3d4655; color: white; padding: 10px 25px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .list-btn:hover { background: #fff; color: #0b111e; }
     </style>
@@ -40,22 +30,17 @@
             <button class="btn-sm" id="editBtn">수정</button>
             <button class="btn-sm btn-del" id="deleteBtn">삭제</button>
         </div>
-
         <div class="post-header">
-            <div class="post-title" id="postTitle">게시글을 불러오고 있습니다...</div>
+            <div class="post-title" id="postTitle">로딩 중...</div>
             <div class="post-info">
-                <span class="writer-badge" id="postWriter">Writer</span>
-                <span id="postDate">0000. 00. 00.</span>
+                <span class="writer-badge" id="postWriter">-</span>
+                <span id="postDate">-</span>
                 <span style="margin-left:20px;">조회 <span id="postViews">0</span></span>
             </div>
         </div>
-
-        <div class="content-area" id="postContent">데이터 로딩 중...</div>
-
+        <div class="content-area" id="postContent">데이터를 불러오고 있습니다...</div>
         <div class="post-footer">
-            <button class="like-btn" id="likeBtn">
-                ❤️ <span id="likeCount">0</span>
-            </button>
+            <button class="like-btn" id="likeBtn">❤️ <span id="likeCount">0</span></button>
             <button class="list-btn" id="goListBtn">목록으로</button>
         </div>
     </div>
@@ -64,7 +49,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, get, update, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // ✅ 실시간 DB 설정 (jiwoo-fanpage)
         const firebaseConfig = {
             databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
             projectId: "jiwoo-fanpage"
@@ -73,67 +57,54 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // URL 파라미터에서 정보 추출
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
         const user = urlParams.get('user') || "Unknown";
         const postRef = ref(db, `posts_v2/${postId}`);
 
-        // 1. 게시글 데이터 로드 및 조회수 증가
+        // 데이터 로드 및 조회수 증가
         if (postId) {
             get(postRef).then((snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     document.getElementById('postTitle').innerText = data.title;
-                    document.getElementById('postWriter').innerText = data.writer || data.author || "익명";
+                    document.getElementById('postWriter').innerText = data.writer || "익명";
                     document.getElementById('postDate').innerText = data.date || "-";
                     document.getElementById('postContent').innerText = data.content;
                     document.getElementById('postViews').innerText = (data.views || 0) + 1;
                     document.getElementById('likeCount').innerText = data.likes || 0;
-
-                    // 조회수 1 증가 업데이트 (서버)
                     update(postRef, { views: (data.views || 0) + 1 });
-                } else {
-                    alert("삭제된 게시글이거나 존재하지 않습니다.");
-                    goToList();
                 }
-            }).catch(err => {
-                console.error("데이터 로드 실패:", err);
             });
         }
 
-        // 2. 좋아요 기능
-        document.getElementById('likeBtn').onclick = async () => {
-            const snap = await get(postRef);
-            if (snap.exists()) {
-                const currentLikes = snap.val().likes || 0;
-                await update(postRef, { likes: currentLikes + 1 });
-                document.getElementById('likeCount').innerText = currentLikes + 1;
-            }
-        };
-
-        // 3. 삭제 기능
-        document.getElementById('deleteBtn').onclick = async () => {
-            if (confirm("정말 이 게시물을 삭제하시겠습니까?")) {
-                await remove(postRef);
-                alert("삭제되었습니다.");
-                goToList();
-            }
-        };
-
-        // 4. 수정 페이지로 이동
+        // 수정 버튼 클릭 이벤트 (활성화 완료)
         document.getElementById('editBtn').onclick = () => {
+            if(!postId) return;
+            // 수정 페이지(edit.html)로 ID와 사용자명을 가지고 이동합니다.
             location.href = `edit.html?id=${postId}&user=${encodeURIComponent(user)}`;
         };
 
-        // 5. 목록으로 가기
-        document.getElementById('goListBtn').onclick = () => {
-            goToList();
+        // 좋아요
+        document.getElementById('likeBtn').onclick = async () => {
+            const snap = await get(postRef);
+            const currentLikes = (snap.val().likes || 0) + 1;
+            await update(postRef, { likes: currentLikes });
+            document.getElementById('likeCount').innerText = currentLikes;
         };
 
-        function goToList() {
+        // 삭제
+        document.getElementById('deleteBtn').onclick = async () => {
+            if (confirm("정말 삭제하시겠습니까?")) {
+                await remove(postRef);
+                location.href = `board.html?user=${encodeURIComponent(user)}`;
+            }
+        };
+
+        // 목록으로
+        document.getElementById('goListBtn').onclick = () => {
             location.href = `board.html?user=${encodeURIComponent(user)}`;
-        }
+        };
     </script>
 </body>
 </html>
