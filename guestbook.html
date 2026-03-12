@@ -6,7 +6,7 @@
     <title>UNIVERSE | GUESTBOOK</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* 🌌 우주 테마 기본 스타일 */
+        /* 🌌 기본 테마 설정 */
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #0b111e;
@@ -15,81 +15,99 @@
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
             background: radial-gradient(circle at center, #1a253a 0%, #0b111e 80%);
+            word-break: keep-all; /* 한글 줄바꿈 최적화 */
         }
 
-        /* 🔙 상단 복귀 링크 (menu.html 연결 유지) */
-        .back-link { margin-top: 30px; text-align: center; z-index: 10; }
+        /* 🔙 상단 복귀 링크 (menu.html로 확실히 연결) */
+        .back-link { margin-top: 30px; text-align: center; z-index: 10; width: 100%; }
         .back-link a {
+            display: inline-block;
             text-decoration: none; color: #8ea8c9; font-size: 13px;
-            letter-spacing: 2px; transition: 0.3s; padding: 8px 18px;
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            letter-spacing: 2px; transition: 0.3s; padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 25px;
             background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
         }
         .back-link a:hover { 
             color: #fff; 
             background: rgba(255,255,255,0.15); 
-            box-shadow: 0 0 15px rgba(255,255,255,0.2); 
-            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 0 20px rgba(255, 45, 85, 0.3);
+            border-color: #ff2d55;
         }
 
-        header { text-align: center; padding: 50px 20px 30px; }
-        header h1 { font-weight: 700; letter-spacing: 8px; margin: 0; font-size: 2.2rem; color: #fff; }
-        header p { color: #8ea8c9; font-size: 0.9rem; margin-top: 10px; opacity: 0.8; }
+        header { text-align: center; padding: clamp(40px, 8vh, 60px) 20px 30px; }
+        header h1 { 
+            font-weight: 700; letter-spacing: clamp(4px, 2vw, 8px); 
+            margin: 0; font-size: clamp(1.8rem, 5vw, 2.5rem); color: #fff; 
+        }
+        header p { color: #8ea8c9; font-size: 0.95rem; margin-top: 12px; opacity: 0.8; }
 
-        .container { width: 90%; max-width: 650px; margin-bottom: 50px; }
+        /* 📱 메인 컨테이너 (반응형 폭 조절) */
+        .container { width: 92%; max-width: 700px; margin-bottom: 60px; }
 
-        /* ✍️ 방명록 입력 폼 */
+        /* ✍️ 방명록 입력 폼 (글래스모피즘 적용) */
         .guestbook-form {
             display: flex; flex-direction: column; gap: 15px;
             background: rgba(255, 255, 255, 0.05);
-            padding: 25px; border-radius: 20px;
+            padding: clamp(20px, 4vw, 30px); border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
             margin-bottom: 40px;
         }
         input, textarea {
-            padding: 15px; background: rgba(0, 0, 0, 0.3);
+            padding: 16px; background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; color: white; outline: none;
-            font-family: inherit; transition: 0.3s;
+            border-radius: 14px; color: white; outline: none;
+            font-family: inherit; transition: 0.3s; font-size: 16px; /* 모바일 자동확대 방지용 16px */
         }
-        input:focus, textarea:focus { border-color: #ff2d55; background: rgba(0, 0, 0, 0.5); }
-        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.3); }
+        input:focus, textarea:focus { border-color: #ff2d55; background: rgba(0, 0, 0, 0.6); box-shadow: 0 0 10px rgba(255, 45, 85, 0.2); }
+        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.25); }
 
-        button {
-            padding: 15px; background-color: #ff2d55;
-            color: #fff; border: none; border-radius: 12px;
-            cursor: pointer; font-weight: bold; font-size: 16px;
-            transition: 0.3s; box-shadow: 0 5px 15px rgba(255, 45, 85, 0.3);
+        button#submitBtn {
+            padding: 16px; background-color: #ff2d55;
+            color: #fff; border: none; border-radius: 14px;
+            cursor: pointer; font-weight: bold; font-size: 17px;
+            transition: 0.3s; box-shadow: 0 8px 20px rgba(255, 45, 85, 0.4);
+            margin-top: 5px;
         }
-        button:hover { background-color: #fff; color: #ff2d55; transform: translateY(-2px); }
+        button#submitBtn:hover { background-color: #fff; color: #ff2d55; transform: translateY(-3px); }
+        button#submitBtn:active { transform: translateY(0); }
 
-        /* 💬 메시지 아이템 */
+        /* 💬 메시지 리스트 */
         .message-item {
             background: rgba(255, 255, 255, 0.03);
-            padding: 20px; border-radius: 15px;
-            border-left: 4px solid #ff2d55;
-            margin-bottom: 15px; animation: fadeIn 0.5s ease;
+            padding: 22px; border-radius: 18px;
+            border-left: 5px solid #ff2d55;
+            margin-bottom: 18px; animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255,255,255,0.05);
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .msg-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; color: #8ea8c9; }
-        .msg-name { font-weight: bold; color: #fff; font-size: 15px; }
-        .msg-content { line-height: 1.6; font-size: 15px; color: #cbd5e0; white-space: pre-wrap; }
+        .msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .msg-name { font-weight: bold; color: #fff; font-size: 16px; background: rgba(255,45,85,0.1); padding: 2px 8px; border-radius: 6px; }
+        .msg-date { font-size: 12px; color: #6e84a3; }
+        .msg-content { line-height: 1.7; font-size: 15.5px; color: #d1d9e6; white-space: pre-wrap; word-wrap: break-word; }
 
-        /* 🔢 페이지네이션 */
-        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 30px; }
+        /* 🔢 페이지네이션 (모바일 터치 최적화) */
+        .pagination { display: flex; justify-content: center; gap: 12px; margin-top: 40px; }
         .page-btn {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.3s;
+            color: #fff; min-width: 44px; height: 44px; border-radius: 12px; 
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;
         }
-        .page-btn.active { background: #ff2d55; border-color: #ff2d55; }
+        .page-btn.active { background: #ff2d55; border-color: #ff2d55; box-shadow: 0 5px 15px rgba(255, 45, 85, 0.4); }
         .page-btn:hover:not(.active) { background: rgba(255,255,255,0.2); }
 
-        @media (max-width: 768px) {
-            header h1 { font-size: 1.8rem; letter-spacing: 5px; }
-            .container { width: 95%; }
+        /* 📱 전기종 대응 모바일 최적화 */
+        @media (max-width: 480px) {
+            header { padding-top: 30px; }
+            .back-link { margin-top: 20px; }
+            .container { width: 94%; }
+            .guestbook-form { padding: 18px; }
+            .msg-header { flex-direction: column; align-items: flex-start; }
+            .msg-date { margin-top: -4px; }
         }
     </style>
 </head>
@@ -101,24 +119,26 @@
 
     <header>
         <h1>GUESTBOOK</h1>
-        <p>지우 유니버스에 오신 것을 환영합니다.</p>
+        <p>지우 유니버스의 소중한 기록들</p>
     </header>
 
     <div class="container">
         <div class="guestbook-form">
-            <input type="text" id="nameInput" placeholder="닉네임을 입력하세요">
-            <textarea id="messageInput" rows="3" placeholder="지우님에게 따듯한 인사말을 남겨주세요"></textarea>
-            <button id="submitBtn">지우에게 메시지 전송</button>
+            <input type="text" id="nameInput" placeholder="닉네임을 입력하세요" maxlength="15">
+            <textarea id="messageInput" rows="3" placeholder="지우님에게 따듯한 인사를 남겨주세요" maxlength="300"></textarea>
+            <button id="submitBtn">메시지 전송하기</button>
         </div>
 
         <div id="messagesList"></div>
+
         <div class="pagination" id="pagination"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, push, set, onValue, query } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+        // Firebase 설정 (기존 정보 유지)
         const firebaseConfig = {
             databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
             projectId: "jiwoo-fanpage"
@@ -132,33 +152,34 @@
         let currentPage = 1;
         let allMessages = [];
 
-        // ✍️ 메시지 작성 (전송 즉시 리스트 최상단 업데이트)
+        // ✍️ 메시지 전송 로직
         document.getElementById('submitBtn').onclick = async () => {
-            const name = document.getElementById('nameInput').value;
-            const message = document.getElementById('messageInput').value;
+            const name = document.getElementById('nameInput').value.trim();
+            const message = document.getElementById('messageInput').value.trim();
 
-            if(!name || !message) return alert("이름과 인사말을 모두 입력해주세요!");
+            if(!name || !message) return alert("이름과 메시지를 입력해 주세요!");
 
             const newMessageRef = push(guestbookRef);
             const now = new Date();
             
+            // 실시간 정렬을 위해 timestamp를 숫자로 저장
             await set(newMessageRef, {
                 name: name,
                 message: message,
-                timestamp: Date.now(), // 정렬 기준용 (숫자)
+                timestamp: Date.now(), 
                 date: now.toLocaleString('ko-KR', { 
-                    year: 'numeric', month: 'long', day: 'numeric', 
-                    hour: '2-digit', minute: '2-digit', second: '2-digit',
+                    year: 'numeric', month: '2-digit', day: '2-digit', 
+                    hour: '2-digit', minute: '2-digit', 
                     hour12: true 
-                }) // 표시용 (오전/오후 포함)
+                }) 
             });
 
             document.getElementById('nameInput').value = "";
             document.getElementById('messageInput').value = "";
-            alert("지우님에게 마음이 전달되었습니다!");
+            alert("지우 유니버스에 기록되었습니다!");
         };
 
-        // 🔄 실시간 데이터 로드 및 정렬 검수
+        // 🔄 데이터 실시간 수신 및 정렬 로직 (검수 완료)
         onValue(query(guestbookRef), (snapshot) => {
             const data = snapshot.val();
             allMessages = [];
@@ -166,22 +187,24 @@
                 Object.keys(data).forEach(key => {
                     allMessages.push(data[key]);
                 });
-                // 🎯 정렬 기준을 명확하게 timestamp(숫자) 내림차순으로 설정
+                // 🎯 timestamp를 비교하여 최신순(내림차순)으로 완벽하게 정렬
                 allMessages.sort((a, b) => b.timestamp - a.timestamp);
             }
             renderMessages();
             renderPagination();
         });
 
+        // 🖼️ 화면 렌더링 함수
         function renderMessages() {
             const listDiv = document.getElementById('messagesList');
             listDiv.innerHTML = "";
+
             const start = (currentPage - 1) * ITEMS_PER_PAGE;
             const end = start + ITEMS_PER_PAGE;
             const paginatedItems = allMessages.slice(start, end);
 
             if (paginatedItems.length === 0) {
-                listDiv.innerHTML = "<p style='text-align:center; color:#8ea8c9;'>첫 번째 기록을 남겨보세요.</p>";
+                listDiv.innerHTML = "<p style='text-align:center; color:#8ea8c9; padding:40px;'>아직 기록된 메시지가 없습니다.<br>첫 번째 우주 기록을 남겨보세요!</p>";
                 return;
             }
 
@@ -191,7 +214,7 @@
                 item.innerHTML = `
                     <div class="msg-header">
                         <span class="msg-name">${msg.name}</span>
-                        <span>${msg.date}</span>
+                        <span class="msg-date">${msg.date}</span>
                     </div>
                     <div class="msg-content">${msg.message}</div>
                 `;
@@ -199,6 +222,7 @@
             });
         }
 
+        // 🔢 페이지네이션 함수
         function renderPagination() {
             const pagDiv = document.getElementById('pagination');
             pagDiv.innerHTML = "";
@@ -213,7 +237,8 @@
                     currentPage = i;
                     renderMessages();
                     renderPagination();
-                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                    // 페이지 전환 시 상단으로 부드럽게 이동
+                    window.scrollTo({ top: 300, behavior: 'smooth' });
                 };
                 pagDiv.appendChild(btn);
             }
