@@ -9,14 +9,12 @@
         body { margin: 0; padding: 0; background-color: #0b111e; color: white; font-family: 'Noto Sans KR', sans-serif; }
         .universe-path { width: 100%; padding: 30px 0 10px 0; display: flex; justify-content: center; align-items: center; }
         .universe-logo { text-decoration: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .logo-icon { width: 45px; height: 45px; fill: none; stroke: #ff2d55; stroke-width: 1.2; transition: 0.5s; filter: drop-shadow(0 0 8px rgba(255, 45, 85, 0.4)); }
-        .universe-logo:hover .logo-icon { transform: rotate(180deg) scale(1.1); stroke: #ffffff; filter: drop-shadow(0 0 15px #fff); }
+        .logo-icon { width: 45px; height: 45px; fill: none; stroke: #ff2d55; stroke-width: 1.2; }
         .logo-text { font-size: 10px; color: #ff2d55; letter-spacing: 4px; margin-top: 10px; text-transform: uppercase; }
 
         .board-container { max-width: 950px; margin: 0 auto; padding: 20px; }
         .board-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff2d55; padding-bottom: 15px; margin-bottom: 30px; }
-        .write-btn { background-color: #ff2d55; color: white; padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .write-btn:hover { background-color: #fff; color: #ff2d55; box-shadow: 0 0 15px #ff2d55; }
+        .write-btn { background-color: #ff2d55; color: white; padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
         
         table { width: 100%; border-collapse: collapse; background-color: #161d2a; border-radius: 12px; overflow: hidden; }
         th, td { padding: 18px 10px; text-align: center; border-bottom: 1px solid #242d3c; }
@@ -29,18 +27,18 @@
 <body>
 
     <div class="universe-path">
-        <a href="#" class="universe-logo" onclick="goBack()"> 
+        <div class="universe-logo" onclick="goBack()"> 
             <svg class="logo-icon" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" stroke-dasharray="2 2" /><circle cx="12" cy="12" r="4" fill="#ff2d55" /><path d="M12 2L12 6M12 18L12 22M2 12L6 12M18 12L22 12" />
             </svg>
             <span class="logo-text">Control Tower</span>
-        </a>
+        </div>
     </div>
 
     <div class="board-container">
         <div class="board-header">
             <h2 style="font-weight: 400; letter-spacing: 2px;">FREE BOARD</h2>
-            <button type="button" class="write-btn" id="btn-write" onclick="goToWrite()">글쓰기</button>
+            <button class="write-btn" id="writeBtn">글쓰기</button>
         </div>
         <table>
             <thead>
@@ -58,53 +56,58 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // 관리자님 캡처 기반 Realtime DB 설정 (apiKey는 관리자님 실제 키로 유지 필수!)
+        // 관리자님의 구글 Firestore 설정값 (이게 진짜입니다)
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
-            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
-            projectId: "jiwoo-fanpage",
+            authDomain: "universe-han-ji-woo.firebaseapp.com",
+            projectId: "universe-han-ji-woo",
+            storageBucket: "universe-han-ji-woo.appspot.com",
+            messagingSenderId: "847248386851",
             appId: "1:847248386851:web:46fbbbd21a41d39281dc02"
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+        const db = getFirestore(app);
 
-        // 🔥 관리자님! DB에서 'posts'인지 'posts_v2'인지 경로 확인이 필요하지만, 일단 공통 경로로 설정했습니다.
-        const postsRef = ref(db, 'posts'); 
+        // 무한 증식 방지를 위해 쿼리를 명확히 분리
+        const q = query(collection(db, "freeboard"), orderBy("timestamp", "desc"));
         
-        onValue(postsRef, (snapshot) => {
-            const data = snapshot.val();
+        // 실시간 리스너 시작
+        onSnapshot(q, (snapshot) => {
             const boardContent = document.getElementById('boardContent');
             boardContent.innerHTML = "";
-            
-            if (data) {
-                // 객체를 배열로 변환하여 역순 정렬
-                const items = [];
-                for (let id in data) {
-                    items.push({ id, ...data[id] });
-                }
-                items.reverse(); 
+            let total = snapshot.size;
 
-                let no = items.length;
-                items.forEach((post) => {
-                    const row = `
-                        <tr>
-                            <td>${no--}</td>
-                            <td class="title-cell" onclick="location.href='view.html?id=${post.id}&user=${encodeURIComponent(getUserName())}'">
-                                <span class="category">[${post.category || '일반'}]</span> ${post.title}
-                            </td>
-                            <td>${post.author || post.writer || '익명'}</td>
-                            <td style="color:#8a94a6; font-size:13px;">${post.date || '-'}</td>
-                            <td>${post.views || 0}</td>
-                        </tr>
-                    `;
-                    boardContent.innerHTML += row;
-                });
-            } else {
-                boardContent.innerHTML = "<tr><td colspan='5'>등록된 게시글이 없습니다.</td></tr>";
-            }
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                let dateStr = "-";
+                if (data.timestamp) {
+                    const d = data.timestamp.toDate();
+                    dateStr = `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}.`;
+                }
+
+                const row = `
+                    <tr>
+                        <td>${total--}</td>
+                        <td class="title-cell" onclick="location.href='view.html?id=${doc.id}&user=${encodeURIComponent(getUserName())}'">
+                            <span class="category">[${data.category || '일반'}]</span> ${data.title}
+                        </td>
+                        <td>${data.writer}</td>
+                        <td style="color:#8a94a6; font-size:13px;">${dateStr}</td>
+                        <td>${data.views || 0}</td>
+                    </tr>
+                `;
+                boardContent.innerHTML += row;
+            });
+        }, (error) => {
+            console.error("무한 증식/리스너 오류 방지:", error);
+        });
+
+        // 글쓰기 버튼 이벤트 리스너 (HTML onclick 대신 안전하게 등록)
+        document.getElementById('writeBtn').addEventListener('click', () => {
+            location.href = `write.html?user=${encodeURIComponent(getUserName())}`;
         });
     </script>
 
@@ -115,10 +118,6 @@
         }
         function goBack() { 
             location.href = `menu.html?user=${encodeURIComponent(getUserName())}`; 
-        }
-        function goToWrite() { 
-            const user = getUserName();
-            location.href = `write.html?user=${encodeURIComponent(user)}`; 
         }
     </script>
 </body>
