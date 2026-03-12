@@ -24,6 +24,7 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
+        // 실시간 접속자 및 토탈 팬 카운트 (기존 로직 유지)
         function trackOnlineUsers() {
             const connectedRef = db.ref(".info/connected");
             const onlineRef = db.ref("online_users").push();
@@ -40,8 +41,7 @@
         }
 
         function updateTotalFans() {
-            const fanCountRef = db.ref('total_fan_count');
-            fanCountRef.on('value', (snapshot) => {
+            db.ref('total_fan_count').on('value', (snapshot) => {
                 const count = snapshot.val() || 0;
                 document.getElementById('userCount').innerText = `${count.toLocaleString()}명 지우 유니버스 입성`;
             });
@@ -50,29 +50,26 @@
         window.onload = () => {
             trackOnlineUsers();
             updateTotalFans();
-            // 주소창에 user 정보가 있으면 가져와서 표시
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
             if(user) document.getElementById('nickBadge').innerText = user;
         };
 
-        // [핵심 수정] 로그인 성공 시 URL에 닉네임을 포함하여 menu.html로 보냄
+        // 🎯 [중심 컨트롤 타워 연결] 로그인 로직
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
 
-            // 관리자 계정 체크
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
-                alert("관리자님 환영합니다!");
-                // 저장소에만 담지 않고 주소창에 직접 박아서 보냅니다.
-                location.href = "menu.html?user=" + encodeURIComponent("ADMIN");
+                alert("관리자님, 유니버스 컨트롤 타워로 이동합니다!");
+                location.href = "menu.html?user=" + encodeURIComponent("관리자");
                 return;
             }
 
-            // 일반 팬 로그인
-            auth.signInWithEmailAndPassword(email, pw).then(() => {
-                // 팬 로그인 시에도 주소창에 닉네임 박아서 이동
-                location.href = "menu.html?user=" + encodeURIComponent("FAN");
+            auth.signInWithEmailAndPassword(email, pw).then((userCredential) => {
+                const userEmail = userCredential.user.email.split('@')[0]; // 이메일 앞자리 닉네임화
+                alert("지우 유니버스에 오신 것을 환영합니다!");
+                location.href = `menu.html?user=${encodeURIComponent(userEmail)}`;
             }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
@@ -80,96 +77,161 @@
             const email = document.getElementById('sEmail').value;
             const pw = document.getElementById('sPw').value;
             auth.createUserWithEmailAndPassword(email, pw).then(() => {
-                db.ref('total_fan_count').transaction((currentCount) => {
-                    return (currentCount || 0) + 1;
-                });
-                alert("지우 유니버스 입성을 환영합니다! 로그인을 진행해 주세요."); 
+                db.ref('total_fan_count').transaction((currentCount) => (currentCount || 0) + 1);
+                alert("입성을 환영합니다! 로그인을 진행해 주세요."); 
                 location.reload();
             }).catch((err) => alert(err.message));
         }
 
-        function openAuth() { document.getElementById('authModal').classList.add('active'); document.getElementById('authModal').style.display = 'flex'; }
-        function closeAuth() { document.getElementById('authModal').classList.remove('active'); setTimeout(() => document.getElementById('authModal').style.display = 'none', 400); }
+        function openAuth() { 
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+        function closeAuth() { 
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 400); 
+        }
     </script>
 
     <style>
-        body { margin: 0; padding: 0; background: #ffffff; height: 100vh; font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; }
-        .liquid-bg { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); z-index: 1; }
-        .main-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        .header-text { padding-top: 8vh; text-align: center; }
-        .univ-title { font-family: 'Arial Black', sans-serif; font-size: 3.8rem; font-weight: 900; color: #1a1a1a; line-height: 0.9; letter-spacing: -2px; text-transform: uppercase; margin: 0; }
-        .coming-soon-label { font-size: 1.2rem; color: #8ea8c9; letter-spacing: 5px; margin-top: 10px; font-weight: 900; }
-        .hero-photo-zone { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .main-img { height: 85%; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); }
-        .footer-btn-zone { height: 15vh; display: flex; justify-content: center; align-items: center; }
-        .btn-stay { cursor: pointer; border: none; width: 80%; max-width: 320px; height: 55px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 8px; border-radius: 5px; text-transform: uppercase; }
-
-        #statusZone { 
-            display: flex; 
-            position: fixed; 
-            right: 25px; 
-            top: 25px; 
-            flex-direction: column; 
-            align-items: flex-end; 
-            z-index: 100;
+        body { 
+            margin: 0; padding: 0; background: #ffffff; height: 100vh; 
+            font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; 
         }
-        .nick-box { font-size: 0.6rem; border: 1px solid #1a1a1a; padding: 2px 6px; font-weight: bold; background: #fff; margin-bottom: 6px; letter-spacing: 1px; }
-        .status-msg { font-size: 0.75rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
-        .count-info { font-size: 0.65rem; color: #888; text-align: right; margin-top: 2px; line-height: 1.4; }
+        .liquid-bg { 
+            position: absolute; width: 100%; height: 100%; 
+            background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); 
+            z-index: 1; 
+        }
+        .main-container { 
+            position: relative; width: 100%; height: 100vh; 
+            display: flex; flex-direction: column; align-items: center; z-index: 10; 
+        }
+        
+        /* 텍스트 반응형 조절 */
+        .header-text { padding-top: 8vh; text-align: center; }
+        .univ-title { 
+            font-family: 'Arial Black', sans-serif; font-size: clamp(2.5rem, 10vw, 3.8rem); 
+            font-weight: 900; color: #1a1a1a; line-height: 0.95; 
+            letter-spacing: -2px; text-transform: uppercase; margin: 0; 
+        }
+        .coming-soon-label { 
+            font-size: clamp(0.9rem, 4vw, 1.2rem); 
+            color: #ff2d55; letter-spacing: 5px; margin-top: 15px; font-weight: 900; 
+        }
 
+        /* 이미지 반응형 최적화 */
+        .hero-photo-zone { 
+            flex: 1; display: flex; justify-content: center; align-items: center; 
+            overflow: hidden; width: 100%;
+        }
+        .main-img { 
+            max-height: 75vh; width: auto; max-width: 90%; 
+            object-fit: contain;
+            animation: softPulse 6s infinite alternate ease-in-out; 
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); 
+        }
+
+        .footer-btn-zone { height: 15vh; width: 100%; display: flex; justify-content: center; align-items: center; }
+        .btn-stay { 
+            cursor: pointer; border: none; width: 85%; max-width: 320px; height: 60px; 
+            background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 5px; 
+            border-radius: 30px; text-transform: uppercase; transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .btn-stay:hover { transform: translateY(-3px); background: #000; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+
+        /* 상태창 반응형 */
+        #statusZone { 
+            position: fixed; right: 25px; top: 25px; 
+            display: flex; flex-direction: column; align-items: flex-end; z-index: 100;
+        }
+        .nick-box { font-size: 0.65rem; border: 1px solid #1a1a1a; padding: 3px 8px; font-weight: bold; background: #fff; margin-bottom: 6px; }
+        .status-msg { font-size: 0.8rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 2px solid #ff2d55; }
+        .count-info { font-size: 0.7rem; color: #888; text-align: right; line-height: 1.5; }
+
+        /* 모바일 대응 미디어 쿼리 */
         @media screen and (max-width: 600px) {
             #statusZone { right: 15px; top: 15px; }
-            .status-msg { font-size: 0.7rem; }
-            .count-info { 
-                font-size: 0.6rem; 
-                display: block; 
-                width: 110px; 
-                word-break: keep-all; 
-                margin-top: 5px;
-            }
+            .main-img { max-height: 60vh; }
+            .btn-stay { height: 55px; font-size: 0.9rem; }
+            .univ-title { line-height: 1.1; }
         }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.4); backdrop-filter: blur(25px); display: none; align-items: center; justify-content: center; z-index: 500; opacity: 0; transition: 0.3s; }
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .auth-card { width: 85%; max-width: 400px; padding: 40px 10px; background: #fff; border-radius: 25px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
-        .auth-input { width: 80%; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 1rem; }
-        .btn-submit { width: 85%; padding: 15px; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; font-weight: 900; cursor: pointer; }
-        @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.04); } }
+        /* 인증 모달 */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); 
+            display: none; align-items: center; justify-content: center; z-index: 500; 
+            opacity: 0; transition: 0.4s; 
+        }
+        .modal-overlay.active { opacity: 1; }
+        .auth-card { 
+            width: 90%; max-width: 400px; padding: 40px 20px; 
+            background: #fff; border-radius: 30px; text-align: center; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15); border: 1px solid #eee;
+        }
+        .auth-input { 
+            width: 100%; padding: 15px; margin-bottom: 12px; 
+            border: 1px solid #eee; border-radius: 12px; font-size: 1rem; 
+            box-sizing: border-box; background: #f9f9f9;
+        }
+        .btn-submit { 
+            width: 100%; padding: 16px; background: #1a1a1a; color: #fff; 
+            border: none; border-radius: 12px; font-weight: 900; cursor: pointer; 
+        }
+        @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
     </style>
 </head>
 <body>
     <div class="liquid-bg"></div>
     <div class="main-container">
-        <div class="header-text"><h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1><h2 class="coming-soon-label">COMING SOON</h2></div>
-        <div class="hero-photo-zone"><img src="jiwoo_profile3.png" alt="Han Ji Woo" class="main-img"></div>
+        <div class="header-text">
+            <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
+            <h2 class="coming-soon-label">OFFICIAL OPEN</h2>
+        </div>
+        
+        <div class="hero-photo-zone">
+            <img src="jiwoo_profile3.png" alt="Han Ji Woo" class="main-img">
+        </div>
+        
         <div class="footer-btn-zone">
-            <button class="btn-stay" onclick="openAuth()">STAY TUNED</button>
+            <button class="btn-stay" onclick="openAuth()">ENTER UNIVERSE</button>
         </div>
     </div>
 
     <div id="statusZone">
         <div class="nick-box" id="nickBadge">VISITOR</div>
-        <div class="status-msg">오픈 준비 중</div>
-        <div class="count-info" id="userCount">로딩 중...</div>
+        <div class="status-msg">중심 타워 가동 중</div>
+        <div class="count-info" id="userCount">연결 중...</div>
         <div class="count-info" id="onlineCount">실시간 탐사 준비 중...</div>
     </div>
 
     <div class="modal-overlay" id="authModal">
         <div class="auth-card">
             <div id="loginBox">
-                <h3>LOGIN</h3>
-                <input type="email" id="lEmail" class="auth-input" placeholder="이메일">
+                <h3 style="letter-spacing: 3px; margin-bottom: 25px;">LOGIN</h3>
+                <input type="email" id="lEmail" class="auth-input" placeholder="이메일 주소">
                 <input type="password" id="lPw" class="auth-input" placeholder="비밀번호">
-                <button class="btn-submit" onclick="handleLogin()">로그인</button>
-                <p style="margin-top:20px; font-size:0.8rem;">계정이 없나요? <span onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';" style="color:#8ea8c9; cursor:pointer; font-weight:bold;">회원가입</span></p>
+                <button class="btn-submit" onclick="handleLogin()">유니버스 접속</button>
+                <p style="margin-top:25px; font-size:0.85rem; color:#666;">
+                    처음이신가요? <span onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';" style="color:#ff2d55; cursor:pointer; font-weight:bold; text-decoration: underline;">멤버십 가입</span>
+                </p>
             </div>
+            
             <div id="signBox" style="display:none;">
-                <h3>JOIN US</h3>
-                <input type="email" id="sEmail" class="auth-input" placeholder="이메일">
+                <h3 style="letter-spacing: 3px; margin-bottom: 25px;">JOIN US</h3>
+                <input type="email" id="sEmail" class="auth-input" placeholder="이메일 주소">
                 <input type="password" id="sPw" class="auth-input" placeholder="비밀번호">
-                <button class="btn-submit" onclick="handleSignup()">가입하기</button>
+                <button class="btn-submit" onclick="handleSignup()">멤버십 승인</button>
+                <p style="margin-top:25px; font-size:0.85rem; color:#666;">
+                    이미 계정이 있나요? <span onclick="document.getElementById('loginBox').style.display='block'; document.getElementById('signBox').style.display='none';" style="color:#ff2d55; cursor:pointer; font-weight:bold; text-decoration: underline;">로그인으로 이동</span>
+                </p>
             </div>
-            <button style="margin-top:20px; border:none; background:none; text-decoration:underline; cursor:pointer; color:#999;" onclick="closeAuth()">닫기</button>
+            
+            <button style="margin-top:25px; border:none; background:none; cursor:pointer; color:#bbb; font-size: 0.8rem;" onclick="closeAuth()">[ 닫기 ]</button>
         </div>
     </div>
 </body>
