@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>UNIVERSE | 자유게시판</title>
+    
+    <script src="config.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* 🎨 기본 베이스 설정 (사파리/크롬 공통) */
+        /* 🎨 기존 디자인 스타일 유지 */
         :root { --main-red: #ff2d55; --bg-dark: #0b111e; --row-bg: rgba(22, 29, 42, 0.8); }
         body { 
             margin: 0; padding: 0; background-color: var(--bg-dark); color: white; 
             font-family: 'Noto Sans KR', sans-serif; overflow-x: hidden;
-            -webkit-font-smoothing: antialiased; /* 아이폰 글자 부드럽게 */
+            -webkit-font-smoothing: antialiased;
         }
-        
-        /* 🌌 우주 배경 */
         body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a253a 0%, #0b111e 70%); z-index: -1; opacity: 0.6; }
 
-        /* ♎ 상단 로고 영역 */
         .universe-path { width: 100%; padding: 30px 0; display: flex; justify-content: center; align-items: center; }
         .constellation-tower { text-decoration: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .libra-svg-wrapper { position: relative; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; }
@@ -30,48 +30,40 @@
         .libra-lines line { stroke: rgba(255, 255, 255, 0.25); stroke-width: 1.2; }
         .tower-guide { font-size: 10px; color: rgba(255, 255, 255, 0.4); letter-spacing: 2px; margin-top: 10px; font-weight: 300; }
 
-        /* 📋 게시판 컨테이너 */
         .board-container { max-width: 1000px; margin: 0 auto; padding: 0 20px 50px; position: relative; }
         .board-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px; }
         .header-title { font-size: 22px; font-weight: 700; margin: 0; }
-        .write-btn { background-color: var(--main-red); color: white; padding: 10px 20px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .write-btn { background-color: var(--main-red); color: white; padding: 10px 20px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.3s; }
+        .write-btn:hover { background-color: white; color: var(--main-red); }
 
-        /* 📑 테이블 레이아웃 */
         .board-table-wrapper { width: 100%; background: var(--row-bg); border-radius: 15px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background: rgba(255, 255, 255, 0.05); color: #8a94a6; font-size: 13px; padding: 15px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
         td { padding: 15px 10px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 14px; }
 
-        /* 🎯 셀 너비 조절 (PC) */
         .col-no { width: 60px; }
         .col-title { width: auto; }
         .col-writer { width: 120px; }
         .col-date { width: 120px; }
         .col-views { width: 70px; }
 
-        /* ✍️ 제목 커스텀 */
         .title-cell { text-align: left; padding-left: 20px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .category { color: var(--main-red); font-weight: bold; margin-right: 5px; font-size: 12px; }
         .title-text:hover { text-decoration: underline; color: var(--main-red); }
 
-        /* 📱 전 기종 모바일 대응 (핵심) */
         @media screen and (max-width: 768px) {
             .board-container { padding: 0 10px 30px; }
             .header-title { font-size: 18px; }
             .write-btn { padding: 8px 15px; font-size: 12px; }
-
-            /* 모바일에서 불필요한 열 숨기기 또는 축소 */
-            .col-no, .col-views { display: none; } /* 번호와 조회수는 모바일에서 숨겨 공간 확보 */
+            .col-no, .col-views { display: none; }
             .col-writer { width: 80px; }
             .col-date { width: 80px; }
-
             th, td { padding: 12px 5px; font-size: 13px; }
             .title-cell { padding-left: 10px; }
             .date-text { font-size: 11px !important; opacity: 0.6; }
             .category { display: block; font-size: 10px; margin-bottom: 2px; }
         }
 
-        /* 아이폰 노치 디자인 대응 */
         @supports (padding: env(safe-area-inset-bottom)) {
             .board-container { padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
         }
@@ -80,7 +72,7 @@
 <body>
 
     <div class="universe-path">
-        <div class="constellation-tower" onclick="goBack()">
+        <div class="constellation-tower" onclick="Universe.navigateTo('menu')">
             <div class="libra-svg-wrapper">
                 <div class="star-dot s1"></div>
                 <div class="star-dot s2"></div>
@@ -102,7 +94,7 @@
     <div class="board-container">
         <div class="board-header">
             <h2 class="header-title">자유게시판</h2>
-            <button class="write-btn" id="writeBtn">새 글 작성</button>
+            <button class="write-btn" onclick="location.href='write.html?user=' + encodeURIComponent(Universe.getUser())">새 글 작성</button>
         </div>
 
         <div class="board-table-wrapper">
@@ -127,12 +119,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
-            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
-            projectId: "jiwoo-fanpage"
-        };
-
+        // config.js의 설정값 사용
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const postsRef = ref(db, 'posts_v2');
@@ -159,8 +146,9 @@
                         <td class="col-date date-text">${(post.date || '').split(' ')[0]}</td>
                         <td class="col-views">${post.views || 0}</td>
                     `;
+                    // 상세 페이지 이동 시에도 유저 정보 유지
                     row.onclick = () => {
-                        location.href = `view.html?id=${post.id}&user=${encodeURIComponent(getUserName())}`;
+                        location.href = `view.html?id=${post.id}&user=${encodeURIComponent(Universe.getUser())}`;
                     };
                     boardContent.appendChild(row);
                 });
@@ -168,18 +156,6 @@
                 boardContent.innerHTML = "<tr><td colspan='5' style='padding:80px;'>첫 게시글을 남겨주세요!</td></tr>";
             }
         });
-
-        document.getElementById('writeBtn').onclick = () => {
-            location.href = `write.html?user=${encodeURIComponent(getUserName())}`;
-        };
-
-        window.getUserName = function() {
-            return new URLSearchParams(window.location.search).get('user') || "Unknown";
-        };
-
-        window.goBack = function() {
-            location.href = `menu.html?user=${encodeURIComponent(getUserName())}`;
-        };
     </script>
 </body>
 </html>
