@@ -6,98 +6,100 @@
     <title>Universe | 방명록</title>
     
     <script src="config.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-    <script>
-        // 파이어베이스 초기화 (이미 등록된 설정 사용)
-        const firebaseConfig = {
-            apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
-            authDomain: "jiwoo-fanpage.firebaseapp.com",
-            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com", 
-            projectId: "jiwoo-fanpage",
-            storageBucket: "jiwoo-fanpage.firebasestorage.app",
-            messagingSenderId: "928634858988",
-            appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
-        };
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.database();
-
-        let currentUser = "방문자"; // 기본값 설정
-
-        window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const user = urlParams.get('user');
-            
-            // 🎯 [핵심 수정] 유저 정보가 없어도 index.html로 보내지 않음!
-            if (user) {
-                currentUser = user;
-            }
-            document.getElementById('displayUser').innerText = currentUser;
-            loadMessages();
-        };
-
-        function saveMessage() {
-            const msg = document.getElementById('msgInput').value;
-            if (!msg) return alert("내용을 입력해주세요.");
-
-            db.ref('guestbook').push({
-                user: currentUser,
-                message: msg,
-                timestamp: Date.now()
-            }).then(() => {
-                document.getElementById('msgInput').value = '';
-                alert("기록이 완료되었습니다.");
-            }).catch((err) => {
-                console.error(err);
-                alert("기록 실패: DB 권한을 확인하세요.");
-            });
-        }
-
-        function loadMessages() {
-            db.ref('guestbook').orderByChild('timestamp').limitToLast(50).on('value', (snapshot) => {
-                const list = document.getElementById('msgList');
-                list.innerHTML = '';
-                snapshot.forEach((child) => {
-                    const data = child.val();
-                    const div = document.createElement('div');
-                    div.className = 'msg-item';
-                    div.innerHTML = `<strong>${data.user}</strong>: ${data.message}`;
-                    list.prepend(div);
-                });
-            });
-        }
-    </script>
 
     <style>
-        body { background: #050a10; color: #fff; font-family: sans-serif; margin: 0; padding: 20px; }
+        body { background: #050a10; color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 20px; }
         .container { max-width: 500px; margin: 0 auto; }
-        h2 { text-align: center; color: #8ea8c9; }
+        h2 { text-align: center; color: #8ea8c9; letter-spacing: 4px; }
+        .user-info { text-align: center; font-size: 0.8rem; color: #888; margin-bottom: 20px; }
         .input-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { flex: 1; padding: 10px; border-radius: 5px; border: none; }
-        button { padding: 10px 20px; background: #8ea8c9; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .msg-list { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; height: 400px; overflow-y: auto; }
-        .msg-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; }
-        strong { color: #ff2d55; margin-right: 5px; }
-        .back-btn { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; font-size: 0.8rem; }
+        input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; }
+        button { padding: 10px 20px; background: #8ea8c9; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #050a10; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 15px #8ea8c9; }
+        .msg-list { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px; height: 450px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.05); }
+        .msg-item { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; line-height: 1.5; }
+        strong { color: #ff2d55; margin-right: 8px; }
+        .back-btn { display: block; text-align: center; margin-top: 25px; color: #555; text-decoration: none; font-size: 0.8rem; cursor: pointer; }
+        .back-btn:hover { color: #8ea8c9; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>GUEST BOOK</h2>
-        <p style="text-align:center; font-size: 0.8rem;">현재 접속: <span id="displayUser"></span></p>
+        <p class="user-info">현재 접속 대원: <span id="displayUser">---</span></p>
         
         <div class="input-box">
-            <input type="text" id="msgInput" placeholder="응원 메시지를 남겨주세요!">
-            <button onclick="saveMessage()">기록</button>
+            <input type="text" id="msgInput" placeholder="우주 정거장에 메시지를 남기세요...">
+            <button id="saveBtn">기록</button>
         </div>
 
         <div class="msg-list" id="msgList">
-            </div>
+            <p style="text-align:center; padding-top:100px; color:#444;">데이터 동기화 중...</p>
+        </div>
 
-        <a href="javascript:history.back()" class="back-btn">[ 돌아가기 ]</a>
+        <a onclick="Universe.navigateTo('menu')" class="back-btn">[ 컨트롤 타워로 귀환 ]</a>
     </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // config.js에 정의된 설정값 사용 (중복 선언 불필요)
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const guestbookRef = ref(db, 'guestbook');
+
+        const currentUser = Universe.getUser();
+        document.getElementById('displayUser').innerText = currentUser;
+
+        // 메시지 저장 함수
+        window.saveMessage = function() {
+            const msgInput = document.getElementById('msgInput');
+            const msg = msgInput.value.trim();
+
+            if (!msg) return alert("내용을 입력해주세요.");
+
+            push(guestbookRef, {
+                user: currentUser,
+                message: msg,
+                timestamp: Date.now()
+            }).then(() => {
+                msgInput.value = '';
+                // 알럿 없이 부드럽게 넘어가고 싶으면 아래 주석처리
+                alert("기록이 완료되었습니다.");
+            }).catch((err) => {
+                console.error(err);
+                alert("기록 실패!");
+            });
+        };
+
+        // 버튼 클릭 이벤트 연결
+        document.getElementById('saveBtn').onclick = saveMessage;
+
+        // 메시지 불러오기 (실시간 감시)
+        const recentMessagesQuery = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
+        
+        onValue(recentMessagesQuery, (snapshot) => {
+            const list = document.getElementById('msgList');
+            list.innerHTML = '';
+            
+            const data = snapshot.val();
+            if (data) {
+                // 데이터를 배열로 변환 후 최신순 정렬
+                const items = Object.keys(data).map(key => data[key]);
+                items.sort((a, b) => b.timestamp - a.timestamp);
+
+                items.forEach((item) => {
+                    const div = document.createElement('div');
+                    div.className = 'msg-item';
+                    div.innerHTML = `<strong>${item.user}</strong> ${item.message}`;
+                    list.appendChild(div);
+                });
+            } else {
+                list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#444;'>아직 기록된 메시지가 없습니다.</p>";
+            }
+        });
+    </script>
 </body>
 </html>
