@@ -2,91 +2,148 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Universe Board</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universe | Free Board</title>
     <style>
-        body { background: #050a10; color: white; font-family: sans-serif; padding: 20px; }
-        .btn { background: #ff2d55; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; margin-bottom: 20px; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(255,255,255,0.05); }
-        th { border-bottom: 2px solid #8ea8c9; padding: 12px; color: #8ea8c9; background: rgba(0,0,0,0.3); }
-        td { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px; text-align: center; }
-        #writePage { display: none; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 10px; border: 1px solid #444; }
-        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border-radius: 4px; border: 1px solid #ddd; }
-        .loading { text-align: center; padding: 50px; color: #8ea8c9; }
+        :root { --main-red: #ff2d55; --bg-dark: #050a10; --text-gray: #8ea8c9; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; }
+        .universe-bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%); z-index: -1; }
+        
+        /* 게시판 너비를 850px로 제한해서 시인성 확보 */
+        .container { max-width: 850px; margin: 0 auto; padding: 60px 20px; position: relative; z-index: 10; }
+        
+        .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 2px solid var(--main-red); padding-bottom: 10px; }
+        .board-header h1 { margin: 0; font-size: 1.5rem; letter-spacing: -1px; }
+
+        .btn { background: var(--main-red); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .btn-sub { background: #333; color: #ccc; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; }
+
+        /* 목록 테이블: 높이를 줄여서 컴팩트하게 */
+        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; }
+        th { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-gray); font-size: 0.85rem; background: rgba(255,255,255,0.05); }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); text-align: center; font-size: 0.9rem; }
+        .td-title { text-align: left; cursor: pointer; padding-left: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
+        .td-title:hover { color: var(--main-red); }
+
+        /* 본문 및 글쓰기 영역 */
+        .content-box { display: none; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 12px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
+        .w-textarea { height: 350px; resize: none; line-height: 1.6; }
+
+        .view-title { font-size: 1.6rem; margin-bottom: 10px; color: var(--main-red); font-weight: bold; }
+        .view-info { font-size: 0.85rem; color: var(--text-gray); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+        .view-body { min-height: 200px; line-height: 1.7; white-space: pre-wrap; font-size: 1rem; color: #ddd; }
+
+        /* 페이징 */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
+        .page-btn { background: none; border: 1px solid #333; color: var(--text-gray); padding: 4px 10px; cursor: pointer; font-size: 0.8rem; }
+        .page-btn.active { background: var(--main-red); color: white; border-color: var(--main-red); }
     </style>
 </head>
 <body>
-    <div id="listPage">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1>자유게시판</h1>
-            <button class="btn" onclick="openWrite()">글쓰기</button>
+    <div class="universe-bg"></div>
+    <div class="container">
+        
+        <div id="listPage">
+            <div class="board-header">
+                <h1>FREE BOARD</h1>
+                <button class="btn" onclick="openWrite()">글쓰기</button>
+            </div>
+            <table>
+                <thead>
+                    <tr><th width="60">NO</th><th>TITLE</th><th width="100">USER</th><th width="100">DATE</th></tr>
+                </thead>
+                <tbody id="boardBody"></tbody>
+            </table>
+            <div class="pagination" id="pagination"></div>
         </div>
-        <div id="loadingStatus" class="loading">데이터 로딩 중...</div>
-        <table>
-            <thead><tr><th width="80">번호</th><th>제목</th><th width="150">작성자</th></tr></thead>
-            <tbody id="boardBody"></tbody>
-        </table>
-    </div>
 
-    <div id="writePage">
-        <h2>글쓰기</h2>
-        <input type="text" id="t" placeholder="제목을 입력하세요">
-        <textarea id="c" rows="10" placeholder="내용을 입력하세요"></textarea>
-        <button class="btn" onclick="submit()">등록하기</button>
-        <button class="btn" style="background:#555" onclick="location.reload()">취소</button>
+        <div id="viewPage" class="content-box">
+            <div id="viewTitle" class="view-title"></div>
+            <div id="viewInfo" class="view-info"></div>
+            <div id="viewBody" class="view-body"></div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn-sub" onclick="closeView()">목록으로</button>
+            </div>
+        </div>
+
+        <div id="writePage" class="content-box">
+            <h2 style="margin-top:0;">WRITE</h2>
+            <input type="text" id="postTitle" class="w-input" placeholder="제목">
+            <textarea id="postContent" class="w-input w-textarea" placeholder="내용을 입력하세요"></textarea>
+            <div style="text-align: right;">
+                <button class="btn-sub" style="margin-right:8px;" onclick="closeWrite()">취소</button>
+                <button id="submitBtn" class="btn" onclick="submitPost()">등록</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 관리자님이 주신 최신 주소로 교체 완료!
-        const API = "https://script.google.com/macros/s/AKfycbwgMzQi8ib58Qkld2aUED-cnuaQQ9wWwd8Z1b-ym96o3hfKRP59yes3GnwgC-7LQEkk7w/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwgMzQi8ib58Qkld2aUED-cnuaQQ9wWwd8Z1b-ym96o3hfKRP59yes3GnwgC-7LQEkk7w/exec";
+        let allPosts = [];
+        let currentPage = 1;
+        const postsPerPage = 12; // 12개씩 끊어서 컴팩트하게
 
-        async function load() {
-            try {
-                const res = await fetch(API);
-                const data = await res.json();
-                const tbody = document.getElementById('boardBody');
-                
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3">게시글이 없습니다. 첫 글을 써보세요!</td></tr>';
-                } else {
-                    tbody.innerHTML = data.map((item, i) => {
-                        // 데이터가 어떤 이름으로 들어와도 제목을 찾아내는 마법
-                        const title = item.Title || item.title || Object.values(item)[2] || "제목 없음";
-                        const user = item.User || item.user || "익명";
-                        return `<tr><td>${i + 1}</td><td style="text-align:left; padding-left:30px;">${title}</td><td>${user}</td></tr>`;
-                    }).reverse().join('');
-                }
-            } catch (e) {
-                document.getElementById('loadingStatus').innerText = "오류 발생! 시트 설정을 확인해주세요.";
-            } finally {
-                document.getElementById('loadingStatus').style.display = 'none';
+        async function loadPosts() {
+            const res = await fetch(API_URL);
+            allPosts = await res.json();
+            renderBoard();
+        }
+
+        function renderBoard() {
+            const tbody = document.getElementById('boardBody');
+            const start = (currentPage - 1) * postsPerPage;
+            const currentPosts = allPosts.slice().reverse().slice(start, start + postsPerPage);
+
+            tbody.innerHTML = currentPosts.map((p, i) => {
+                const title = p.Title || p.title || "제목 없음";
+                const user = p.User || p.user || "익명";
+                const date = (p.Date || p.date || "").split('T')[0];
+                const realIndex = allPosts.length - 1 - (start + i);
+
+                return `<tr>
+                    <td>${allPosts.length - (start + i)}</td>
+                    <td class="td-title" onclick="viewPost(${realIndex})">${title}</td>
+                    <td>${user}</td>
+                    <td><span style="font-size:0.8rem; color:#666;">${date}</span></td>
+                </tr>`;
+            }).join('');
+            renderPagination();
+        }
+
+        function viewPost(idx) {
+            const p = allPosts[idx];
+            document.getElementById('listPage').style.display = 'none';
+            document.getElementById('viewPage').style.display = 'block';
+            document.getElementById('viewTitle').innerText = p.Title || p.title;
+            document.getElementById('viewInfo').innerText = `BY ${p.User || '익명'} | ${p.Date || ''}`;
+            document.getElementById('viewBody').innerText = p.Content || p.content;
+        }
+
+        function closeView() { document.getElementById('viewPage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; }
+        function openWrite() { document.getElementById('listPage').style.display = 'none'; document.getElementById('writePage').style.display = 'block'; }
+        function closeWrite() { location.reload(); }
+
+        async function submitPost() {
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            if(!title || !content) return alert("빈칸을 채워주세요!");
+            
+            document.getElementById('submitBtn').innerText = "SENDING...";
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ title, content, tag: '수다', user: '관리자' }) });
+            location.reload();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(allPosts.length / postsPerPage);
+            const container = document.getElementById('pagination');
+            container.innerHTML = "";
+            for(let i=1; i<=totalPages; i++) {
+                container.innerHTML += `<button class="page-btn ${i===currentPage?'active':''}" onclick="currentPage=${i};renderBoard();">${i}</button>`;
             }
         }
 
-        async function submit() {
-            const title = document.getElementById('t').value;
-            const content = document.getElementById('c').value;
-            if(!title || !content) return alert("제목과 내용을 입력해주세요.");
-
-            const btn = event.target;
-            btn.innerText = "전송 중...";
-            btn.disabled = true;
-
-            try {
-                await fetch(API, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ title, content, tag: '수다', user: '관리자' }) 
-                });
-                alert('글이 성공적으로 등록되었습니다!');
-                location.reload();
-            } catch (e) {
-                alert('전송 실패!');
-                btn.disabled = false;
-                btn.innerText = "등록하기";
-            }
-        }
-
-        function openWrite() { document.getElementById('listPage').style.display='none'; document.getElementById('writePage').style.display='block'; }
-        window.onload = load;
+        window.onload = loadPosts;
     </script>
 </body>
 </html>
