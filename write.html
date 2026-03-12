@@ -4,151 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UNIVERSE | 기록 스테이션</title>
+    
+    <script src="config.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* 🌌 기본 우주 배경 설정 */
+        /* 🌌 기존 우주 디자인 스타일 유지 */
         body { 
-            margin: 0; 
-            background-color: #0b111e; 
-            color: white; 
-            font-family: 'Noto Sans KR', sans-serif; 
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow-x: hidden;
+            margin: 0; background-color: #0b111e; color: white; 
+            font-family: 'Noto Sans KR', sans-serif; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow-x: hidden;
         }
 
-        /* ✨ 배경 별무리 효과 */
-        .universe-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1a253a 0%, #0b111e 80%);
-            z-index: -1;
-        }
-        .star {
-            position: absolute; background: #fff; border-radius: 50%; opacity: 0;
-            animation: twinkle var(--duration) infinite ease-in-out;
-        }
+        .universe-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a253a 0%, #0b111e 80%); z-index: -1; }
+        .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0; animation: twinkle var(--duration) infinite ease-in-out; }
         @keyframes twinkle {
             0%, 100% { opacity: var(--min-opacity); transform: scale(1); }
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* 🛸 글쓰기 컨테이너 (반응형 최적화) */
         .write-container { 
-            width: 92%; 
-            max-width: 850px; 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(20px);
-            padding: 40px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 24px; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            margin: 20px 0;
-            box-sizing: border-box;
-            transition: 0.3s;
+            width: 92%; max-width: 850px; background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(20px); padding: 40px; border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            margin: 20px 0; box-sizing: border-box;
         }
 
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-            padding-bottom: 20px; 
-            margin-bottom: 25px; 
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 20px; margin-bottom: 25px; }
         .header h2 { margin: 0; font-weight: 700; letter-spacing: 1px; color: #fff; font-size: 1.5rem; }
 
-        .info-row { 
-            margin-bottom: 25px; 
-            font-size: 14px; 
-            color: #8ea8c9; 
-            display: flex; 
-            gap: 15px; 
-            align-items: center; 
-            flex-wrap: wrap; /* 모바일에서 자동 줄바꿈 */
-        }
-        
-        /* 말머리 드롭다운 */
-        .category-select {
-            padding: 8px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            font-size: 13px;
-            outline: none;
-            background-color: rgba(0, 0, 0, 0.4);
-            color: #fff;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .info-row { margin-bottom: 25px; font-size: 14px; color: #8ea8c9; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .category-select { padding: 8px 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; font-size: 13px; outline: none; background-color: rgba(0, 0, 0, 0.4); color: #fff; cursor: pointer; transition: 0.3s; }
         .category-select:hover { border-color: #ff2d55; }
 
-        /* 입력창 스타일 */
-        input[type="text"] { 
-            width: 100%; 
-            padding: 15px 0; 
-            border: none; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-            font-size: 24px; 
-            font-weight: bold; 
-            outline: none; 
-            background: transparent; 
-            color: #fff;
-            margin-bottom: 25px; 
-            transition: 0.3s;
-            box-sizing: border-box;
-        }
+        input[type="text"] { width: 100%; padding: 15px 0; border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 24px; font-weight: bold; outline: none; background: transparent; color: #fff; margin-bottom: 25px; box-sizing: border-box; }
         input[type="text"]:focus { border-bottom: 1px solid #ff2d55; }
-        input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.15); }
+        textarea { width: 100%; min-height: 350px; border: none; font-size: 16px; line-height: 1.8; outline: none; resize: none; background: transparent; color: rgba(255, 255, 255, 0.8); box-sizing: border-box; }
 
-        textarea { 
-            width: 100%; 
-            min-height: 350px; 
-            border: none; 
-            font-size: 16px; 
-            line-height: 1.8; 
-            outline: none; 
-            resize: none; 
-            background: transparent; 
-            color: rgba(255, 255, 255, 0.8);
-            box-sizing: border-box;
-        }
+        .btn-submit { background-color: #ff2d55; color: white; border: none; padding: 10px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.4s; box-shadow: 0 5px 15px rgba(255, 45, 85, 0.3); white-space: nowrap; }
+        .btn-submit:hover { background-color: #fff; color: #ff2d55; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); transform: translateY(-2px); }
 
-        /* 🚀 등록 버튼 */
-        .btn-submit { 
-            background-color: #ff2d55; 
-            color: white; 
-            border: none; 
-            padding: 10px 30px; 
-            border-radius: 20px; 
-            font-weight: bold;
-            cursor: pointer; 
-            transition: 0.4s;
-            box-shadow: 0 5px 15px rgba(255, 45, 85, 0.3);
-            white-space: nowrap;
-        }
-        .btn-submit:hover { 
-            background-color: #fff; color: #ff2d55; 
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-            transform: translateY(-2px);
-        }
-
-        /* 📱 모바일 및 태블릿 대응 미디어 쿼리 */
         @media (max-width: 768px) {
-            body { align-items: flex-start; } /* 모바일은 상단부터 시작 */
-            .write-container {
-                width: 100%;
-                margin: 0;
-                padding: 30px 20px;
-                border-radius: 0; /* 모바일 전면 밀착 */
-                border: none;
-                min-height: 100vh;
-            }
+            body { align-items: flex-start; }
+            .write-container { width: 100%; margin: 0; padding: 30px 20px; border-radius: 0; border: none; min-height: 100vh; }
             .header h2 { font-size: 1.2rem; }
             input[type="text"] { font-size: 20px; }
             textarea { min-height: 300px; font-size: 15px; }
-            .btn-submit { padding: 8px 25px; font-size: 14px; }
         }
     </style>
 </head>
@@ -157,7 +59,7 @@
 
     <div class="write-container">
         <div class="header">
-            <h2>기록 스테이션</h2>
+            <h2 onclick="Universe.navigateTo('board')" style="cursor:pointer">기록 스테이션</h2>
             <button class="btn-submit" id="saveBtn">등록</button>
         </div>
 
@@ -169,7 +71,7 @@
                     <option value="지우">지우</option>
                 </select>
             </div>
-            <div>기록관: <span id="writerName" style="font-weight: bold; color: #fff;">로드 중...</span></div>
+            <div>기록관: <span id="writerName" style="font-weight: bold; color: #fff;">---</span></div>
         </div>
 
         <input type="text" id="title" placeholder="제목을 입력하세요" autocomplete="off">
@@ -180,32 +82,29 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        const firebaseConfig = {
-            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
-            projectId: "jiwoo-fanpage"
-        };
-
+        // config.js의 설정값 사용
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const user = urlParams.get('user') || "익명";
-        document.getElementById('writerName').innerText = user;
+        // Universe 객체로 유저 정보 가져오기
+        const currentUser = Universe.getUser();
+        document.getElementById('writerName').innerText = currentUser;
 
-        const isAdmin = (user === "관리자" || user === "한지우");
-        const categorySelect = document.getElementById('category');
-
+        // 관리자 권한 확인 (공지 카테고리 추가)
+        const isAdmin = (currentUser === "관리자" || currentUser === "한지우");
         if (isAdmin) {
+            const categorySelect = document.getElementById('category');
             const adminOption = document.createElement('option');
             adminOption.value = "공지";
             adminOption.innerText = "공지";
-            categorySelect.appendChild(adminOption);
+            categorySelect.prepend(adminOption); // 공지를 맨 앞으로
+            categorySelect.value = "공지";
         }
 
-        // 별무리 배경 생성
+        // 별무리 배경 생성 (기존 로직 유지)
         function createStars() {
             const container = document.getElementById('starContainer');
-            const starCount = window.innerWidth < 768 ? 50 : 100; // 모바일은 성능을 위해 별 개수 조절
+            const starCount = window.innerWidth < 768 ? 50 : 100;
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -222,15 +121,14 @@
         }
         createStars();
 
-        // 등록 로직
+        // 게시글 저장 로직
         document.getElementById('saveBtn').onclick = async () => {
-            const category = categorySelect.value;
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
+            const category = document.getElementById('category').value;
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
 
             if(!title || !content) return alert("제목과 내용을 입력해주세요.");
             
-            // 등록 중 중복 클릭 방지
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.disabled = true;
             saveBtn.innerText = "전송 중...";
@@ -243,16 +141,18 @@
                     category: category,
                     title: title,
                     content: content,
-                    writer: user,
+                    writer: currentUser,
                     date: new Date().toLocaleDateString(),
                     timestamp: Date.now(),
                     views: 0,
                     likes: 0
                 });
 
-                alert("성공적으로 등록되었습니다.");
-                location.href = `board.html?user=${encodeURIComponent(user)}`;
+                alert("성공적으로 기록되었습니다.");
+                // Universe 표준 함수로 게시판으로 이동
+                Universe.navigateTo('board');
             } catch (e) {
+                console.error(e);
                 alert("오류가 발생했습니다. 다시 시도해주세요.");
                 saveBtn.disabled = false;
                 saveBtn.innerText = "등록";
