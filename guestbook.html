@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universe | 배우 한지우 팬페이지</title>
+    <title>Universe | Guestbook</title>
     
+    <script src="config.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -20,163 +22,125 @@
             appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
         };
         firebase.initializeApp(firebaseConfig);
-        
-        const auth = firebase.auth();
         const db = firebase.database();
 
-        // [실시간 접속자 로직 생략 - 동일]
-        function trackOnlineUsers() {
-            const connectedRef = db.ref(".info/connected");
-            const onlineRef = db.ref("online_users").push();
-            connectedRef.on("value", (snap) => {
-                if (snap.val() === true) {
-                    onlineRef.set(true);
-                    onlineRef.onDisconnect().remove();
-                }
-            });
-            db.ref("online_users").on("value", (snap) => {
-                const count = snap.numChildren() || 0;
-                document.getElementById('onlineCount').innerText = `${count}명 실시간 탐사 중`;
-            });
-        }
-
-        function updateTotalFans() {
-            db.ref('total_fan_count').on('value', (snapshot) => {
-                const count = snapshot.val() || 0;
-                document.getElementById('userCount').innerText = `${count.toLocaleString()}명 지우 유니버스 입성`;
-            });
-        }
-
-        // 🎯 엔터 키 이벤트 리스너 (반응성 강화)
-        function setupEnterKey() {
-            const loginIds = ['lEmail', 'lPw'];
-            loginIds.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
-            });
-        }
+        let currentUser = "";
 
         window.onload = () => {
-            trackOnlineUsers();
-            updateTotalFans();
-            setupEnterKey();
             const urlParams = new URLSearchParams(window.location.search);
-            const user = urlParams.get('user');
-            if(user) document.getElementById('nickBadge').innerText = user;
-        };
-
-        // 🎯 [경로 수정 핵심] 로그인 핸들러
-        function handleLogin() {
-            const email = document.getElementById('lEmail').value;
-            const pw = document.getElementById('lPw').value;
-
-            // 관리자 로그인 경로 확인
-            if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
-                alert("관리자님, 유니버스 컨트롤 타워로 이동합니다!");
-                location.replace("menu.html?user=" + encodeURIComponent("관리자")); // location.href 대신 replace 권장
+            currentUser = urlParams.get('user');
+            
+            // 로그인 정보가 없으면 입구로 튕겨내기
+            if(!currentUser) {
+                UniverseNav.goToIndex();
                 return;
             }
+            
+            document.getElementById('userBadge').innerText = currentUser;
+            loadMessages();
+        };
 
-            auth.signInWithEmailAndPassword(email, pw).then((userCredential) => {
-                const userEmail = userCredential.user.email.split('@')[0];
-                alert("지우 유니버스에 오신 것을 환영합니다!");
-                
-                // 🎯 여기서 확실하게 menu.html로 보내고 있는지 확인하세요!
-                location.replace(`menu.html?user=${encodeURIComponent(userEmail)}`);
-            }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
+        // 메시지 저장
+        function postMessage() {
+            const msgInput = document.getElementById('msgInput');
+            const message = msgInput.value.trim();
+            if(!message) return;
+
+            db.ref('guestbook').push({
+                user: currentUser,
+                text: message,
+                timestamp: Date.now()
+            });
+
+            msgInput.value = "";
         }
 
-        function handleSignup() {
-            const email = document.getElementById('sEmail').value;
-            const pw = document.getElementById('sPw').value;
-            auth.createUserWithEmailAndPassword(email, pw).then(() => {
-                db.ref('total_fan_count').transaction((currentCount) => (currentCount || 0) + 1);
-                alert("입성을 환영합니다! 로그인을 진행해 주세요."); 
-                location.reload();
-            }).catch((err) => alert(err.message));
-        }
+        // 메시지 불러오기 (실시간)
+        function loadMessages() {
+            db.ref('guestbook').limitToLast(50).on('value', (snapshot) => {
+                const list = document.getElementById('msgList');
+                list.innerHTML = "";
+                const data = snapshot.val();
+                if(!data) return;
 
-        function openAuth() { 
-            const modal = document.getElementById('authModal');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-        function closeAuth() { 
-            const modal = document.getElementById('authModal');
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 400); 
+                Object.values(data).reverse().forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'msg-card';
+                    div.innerHTML = `
+                        <div class="msg-user">${item.user}</div>
+                        <div class="msg-text">${item.text}</div>
+                    `;
+                    list.appendChild(div);
+                });
+            });
         }
     </script>
 
     <style>
-        /* [스타일 시트 동일 - 생략] */
-        body { margin: 0; padding: 0; background: #ffffff; height: 100vh; font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; }
-        .liquid-bg { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); z-index: 1; }
-        .main-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        .header-text { padding-top: 8vh; text-align: center; }
-        .univ-title { font-family: 'Arial Black', sans-serif; font-size: clamp(2.5rem, 10vw, 3.8rem); font-weight: 900; color: #1a1a1a; line-height: 0.95; letter-spacing: -2px; text-transform: uppercase; margin: 0; }
-        .coming-soon-label { font-size: clamp(0.9rem, 4vw, 1.2rem); color: #ff2d55; letter-spacing: 5px; margin-top: 15px; font-weight: 900; }
-        .hero-photo-zone { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; width: 100%; }
-        .main-img { max-height: 75vh; width: auto; max-width: 90%; object-fit: contain; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); }
-        .footer-btn-zone { height: 15vh; width: 100%; display: flex; justify-content: center; align-items: center; }
-        .btn-stay { cursor: pointer; border: none; width: 85%; max-width: 320px; height: 60px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 5px; border-radius: 30px; text-transform: uppercase; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        #statusZone { position: fixed; right: 25px; top: 25px; display: flex; flex-direction: column; align-items: flex-end; z-index: 100; }
-        .nick-box { font-size: 0.65rem; border: 1px solid #1a1a1a; padding: 3px 8px; font-weight: bold; background: #fff; margin-bottom: 6px; }
-        .status-msg { font-size: 0.8rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 2px solid #ff2d55; }
-        .count-info { font-size: 0.7rem; color: #888; text-align: right; line-height: 1.5; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; z-index: 500; opacity: 0; transition: 0.4s; }
-        .modal-overlay.active { opacity: 1; }
-        .auth-card { width: 90%; max-width: 400px; padding: 40px 20px; background: #fff; border-radius: 30px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.15); border: 1px solid #eee; }
-        .auth-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem; box-sizing: border-box; background: #f9f9f9; }
-        .btn-submit { width: 100%; padding: 16px; background: #1a1a1a; color: #fff; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; }
-        @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
+        body { 
+            margin: 0; padding: 0; background: #050a10; color: #fff;
+            font-family: 'Apple SD Gothic Neo', sans-serif; height: 100vh;
+            display: flex; flex-direction: column;
+        }
+        /* 상단 네비게이션 */
+        .nav-bar {
+            padding: 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(10px);
+        }
+        .btn-back { 
+            background: none; border: 1px solid #8ea8c9; color: #8ea8c9; 
+            padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold;
+        }
+        .user-info { font-size: 0.8rem; color: #8ea8c9; }
+
+        /* 입력 구역 */
+        .input-zone { padding: 20px; background: rgba(255,255,255,0.05); }
+        .input-box {
+            display: flex; gap: 10px; max-width: 600px; margin: 0 auto;
+        }
+        input {
+            flex: 1; padding: 12px; border-radius: 10px; border: none;
+            background: rgba(255,255,255,0.1); color: #fff; outline: none;
+        }
+        .btn-send {
+            background: #8ea8c9; color: #050a10; border: none; padding: 0 20px;
+            border-radius: 10px; font-weight: 900; cursor: pointer;
+        }
+
+        /* 메시지 리스트 */
+        .msg-list {
+            flex: 1; overflow-y: auto; padding: 20px;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .msg-card {
+            background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px;
+            max-width: 500px; border-left: 3px solid #8ea8c9;
+        }
+        .msg-user { font-size: 0.75rem; color: #8ea8c9; font-weight: bold; margin-bottom: 5px; }
+        .msg-text { font-size: 0.95rem; line-height: 1.5; }
+
+        /* 스크롤바 디자인 */
+        .msg-list::-webkit-scrollbar { width: 5px; }
+        .msg-list::-webkit-scrollbar-thumb { background: rgba(142, 168, 204, 0.3); border-radius: 10px; }
     </style>
 </head>
 <body>
-    <div class="liquid-bg"></div>
-    <div class="main-container">
-        <div class="header-text">
-            <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
-            <h2 class="coming-soon-label">OFFICIAL OPEN</h2>
+
+    <div class="nav-bar">
+        <button class="btn-back" onclick="UniverseNav.goToMenu()">← BACK TO MENU</button>
+        <div class="user-info">대원: <span id="userBadge">---</span></div>
+    </div>
+
+    <div class="msg-list" id="msgList">
         </div>
-        <div class="hero-photo-zone">
-            <img src="jiwoo_profile3.png" alt="Han Ji Woo" class="main-img">
-        </div>
-        <div class="footer-btn-zone">
-            <button class="btn-stay" onclick="openAuth()">ENTER UNIVERSE</button>
+
+    <div class="input-zone">
+        <div class="input-box">
+            <input type="text" id="msgInput" placeholder="지우 유니버스에 메시지를 남기세요..." onkeypress="if(event.key==='Enter') postMessage()">
+            <button class="btn-send" onclick="postMessage()">전송</button>
         </div>
     </div>
 
-    <div id="statusZone">
-        <div class="nick-box" id="nickBadge">VISITOR</div>
-        <div class="status-msg">중심 타워 가동 중</div>
-        <div class="count-info" id="userCount">연결 중...</div>
-        <div class="count-info" id="onlineCount">실시간 탐사 준비 중...</div>
-    </div>
-
-    <div class="modal-overlay" id="authModal">
-        <div class="auth-card">
-            <div id="loginBox">
-                <h3 style="letter-spacing: 3px; margin-bottom: 25px;">LOGIN</h3>
-                <input type="email" id="lEmail" class="auth-input" placeholder="이메일 주소">
-                <input type="password" id="lPw" class="auth-input" placeholder="비밀번호">
-                <button class="btn-submit" onclick="handleLogin()">유니버스 접속</button>
-                <p style="margin-top:25px; font-size:0.85rem; color:#666;">
-                    처음이신가요? <span onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';" style="color:#ff2d55; cursor:pointer; font-weight:bold; text-decoration: underline;">멤버십 가입</span>
-                </p>
-            </div>
-            
-            <div id="signBox" style="display:none;">
-                <h3 style="letter-spacing: 3px; margin-bottom: 25px;">JOIN US</h3>
-                <input type="email" id="sEmail" class="auth-input" placeholder="이메일 주소">
-                <input type="password" id="sPw" class="auth-input" placeholder="비밀번호">
-                <button class="btn-submit" onclick="handleSignup()">멤버십 승인</button>
-                <p style="margin-top:25px; font-size:0.85rem; color:#666;">
-                    이미 계정이 있나요? <span onclick="document.getElementById('loginBox').style.display='block'; document.getElementById('signBox').style.display='none';" style="color:#ff2d55; cursor:pointer; font-weight:bold; text-decoration: underline;">로그인으로 이동</span>
-                </p>
-            </div>
-            <button style="margin-top:25px; border:none; background:none; cursor:pointer; color:#bbb; font-size: 0.8rem;" onclick="closeAuth()">[ 닫기 ]</button>
-        </div>
-    </div>
 </body>
 </html>
