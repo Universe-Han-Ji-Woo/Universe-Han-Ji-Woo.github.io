@@ -17,14 +17,20 @@
             background: radial-gradient(circle at center, #1a253a 0%, #0b111e 80%);
         }
 
-        /* 🔙 상단 복귀 링크 */
+        /* 🔙 상단 복귀 링크 (menu.html로 경로 수정) */
         .back-link { margin-top: 30px; text-align: center; z-index: 10; }
         .back-link a {
             text-decoration: none; color: #8ea8c9; font-size: 13px;
-            letter-spacing: 2px; transition: 0.3s; padding: 5px 15px;
+            letter-spacing: 2px; transition: 0.3s; padding: 8px 18px;
             border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            background: rgba(255,255,255,0.05);
         }
-        .back-link a:hover { color: #fff; background: rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .back-link a:hover { 
+            color: #fff; 
+            background: rgba(255,255,255,0.15); 
+            box-shadow: 0 0 15px rgba(255,255,255,0.2); 
+            border-color: rgba(255,255,255,0.3);
+        }
 
         header { text-align: center; padding: 50px 20px 30px; }
         header h1 { font-weight: 700; letter-spacing: 8px; margin: 0; font-size: 2.2rem; color: #fff; }
@@ -81,7 +87,7 @@
         .page-btn.active { background: #ff2d55; border-color: #ff2d55; }
         .page-btn:hover:not(.active) { background: rgba(255,255,255,0.2); }
 
-        /* 📱 반응형 최적화 */
+        /* 📱 반응형 최적화 (전기종 대응) */
         @media (max-width: 768px) {
             header h1 { font-size: 1.8rem; letter-spacing: 5px; }
             .container { width: 95%; }
@@ -93,7 +99,7 @@
 <body>
 
     <div class="back-link">
-        <a href="index.html">← BACK TO UNIVERSE</a>
+        <a href="menu.html">← BACK TO UNIVERSE</a>
     </div>
 
     <header>
@@ -117,7 +123,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, push, set, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // Firebase 설정 (기존 설정 사용)
         const firebaseConfig = {
             databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
             projectId: "jiwoo-fanpage"
@@ -127,11 +132,11 @@
         const db = getDatabase(app);
         const guestbookRef = ref(db, 'guestbook');
 
-        const ITEMS_PER_PAGE = 5; // 한 페이지당 표시할 글 개수
+        const ITEMS_PER_PAGE = 5; 
         let currentPage = 1;
         let allMessages = [];
 
-        // ✍️ 메시지 작성 함수
+        // ✍️ 메시지 작성
         document.getElementById('submitBtn').onclick = async () => {
             const name = document.getElementById('nameInput').value;
             const message = document.getElementById('messageInput').value;
@@ -151,12 +156,11 @@
             alert("지우님에게 마음이 전달되었습니다!");
         };
 
-        // 🔄 실시간 데이터 수신 및 페이징 처리
+        // 🔄 실시간 데이터 로드
         onValue(query(guestbookRef), (snapshot) => {
             const data = snapshot.val();
             allMessages = [];
             if (data) {
-                // 데이터를 배열로 변환 후 최신순 정렬
                 Object.keys(data).forEach(key => {
                     allMessages.push(data[key]);
                 });
@@ -166,11 +170,9 @@
             renderPagination();
         });
 
-        // 🖼️ 메시지 렌더링
         function renderMessages() {
             const listDiv = document.getElementById('messagesList');
             listDiv.innerHTML = "";
-
             const start = (currentPage - 1) * ITEMS_PER_PAGE;
             const end = start + ITEMS_PER_PAGE;
             const paginatedItems = allMessages.slice(start, end);
@@ -194,11 +196,9 @@
             });
         }
 
-        // 🔢 페이지 버튼 생성
         function renderPagination() {
             const pagDiv = document.getElementById('pagination');
             pagDiv.innerHTML = "";
-            
             const totalPages = Math.ceil(allMessages.length / ITEMS_PER_PAGE);
             if (totalPages <= 1) return;
 
