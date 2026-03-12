@@ -98,16 +98,7 @@
         let currentPage = 1;
         let currentPostIdx = -1;
         const postsPerPage = 12;
-        let isProcessing = false; // 중복 클릭 방지 플래그
-
-        function formatTime(dateStr, showDetail) {
-            if(!dateStr) return "-";
-            const d = new Date(dateStr);
-            if(isNaN(d)) return dateStr;
-            return showDetail 
-                ? d.toLocaleString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })
-                : d.toLocaleDateString('ko-KR');
-        }
+        let isProcessing = false;
 
         async function loadPosts() {
             try {
@@ -144,7 +135,6 @@
             renderPagination();
         }
 
-        // 인덱스가 아닌 고유 ID로 게시글 찾기 (데이터 밀림 방지)
         function viewPostByID(id) {
             const idx = allPosts.findIndex(p => String(p.id) === String(id));
             if(idx !== -1) viewPost(idx);
@@ -154,7 +144,7 @@
             currentPostIdx = idx;
             const p = allPosts[idx];
             
-            // 단순 조회수 증가 요청 (UI 먼저 반영)
+            // 단순 조회수 증가 (action만 포함)
             fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'view', id: p.id }) });
             p.views += 1; 
 
@@ -165,24 +155,23 @@
             document.getElementById('viewBody').innerText = p.content;
             document.getElementById('likeCount').innerText = p.likes;
             document.getElementById('likeBtn').classList.remove('clicked');
-            document.getElementById('delBtn').innerText = "게시글 삭제";
-            isProcessing = false;
         }
 
         async function handleLike() {
+            if(isProcessing) return;
             const btn = document.getElementById('likeBtn');
-            if(btn.classList.contains('clicked') || isProcessing) return;
+            if(btn.classList.contains('clicked')) return;
             
             const p = allPosts[currentPostIdx];
             btn.classList.add('clicked');
             isProcessing = true;
 
             try {
+                // 좋아요 요청 (action 명시)
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'like', id: p.id }) });
                 p.likes += 1;
                 document.getElementById('likeCount').innerText = p.likes;
-            } catch(e) { btn.classList.remove('clicked'); }
-            finally { isProcessing = false; }
+            } finally { isProcessing = false; }
         }
 
         async function deletePost() {
@@ -190,41 +179,21 @@
             
             const p = allPosts[currentPostIdx];
             const delBtn = document.getElementById('delBtn');
-            delBtn.innerText = "삭제 중...";
+            delBtn.innerText = "삭제 처리 중...";
             isProcessing = true;
 
             try {
-                // 삭제 명령 전송
-                const response = await fetch(API_URL, { 
+                // 삭제 요청 시 반드시 action: 'delete'만 포함 (제목/본문 절대 포함 금지)
+                await fetch(API_URL, { 
                     method: 'POST', 
                     body: JSON.stringify({ action: 'delete', id: p.id }) 
                 });
-
-                if(response.ok) {
-                    alert("성공적으로 삭제되었습니다.");
-                    // 단순 새로고침 대신 목록 상태로 초기화 후 데이터 재로드
-                    closeView();
-                    loadPosts();
-                }
+                alert("삭제되었습니다.");
+                window.location.reload(); 
             } catch(e) { 
-                alert("삭제 처리 중 오류가 발생했습니다."); 
+                alert("삭제 실패"); 
                 delBtn.innerText = "게시글 삭제";
-            } finally { 
-                isProcessing = false; 
-            }
-        }
-
-        function closeView() { 
-            document.getElementById('viewPage').style.display = 'none'; 
-            document.getElementById('listPage').style.display = 'block'; 
-        }
-        
-        function openWrite() { document.getElementById('listPage').style.display = 'none'; document.getElementById('writePage').style.display = 'block'; }
-        function closeWrite() { 
-            document.getElementById('postTitle').value = "";
-            document.getElementById('postContent').value = "";
-            document.getElementById('writePage').style.display = 'none'; 
-            document.getElementById('listPage').style.display = 'block'; 
+            } finally { isProcessing = false; }
         }
 
         async function submitPost() {
@@ -232,24 +201,43 @@
             const title = document.getElementById('postTitle').value.trim();
             const content = document.getElementById('postContent').value.trim();
             
-            if(!title || !content) return alert("제목과 내용을 모두 입력해주세요.");
+            if(!title || !content) return alert("제목과 내용을 모두 입력해 주세요.");
 
             isProcessing = true;
             document.getElementById('submitBtn').innerText = "등록 중...";
 
             try {
+                // 글쓰기 요청에는 절대 'action' 필드를 넣지 않음 -> 서버가 새 글로 인식하게 함
                 await fetch(API_URL, { 
                     method: 'POST', 
-                    body: JSON.stringify({ title, content, user: '관리자' }) 
+                    body: JSON.stringify({ title: title, content: content, user: '관리자' }) 
                 });
-                // 글 작성 후 페이지 초기화
-                window.location.reload(); 
+                window.location.reload();
             } catch(e) {
-                alert("등록에 실패했습니다.");
+                alert("등록 실패");
                 document.getElementById('submitBtn').innerText = "등록 완료";
-            } finally {
-                isProcessing = false;
-            }
+            } finally { isProcessing = false; }
+        }
+
+        function formatTime(dateStr, showDetail) {
+            if(!dateStr) return "-";
+            const d = new Date(dateStr);
+            if(isNaN(d)) return dateStr;
+            return showDetail 
+                ? d.toLocaleString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })
+                : d.toLocaleDateString('ko-KR');
+        }
+
+        function closeView() { 
+            document.getElementById('viewPage').style.display = 'none'; 
+            document.getElementById('listPage').style.display = 'block'; 
+            renderBoard();
+        }
+        
+        function openWrite() { document.getElementById('listPage').style.display = 'none'; document.getElementById('writePage').style.display = 'block'; }
+        function closeWrite() { 
+            document.getElementById('writePage').style.display = 'none'; 
+            document.getElementById('listPage').style.display = 'block'; 
         }
 
         function renderPagination() {
