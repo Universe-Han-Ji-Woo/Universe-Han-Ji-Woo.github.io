@@ -18,7 +18,7 @@
             z-index: 1;
         }
 
-        /* 메인 컨트롤 타워 원형 */
+        /* [스타일 유지] 메인 컨트롤 타워 원형 */
         .control-tower {
             position: relative; z-index: 10;
             width: 500px; height: 500px;
@@ -28,6 +28,12 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
+            animation: pulse 4s infinite ease-in-out; /* 은은한 박동 효과 추가 */
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 80px rgba(142, 168, 204, 0.1); }
+            50% { box-shadow: 0 0 120px rgba(142, 168, 204, 0.3); }
         }
 
         .core-identity { text-align: center; z-index: 20; }
@@ -48,9 +54,14 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             flex-direction: column; color: #fff; cursor: pointer;
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .nav-item:hover { background: rgba(142, 168, 204, 0.2); border-color: #8ea8c9; box-shadow: 0 0 30px rgba(142, 168, 204, 0.4); transform: scale(1.1); }
+        .nav-item:hover { 
+            background: rgba(142, 168, 204, 0.2); 
+            border-color: #8ea8c9; 
+            box-shadow: 0 0 30px rgba(142, 168, 204, 0.6); 
+            transform: scale(1.1);
+        }
 
         /* 위치 설정 */
         .nav-item.top    { top: -25px; left: 50%; transform: translateX(-50%); }
@@ -69,7 +80,7 @@
         .guestbook-pos { right: -160px; top: -40px; }
         .line-right {
             position: absolute; width: 130px; height: 1px;
-            background: linear-gradient(to right, rgba(255,255,255,0.6), transparent);
+            background: linear-gradient(to right, rgba(142, 168, 204, 0.8), transparent);
             top: 55px; right: 75px; transform: rotate(-25deg);
         }
 
@@ -77,7 +88,7 @@
         .gallery-pos { left: -160px; top: -40px; }
         .line-left {
             position: absolute; width: 130px; height: 1px;
-            background: linear-gradient(to left, rgba(255,255,255,0.6), transparent);
+            background: linear-gradient(to left, rgba(142, 168, 204, 0.8), transparent);
             top: 55px; left: 75px; transform: rotate(25deg);
         }
 
@@ -87,9 +98,13 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            flex-direction: column; cursor: pointer; transition: 0.3s;
+            flex-direction: column; cursor: pointer; transition: 0.4s;
         }
-        .satellite-node:hover { background: #fff; box-shadow: 0 0 25px #fff; }
+        .satellite-node:hover { 
+            background: #ffffff; 
+            box-shadow: 0 0 30px #ffffff; 
+            transform: translateY(-5px);
+        }
         .satellite-node:hover .node-ko { color: #000; }
         .satellite-node:hover .node-en { color: #555; }
         
@@ -100,6 +115,7 @@
         function go(page) {
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
+            // '자유 게시판' 클릭 시 board.html로 이동하도록 설계됨
             if(user) location.href = `${page}?user=${encodeURIComponent(user)}`;
             else location.href = "index.html";
         }
