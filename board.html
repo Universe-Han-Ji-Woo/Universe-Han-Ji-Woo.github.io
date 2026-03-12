@@ -31,12 +31,12 @@
         .btn-like { background: none; border: 1px solid var(--main-red); color: var(--main-red); padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-like.clicked { background: var(--main-red); color: white; }
 
-        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 15px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; font-size: 1rem; }
-        .w-textarea { height: 400px; resize: none; }
-
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
         .page-btn { background: none; border: 1px solid #333; color: var(--text-gray); padding: 5px 12px; cursor: pointer; border-radius: 4px; }
         .page-btn.active { background: var(--main-red); color: white; border-color: var(--main-red); }
+        
+        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 15px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; font-size: 1rem; }
+        .w-textarea { height: 400px; resize: none; }
     </style>
 </head>
 <body>
@@ -54,7 +54,7 @@
                         <th width="50">번호</th>
                         <th>제목</th>
                         <th width="90">작성자</th>
-                        <th width="160">작성일시</th> <th width="60">조회수</th>
+                        <th width="110">날짜</th> <th width="60">조회수</th>
                     </tr>
                 </thead>
                 <tbody id="boardBody"></tbody>
@@ -93,21 +93,18 @@
         let currentPostIdx = -1;
         const postsPerPage = 12;
 
-        // [추가] 시간을 오전/오후 형식으로 바꿔주는 함수
-        function formatFullDate(dateStr) {
+        // [본문용] 상세 시간 (오전/오후 포함)
+        function formatFullTime(dateStr) {
             if(!dateStr) return "-";
             const d = new Date(dateStr);
             if(isNaN(d)) return dateStr;
-            
             const y = d.getFullYear();
             const m = d.getMonth() + 1;
             const day = d.getDate();
             let hh = d.getHours();
             const mm = d.getMinutes().toString().padStart(2, '0');
             const ampm = hh >= 12 ? '오후' : '오전';
-            hh = hh % 12;
-            hh = hh ? hh : 12; // 0시는 12시로 표시
-            
+            hh = hh % 12 || 12;
             return `${y}.${m}.${day} ${ampm} ${hh}:${mm}`;
         }
 
@@ -127,7 +124,8 @@
             tbody.innerHTML = currentPosts.map((p, i) => {
                 const title = p.Title || p.title || "제목 없음";
                 const user = p.User || p.user || "관리자";
-                const fullDate = formatFullDate(p.Date || p.date);
+                // [목록]에는 날짜만 표시 (예: 2026.3.12)
+                const simpleDate = (p.Date || p.date || "").split('T')[0].replace(/-/g, '.') || "-";
                 const views = p.Views || p.views || 0;
                 const realIndex = allPosts.length - 1 - (start + i);
 
@@ -135,7 +133,7 @@
                     <td>${allPosts.length - (start + i)}</td>
                     <td class="td-title" onclick="viewPost(${realIndex})">${title}</td>
                     <td>${user}</td>
-                    <td style="color:#777; font-size:0.8rem;">${fullDate}</td>
+                    <td style="color:#777;">${simpleDate}</td>
                     <td>${views}</td>
                 </tr>`;
             }).join('');
@@ -149,8 +147,9 @@
             document.getElementById('viewPage').style.display = 'block';
             
             document.getElementById('viewTitle').innerText = p.Title || p.title;
-            const timeInfo = formatFullDate(p.Date || p.date);
-            document.getElementById('viewInfo').innerText = `작성자: ${p.User || '관리자'} | ${timeInfo} | 조회수: ${p.Views || 0}`;
+            // [본문 확인 시]에만 오전/오후 시간 노출
+            const detailedTime = formatFullTime(p.Date || p.date);
+            document.getElementById('viewInfo').innerText = `작성자: ${p.User || '관리자'} | ${detailedTime} | 조회수: ${p.Views || 0}`;
             document.getElementById('viewBody').innerText = p.Content || p.content;
             document.getElementById('likeCount').innerText = p.Likes || p.likes || 0;
             document.getElementById('likeBtn').classList.remove('clicked');
