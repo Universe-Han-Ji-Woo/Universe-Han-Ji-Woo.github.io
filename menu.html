@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Universe | 컨트롤 타워</title>
     <style>
         body, html {
@@ -20,24 +20,23 @@
             overflow: hidden;
         }
 
-        /* ✨ [추가] 이쑤시개로 콕콕 찌른 듯한 세하얀 별 스타일 */
+        /* ✨ 이쑤시개로 콕콕 찌른 듯한 세하얀 별 스타일 */
         .star {
             position: absolute;
             background: #ffffff;
             border-radius: 50%;
             opacity: 0;
-            pointer-events: none; /* 클릭 방해 금지 */
+            pointer-events: none;
             animation: twinkle var(--duration) infinite ease-in-out;
             filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
         }
 
-        /* ✨ [추가] 별들이 제각각 반짝이는 애니메이션 */
         @keyframes twinkle {
             0%, 100% { opacity: var(--min-opacity); transform: scale(1); }
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* [스타일 유지] 메인 컨트롤 타워 원형 */
+        /* 🛸 메인 컨트롤 타워 원형 (반응형 대응) */
         .control-tower {
             position: relative; z-index: 10;
             width: 500px; height: 500px;
@@ -48,6 +47,7 @@
             border-radius: 50%;
             box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
             animation: pulse 4s infinite ease-in-out;
+            transition: transform 0.3s ease;
         }
 
         @keyframes pulse {
@@ -82,6 +82,7 @@
             transform: scale(1.1);
         }
 
+        /* 메뉴 위치 */
         .nav-item.top    { top: -25px; left: 50%; transform: translateX(-50%); }
         .nav-item.bottom { bottom: -25px; left: 50%; transform: translateX(-50%); }
         .nav-item.left   { left: -25px; top: 50%; transform: translateY(-50%); }
@@ -118,10 +119,46 @@
             box-shadow: 0 0 30px #ffffff; 
             transform: translateY(-5px);
         }
-        .satellite-node:hover .node-ko { color: #000; }
-        .satellite-node:hover .node-en { color: #555; }
         .node-en { font-size: 0.5rem; color: #8ea8c9; margin-bottom: 2px; }
         .node-ko { font-size: 0.75rem; color: #fff; font-weight: bold; }
+
+        /* 📱 [반응형 핵심] 모바일/태블릿 대응 미디어 쿼리 */
+        @media (max-width: 768px) {
+            /* 1. 화면 폭에 맞춰 전체 크기 축소 */
+            .control-tower {
+                width: 320px;
+                height: 320px;
+            }
+            .univ-title { font-size: 1.5rem; letter-spacing: 4px; }
+            .user-welcome { font-size: 0.7rem; }
+
+            /* 2. 중앙 메뉴 크기 축소 및 위치 조정 */
+            .nav-item { width: 85px; height: 85px; }
+            .nav-label-ko { font-size: 0.65rem; }
+            .nav-label-en { display: none; } /* 모바일에서는 깔끔하게 한글만 표시 */
+
+            .nav-item.top    { top: -15px; }
+            .nav-item.bottom { bottom: -15px; }
+            .nav-item.left   { left: -15px; }
+            .nav-item.right  { right: -15px; }
+
+            /* 3. 위성(갤러리, 방명록) 위치 모바일 최적화 */
+            .guestbook-pos { right: -20px; top: -90px; }
+            .gallery-pos { left: -20px; top: -90px; }
+            
+            .satellite-node { width: 65px; height: 65px; }
+            .node-ko { font-size: 0.6rem; }
+            .node-en { display: none; }
+
+            .line-right, .line-left { display: none; } /* 모바일에서는 선 제거 (깔끔함 유지) */
+        }
+
+        /* 📱 아주 작은 스마트폰 (iPhone SE 등) 대응 */
+        @media (max-width: 380px) {
+            .control-tower {
+                transform: scale(0.85); /* 화면을 넘칠 경우 전체 스케일 강제 축소 */
+            }
+        }
     </style>
     <script>
         function go(page) {
@@ -131,21 +168,16 @@
             else location.href = "index.html";
         }
 
-        // ✨ [추가] 배경에 이쑤시개로 콕콕 박은듯한 별들을 생성하는 함수
         function createStars() {
             const bg = document.querySelector('.universe-bg');
-            const starCount = 150; // 별의 개수 (원하는 만큼 조절 가능)
+            const starCount = window.innerWidth < 768 ? 80 : 150; // 모바일은 성능위해 별 개수 조절
 
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                
-                // 크기는 아주 작게 (1px ~ 2px)
                 const size = Math.random() * 1.5 + 1;
                 const x = Math.random() * 100;
                 const y = Math.random() * 100;
-                
-                // 애니메이션 속도 및 반짝임 강도 랜덤 설정
                 const duration = Math.random() * 3 + 2; 
                 const minOpacity = Math.random() * 0.3;
 
@@ -167,14 +199,13 @@
             if (!user) { location.href = "index.html"; }
             else { 
                 document.getElementById('userName').innerText = user; 
-                createStars(); // 페이지 로드 시 별 생성
+                createStars();
             }
         };
     </script>
 </head>
 <body>
-    <div class="universe-bg">
-        </div>
+    <div class="universe-bg"></div>
 
     <div class="control-tower">
         <div class="core-identity">
