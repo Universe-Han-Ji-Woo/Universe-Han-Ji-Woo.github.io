@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Universe | 배우 한지우 팬페이지</title>
     
+    <script src="config.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -46,9 +48,7 @@
             });
         }
 
-        // 🎯 [신규] 엔터 키 감지 리스너
         function setupEnterKey() {
-            // 로그인 박스 엔터 감지
             const loginInputs = ['lEmail', 'lPw'];
             loginInputs.forEach(id => {
                 document.getElementById(id).addEventListener('keypress', (e) => {
@@ -56,7 +56,6 @@
                 });
             });
 
-            // 회원가입 박스 엔터 감지
             const signupInputs = ['sEmail', 'sPw'];
             signupInputs.forEach(id => {
                 document.getElementById(id).addEventListener('keypress', (e) => {
@@ -68,26 +67,31 @@
         window.onload = () => {
             trackOnlineUsers();
             updateTotalFans();
-            setupEnterKey(); // 페이지 로드 시 엔터 키 감지 활성화
+            setupEnterKey();
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
             if(user) document.getElementById('nickBadge').innerText = user;
         };
 
+        // 🎯 [핵심 수정] UniverseNav 시스템 적용
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
 
+            // 관리자 로그인
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
                 alert("관리자님, 유니버스 컨트롤 타워로 이동합니다!");
-                location.href = "menu.html?user=" + encodeURIComponent("관리자");
+                UniverseNav.replaceToMenu("관리자");
                 return;
             }
 
+            // 일반 회원 로그인
             auth.signInWithEmailAndPassword(email, pw).then((userCredential) => {
                 const userEmail = userCredential.user.email.split('@')[0];
                 alert("지우 유니버스에 오신 것을 환영합니다!");
-                location.href = `menu.html?user=${encodeURIComponent(userEmail)}`;
+                
+                // 🎯 config.js에 정의된 함수를 사용하여 메뉴로 이동
+                UniverseNav.replaceToMenu(userEmail);
             }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
