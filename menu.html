@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Universe | 컨트롤 타워</title>
+    
+    <script src="config.js"></script>
+
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
@@ -20,14 +23,10 @@
             overflow: hidden;
         }
 
-        /* ✨ 이쑤시개로 콕콕 찌른 듯한 세하얀 별 스타일 */
+        /* ✨ 세하얀 별 스타일 */
         .star {
-            position: absolute;
-            background: #ffffff;
-            border-radius: 50%;
-            opacity: 0;
-            pointer-events: none;
-            animation: twinkle var(--duration) infinite ease-in-out;
+            position: absolute; background: #ffffff; border-radius: 50%; opacity: 0;
+            pointer-events: none; animation: twinkle var(--duration) infinite ease-in-out;
             filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
         }
 
@@ -36,7 +35,7 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* 🛸 메인 컨트롤 타워 원형 (반응형 대응) */
+        /* 🛸 메인 컨트롤 타워 원형 */
         .control-tower {
             position: relative; z-index: 10;
             width: 500px; height: 500px;
@@ -122,56 +121,44 @@
         .node-en { font-size: 0.5rem; color: #8ea8c9; margin-bottom: 2px; }
         .node-ko { font-size: 0.75rem; color: #fff; font-weight: bold; }
 
-        /* 📱 [반응형 핵심] 모바일/태블릿 대응 미디어 쿼리 */
+        /* 📱 모바일 대응 */
         @media (max-width: 768px) {
-            /* 1. 화면 폭에 맞춰 전체 크기 축소 */
-            .control-tower {
-                width: 320px;
-                height: 320px;
-            }
+            .control-tower { width: 320px; height: 320px; }
             .univ-title { font-size: 1.5rem; letter-spacing: 4px; }
-            .user-welcome { font-size: 0.7rem; }
-
-            /* 2. 중앙 메뉴 크기 축소 및 위치 조정 */
             .nav-item { width: 85px; height: 85px; }
             .nav-label-ko { font-size: 0.65rem; }
-            .nav-label-en { display: none; } /* 모바일에서는 깔끔하게 한글만 표시 */
-
-            .nav-item.top    { top: -15px; }
+            .nav-label-en { display: none; }
+            .nav-item.top { top: -15px; }
             .nav-item.bottom { bottom: -15px; }
-            .nav-item.left   { left: -15px; }
-            .nav-item.right  { right: -15px; }
-
-            /* 3. 위성(갤러리, 방명록) 위치 모바일 최적화 */
+            .nav-item.left { left: -15px; }
+            .nav-item.right { right: -15px; }
             .guestbook-pos { right: -20px; top: -90px; }
             .gallery-pos { left: -20px; top: -90px; }
-            
             .satellite-node { width: 65px; height: 65px; }
             .node-ko { font-size: 0.6rem; }
             .node-en { display: none; }
-
-            .line-right, .line-left { display: none; } /* 모바일에서는 선 제거 (깔끔함 유지) */
-        }
-
-        /* 📱 아주 작은 스마트폰 (iPhone SE 등) 대응 */
-        @media (max-width: 380px) {
-            .control-tower {
-                transform: scale(0.85); /* 화면을 넘칠 경우 전체 스케일 강제 축소 */
-            }
+            .line-right, .line-left { display: none; }
         }
     </style>
     <script>
-        function go(page) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const user = urlParams.get('user');
-            if(user) location.href = `${page}?user=${encodeURIComponent(user)}`;
-            else location.href = "index.html";
+        // 🎯 [수정] 중앙 통제실 함수를 사용하도록 go 함수 개선
+        function go(target) {
+            if (target === 'guestbook.html') {
+                UniverseNav.goToGuestbook();
+            } else if (target === 'index.html') {
+                UniverseNav.goToIndex();
+            } else {
+                // 다른 페이지들도 파라미터를 유지하며 이동하도록 처리
+                const urlParams = new URLSearchParams(window.location.search);
+                const user = urlParams.get('user');
+                if(user) location.href = `${target}?user=${encodeURIComponent(user)}`;
+                else location.href = "index.html";
+            }
         }
 
         function createStars() {
             const bg = document.querySelector('.universe-bg');
-            const starCount = window.innerWidth < 768 ? 80 : 150; // 모바일은 성능위해 별 개수 조절
-
+            const starCount = window.innerWidth < 768 ? 80 : 150;
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -180,7 +167,6 @@
                 const y = Math.random() * 100;
                 const duration = Math.random() * 3 + 2; 
                 const minOpacity = Math.random() * 0.3;
-
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
                 star.style.left = `${x}%`;
@@ -188,7 +174,6 @@
                 star.style.setProperty('--duration', `${duration}s`);
                 star.style.setProperty('--min-opacity', minOpacity);
                 star.style.animationDelay = `${Math.random() * 5}s`;
-
                 bg.appendChild(star);
             }
         }
@@ -196,8 +181,9 @@
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
-            if (!user) { location.href = "index.html"; }
-            else { 
+            if (!user) { 
+                UniverseNav.goToIndex(); 
+            } else { 
                 document.getElementById('userName').innerText = user; 
                 createStars();
             }
