@@ -11,31 +11,47 @@
         /* 🌌 깊은 우주 배경 */
         body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a253a 0%, #0b111e 70%); z-index: -1; opacity: 0.6; }
 
-        /* ♎ 천칭자리 우주정거장 관문 */
-        .universe-path { width: 100%; padding: 40px 0 20px 0; display: flex; justify-content: center; align-items: center; }
+        /* ♎ 천칭자리 우주정거장 관문 (성단 컨셉) */
+        .universe-path { width: 100%; padding: 50px 0 30px 0; display: flex; justify-content: center; align-items: center; }
         .constellation-tower { text-decoration: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.5s; position: relative; }
         
-        /* 별자리 아이콘 (은은한 화이트) */
-        .libra-icon { font-size: 30px; color: rgba(255, 255, 255, 0.7); position: relative; width: 55px; height: 55px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.5s; z-index: 2; }
-        .libra-symbol::before { content: '♎'; font-style: normal; }
+        /* 🚩 [수정] 단순 기호 제거 후 CSS로 구현한 세하얀 성단 아이콘 */
+        .libra-cluster { position: relative; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; transition: 0.5s; z-index: 2; }
 
-        /* 🚩 변경된 문구: '우주정거장으로 귀환' */
-        .tower-guide { font-size: 10px; color: rgba(255, 255, 255, 0.4); letter-spacing: 2px; margin-top: 10px; font-weight: 300; transition: 0.5s; }
+        /* 성단의 중심 빛 (세하얗고 투명하게) */
+        .cluster-core { position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8), 0 0 40px 10px rgba(255, 255, 255, 0.4); transition: 0.5s; }
+
+        /* 천칭자리 형태를 이루는 주변 별들 (Pseudo-elements 사용) */
+        .libra-cluster::before, .libra-cluster::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.9); border-radius: 50%; transition: 0.5s; }
+
+        /* 왼쪽 저울 접시 별 */
+        .libra-cluster::before { width: 4px; height: 4px; top: 20px; left: 5px; box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.6); }
+
+        /* 오른쪽 저울 접시 별 */
+        .libra-cluster::after { width: 4px; height: 4px; top: 20px; right: 5px; box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.6); }
+
+        /* 천칭의 수평대 (세하얀 선) */
+        .libra-bar { position: absolute; top: 22px; width: 50px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8) 50%, transparent); transition: 0.5s; }
+
+        /* '우주정거장으로 귀환' 문구 */
+        .tower-guide { font-size: 10px; color: rgba(255, 255, 255, 0.4); letter-spacing: 2.5px; margin-top: 15px; font-weight: 300; transition: 0.5s; }
 
         /* 하단 텍스트 */
         .logo-text { font-size: 11px; color: rgba(255, 255, 255, 0.5); letter-spacing: 4px; margin-top: 5px; text-transform: uppercase; font-weight: 300; transition: 0.3s; }
 
-        /* ✨ 호버 애니메이션 (우주정거장이 빛나는 효과) */
-        @keyframes starGlow { 
-            0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.1); transform: scale(1); } 
-            50% { box-shadow: 0 0 35px rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.6); transform: scale(1.05); } 
+        /* ✨ 호버 애니메이션 (쏟아져 내릴 듯한 화이트 글로우) */
+        @keyframes clusterTwinkle { 
+            0%, 100% { box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8), 0 0 40px 10px rgba(255, 255, 255, 0.4); transform: scale(1); } 
+            50% { box-shadow: 0 0 30px 8px rgba(255, 255, 255, 1), 0 0 60px 15px rgba(255, 255, 255, 0.6); transform: scale(1.1); } 
         }
         
-        .constellation-tower:hover .libra-icon { animation: starGlow 1.5s infinite ease-in-out; background: rgba(255, 255, 255, 0.08); color: #fff; }
+        .constellation-tower:hover .cluster-core { animation: clusterTwinkle 1s infinite ease-in-out; }
+        .constellation-tower:hover .libra-cluster::before, .constellation-tower:hover .libra-cluster::after { background: #fff; box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.9); }
+        .constellation-tower:hover .libra-bar { background: rgba(255, 255, 255, 1); }
         .constellation-tower:hover .tower-guide { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 1); }
         .constellation-tower:hover .logo-text { color: rgba(255, 255, 255, 0.9); }
 
-        /* 게시판 스타일 */
+        /* 게시판 스타일 유지 */
         .board-container { max-width: 950px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
         .board-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 30px; }
         .header-title { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #fff; margin: 0; }
@@ -54,8 +70,9 @@
 
     <div class="universe-path">
         <div class="constellation-tower" onclick="goBack()" title="우주정거장으로 이동"> 
-            <div class="libra-icon">
-                <i class="libra-symbol"></i>
+            <div class="libra-cluster">
+                <div class="cluster-core"></div>
+                <div class="libra-bar"></div>
             </div>
             <span class="tower-guide">우주정거장으로 귀환</span>
             <span class="logo-text">Space Station</span>
@@ -85,6 +102,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+        // ✅ 파이어베이스 설정 유지
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
@@ -131,7 +149,7 @@
             return urlParams.get('user') || "Unknown";
         };
 
-        // 🛡️ [수정 완료] 대문이 아닌, 하위 페이지들의 중심 허브인 'menu.html'로 연결합니다.
+        // 🛡️ 우주정거장 허브(menu.html)로 연결 유지
         window.goBack = function() {
             location.href = `menu.html?user=${encodeURIComponent(getUserName())}`;
         };
