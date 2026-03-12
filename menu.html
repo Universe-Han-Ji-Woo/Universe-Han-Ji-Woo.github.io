@@ -141,23 +141,31 @@
         }
     </style>
     <script>
-        // 🎯 [수정] 중앙 통제실 함수를 사용하도록 go 함수 개선
+        // 🎯 [수정 핵심] 모든 이동 시 user 정보를 강제로 포함시킵니다.
         function go(target) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+
+            if (!user && target !== 'index.html') {
+                UniverseNav.goToIndex();
+                return;
+            }
+
             if (target === 'guestbook.html') {
                 UniverseNav.goToGuestbook();
             } else if (target === 'index.html') {
                 UniverseNav.goToIndex();
+            } else if (target === '#') {
+                alert("준비 중인 구역입니다.");
             } else {
-                // 다른 페이지들도 파라미터를 유지하며 이동하도록 처리
-                const urlParams = new URLSearchParams(window.location.search);
-                const user = urlParams.get('user');
-                if(user) location.href = `${target}?user=${encodeURIComponent(user)}`;
-                else location.href = "index.html";
+                // 일반 페이지 이동 시에도 user 파라미터 유지
+                location.href = `${target}?user=${encodeURIComponent(user)}`;
             }
         }
 
         function createStars() {
             const bg = document.querySelector('.universe-bg');
+            if(!bg) return;
             const starCount = window.innerWidth < 768 ? 80 : 150;
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
@@ -181,7 +189,9 @@
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
+            
             if (!user) { 
+                // 유저 정보 없으면 즉시 퇴출
                 UniverseNav.goToIndex(); 
             } else { 
                 document.getElementById('userName').innerText = user; 
