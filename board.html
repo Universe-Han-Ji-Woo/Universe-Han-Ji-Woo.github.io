@@ -20,9 +20,9 @@
         .btn-delete { background: #442222; color: #ff8888; border: 1px solid #663333; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
         .btn-delete:hover { background: #662222; color: #fff; }
 
-        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; table-layout: fixed; }
         th { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-gray); font-size: 0.85rem; background: rgba(255,255,255,0.05); }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); text-align: center; font-size: 0.85rem; }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); text-align: center; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .td-title { text-align: left; cursor: pointer; padding-left: 20px; font-size: 0.9rem; }
         .td-title:hover { color: var(--main-red); text-decoration: underline; }
 
@@ -54,11 +54,11 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="50">번호</th>
+                        <th width="60">번호</th>
                         <th>제목</th>
-                        <th width="90">작성자</th>
-                        <th width="110">날짜</th>
-                        <th width="60">조회수</th>
+                        <th width="100">작성자</th>
+                        <th width="120">날짜</th>
+                        <th width="70">조회수</th>
                     </tr>
                 </thead>
                 <tbody id="boardBody"></tbody>
@@ -69,11 +69,10 @@
         <div id="viewPage" class="content-box">
             <div class="view-header-flex">
                 <div id="viewTitle" class="view-title"></div>
-                <button class="btn-delete" onclick="deletePost()">게시글 삭제</button>
+                <button id="delBtn" class="btn-delete" onclick="deletePost()">게시글 삭제</button>
             </div>
             <div id="viewInfo" class="view-info"></div>
             <div id="viewBody" class="view-body"></div>
-            
             <div class="bottom-actions">
                 <button id="likeBtn" class="btn-like" onclick="handleLike()">
                     <span>❤️</span> 좋아요 <span id="likeCount">0</span>
@@ -99,6 +98,7 @@
         let currentPage = 1;
         let currentPostIdx = -1;
         const postsPerPage = 12;
+        let isProcessing = false; // 중복 클릭 방지 플래그
 
         function formatTime(dateStr, showDetail) {
             if(!dateStr) return "-";
@@ -115,9 +115,9 @@
                 const data = await res.json();
                 allPosts = data.map(p => ({
                     id: p.id || p.ID,
-                    title: p.title || p.Title,
-                    content: p.content || p.Content,
-                    user: p.user || p.User,
+                    title: p.title || p.Title || "(제목 없음)",
+                    content: p.content || p.Content || "",
+                    user: p.user || p.User || "관리자",
                     date: p.date || p.Date,
                     likes: Number(p.likes || p.Likes || 0),
                     views: Number(p.views || p.Views || 0)
@@ -128,14 +128,14 @@
 
         function renderBoard() {
             const tbody = document.getElementById('boardBody');
+            tbody.innerHTML = "";
             const start = (currentPage - 1) * postsPerPage;
             const currentPosts = allPosts.slice().reverse().slice(start, start + postsPerPage);
 
             tbody.innerHTML = currentPosts.map((p, i) => {
-                const realIndex = allPosts.length - 1 - (start + i);
                 return `<tr>
                     <td>${allPosts.length - (start + i)}</td>
-                    <td class="td-title" onclick="viewPost(${realIndex})">${p.title}</td>
+                    <td class="td-title" onclick="viewPostByID('${p.id}')">${p.title}</td>
                     <td>${p.user}</td>
                     <td style="color:#777;">${formatTime(p.date, false)}</td>
                     <td>${p.views}</td>
@@ -144,9 +144,17 @@
             renderPagination();
         }
 
+        // 인덱스가 아닌 고유 ID로 게시글 찾기 (데이터 밀림 방지)
+        function viewPostByID(id) {
+            const idx = allPosts.findIndex(p => String(p.id) === String(id));
+            if(idx !== -1) viewPost(idx);
+        }
+
         async function viewPost(idx) {
             currentPostIdx = idx;
             const p = allPosts[idx];
+            
+            // 단순 조회수 증가 요청 (UI 먼저 반영)
             fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'view', id: p.id }) });
             p.views += 1; 
 
@@ -157,52 +165,98 @@
             document.getElementById('viewBody').innerText = p.content;
             document.getElementById('likeCount').innerText = p.likes;
             document.getElementById('likeBtn').classList.remove('clicked');
+            document.getElementById('delBtn').innerText = "게시글 삭제";
+            isProcessing = false;
         }
 
         async function handleLike() {
             const btn = document.getElementById('likeBtn');
-            if(btn.classList.contains('clicked')) return;
+            if(btn.classList.contains('clicked') || isProcessing) return;
+            
             const p = allPosts[currentPostIdx];
             btn.classList.add('clicked');
+            isProcessing = true;
+
             try {
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'like', id: p.id }) });
                 p.likes += 1;
                 document.getElementById('likeCount').innerText = p.likes;
             } catch(e) { btn.classList.remove('clicked'); }
+            finally { isProcessing = false; }
         }
 
         async function deletePost() {
-            if(!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+            if(isProcessing || !confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+            
             const p = allPosts[currentPostIdx];
+            const delBtn = document.getElementById('delBtn');
+            delBtn.innerText = "삭제 중...";
+            isProcessing = true;
+
             try {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', id: p.id }) });
-                alert("삭제되었습니다.");
-                location.reload();
-            } catch(e) { alert("삭제 실패"); }
+                // 삭제 명령 전송
+                const response = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'delete', id: p.id }) 
+                });
+
+                if(response.ok) {
+                    alert("성공적으로 삭제되었습니다.");
+                    // 단순 새로고침 대신 목록 상태로 초기화 후 데이터 재로드
+                    closeView();
+                    loadPosts();
+                }
+            } catch(e) { 
+                alert("삭제 처리 중 오류가 발생했습니다."); 
+                delBtn.innerText = "게시글 삭제";
+            } finally { 
+                isProcessing = false; 
+            }
         }
 
         function closeView() { 
             document.getElementById('viewPage').style.display = 'none'; 
             document.getElementById('listPage').style.display = 'block'; 
-            renderBoard();
         }
         
         function openWrite() { document.getElementById('listPage').style.display = 'none'; document.getElementById('writePage').style.display = 'block'; }
-        function closeWrite() { document.getElementById('writePage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; }
+        function closeWrite() { 
+            document.getElementById('postTitle').value = "";
+            document.getElementById('postContent').value = "";
+            document.getElementById('writePage').style.display = 'none'; 
+            document.getElementById('listPage').style.display = 'block'; 
+        }
 
         async function submitPost() {
-            const title = document.getElementById('postTitle').value;
-            const content = document.getElementById('postContent').value;
-            if(!title || !content) return alert("빈칸을 채워주세요!");
+            if(isProcessing) return;
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+            
+            if(!title || !content) return alert("제목과 내용을 모두 입력해주세요.");
+
+            isProcessing = true;
             document.getElementById('submitBtn').innerText = "등록 중...";
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ title, content, user: '관리자' }) });
-            location.reload(); 
+
+            try {
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ title, content, user: '관리자' }) 
+                });
+                // 글 작성 후 페이지 초기화
+                window.location.reload(); 
+            } catch(e) {
+                alert("등록에 실패했습니다.");
+                document.getElementById('submitBtn').innerText = "등록 완료";
+            } finally {
+                isProcessing = false;
+            }
         }
 
         function renderPagination() {
             const totalPages = Math.ceil(allPosts.length / postsPerPage);
             const container = document.getElementById('pagination');
             container.innerHTML = "";
+            if(totalPages <= 1) return;
             for(let i=1; i<=totalPages; i++) {
                 container.innerHTML += `<button class="page-btn ${i===currentPage?'active':''}" onclick="currentPage=${i};renderBoard();">${i}</button>`;
             }
