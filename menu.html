@@ -12,10 +12,29 @@
             display: flex; align-items: center; justify-content: center;
         }
 
+        /* 🌌 배경 설정 및 별들이 박힐 캔버스 영역 */
         .universe-bg {
             position: absolute; width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%);
             z-index: 1;
+            overflow: hidden;
+        }
+
+        /* ✨ [추가] 이쑤시개로 콕콕 찌른 듯한 세하얀 별 스타일 */
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none; /* 클릭 방해 금지 */
+            animation: twinkle var(--duration) infinite ease-in-out;
+            filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+        }
+
+        /* ✨ [추가] 별들이 제각각 반짝이는 애니메이션 */
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--min-opacity); transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
 
         /* [스타일 유지] 메인 컨트롤 타워 원형 */
@@ -28,7 +47,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
-            animation: pulse 4s infinite ease-in-out; /* 은은한 박동 효과 추가 */
+            animation: pulse 4s infinite ease-in-out;
         }
 
         @keyframes pulse {
@@ -63,28 +82,22 @@
             transform: scale(1.1);
         }
 
-        /* 위치 설정 */
         .nav-item.top    { top: -25px; left: 50%; transform: translateX(-50%); }
         .nav-item.bottom { bottom: -25px; left: 50%; transform: translateX(-50%); }
         .nav-item.left   { left: -25px; top: 50%; transform: translateY(-50%); }
         .nav-item.right  { right: -25px; top: 50%; transform: translateY(-50%); }
 
-        /* 글자 스타일 */
         .nav-label-en { font-size: 0.6rem; color: #8ea8c9; letter-spacing: 1px; margin-bottom: 4px; }
         .nav-label-ko { font-size: 0.85rem; font-weight: bold; color: #fff; }
 
-        /* --- 위성 공통 스타일 (방명록 & 갤러리) --- */
+        /* 위성 공통 스타일 */
         .satellite-group { position: absolute; z-index: 25; }
-        
-        /* [우측 상단] 방명록 위성 */
         .guestbook-pos { right: -160px; top: -40px; }
         .line-right {
             position: absolute; width: 130px; height: 1px;
             background: linear-gradient(to right, rgba(142, 168, 204, 0.8), transparent);
             top: 55px; right: 75px; transform: rotate(-25deg);
         }
-
-        /* [좌측 상단] 갤러리 위성 */
         .gallery-pos { left: -160px; top: -40px; }
         .line-left {
             position: absolute; width: 130px; height: 1px;
@@ -107,7 +120,6 @@
         }
         .satellite-node:hover .node-ko { color: #000; }
         .satellite-node:hover .node-en { color: #555; }
-        
         .node-en { font-size: 0.5rem; color: #8ea8c9; margin-bottom: 2px; }
         .node-ko { font-size: 0.75rem; color: #fff; font-weight: bold; }
     </style>
@@ -115,21 +127,54 @@
         function go(page) {
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
-            // '자유 게시판' 클릭 시 board.html로 이동하도록 설계됨
             if(user) location.href = `${page}?user=${encodeURIComponent(user)}`;
             else location.href = "index.html";
+        }
+
+        // ✨ [추가] 배경에 이쑤시개로 콕콕 박은듯한 별들을 생성하는 함수
+        function createStars() {
+            const bg = document.querySelector('.universe-bg');
+            const starCount = 150; // 별의 개수 (원하는 만큼 조절 가능)
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // 크기는 아주 작게 (1px ~ 2px)
+                const size = Math.random() * 1.5 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // 애니메이션 속도 및 반짝임 강도 랜덤 설정
+                const duration = Math.random() * 3 + 2; 
+                const minOpacity = Math.random() * 0.3;
+
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.setProperty('--duration', `${duration}s`);
+                star.style.setProperty('--min-opacity', minOpacity);
+                star.style.animationDelay = `${Math.random() * 5}s`;
+
+                bg.appendChild(star);
+            }
         }
 
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const user = urlParams.get('user');
             if (!user) { location.href = "index.html"; }
-            else { document.getElementById('userName').innerText = user; }
+            else { 
+                document.getElementById('userName').innerText = user; 
+                createStars(); // 페이지 로드 시 별 생성
+            }
         };
     </script>
 </head>
 <body>
-    <div class="universe-bg"></div>
+    <div class="universe-bg">
+        </div>
 
     <div class="control-tower">
         <div class="core-identity">
