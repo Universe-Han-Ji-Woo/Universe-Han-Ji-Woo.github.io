@@ -3,206 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UNIVERSE | GUESTBOOK</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>
-        /* [기존 디자인 스타일 동일 - 반응형 유지] */
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #0b111e;
-            color: white;
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
-            background: radial-gradient(circle at center, #1a253a 0%, #0b111e 80%);
-            word-break: keep-all;
-        }
+    <title>Universe | 배우 한지우 팬페이지</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-        /* 🔙 뒤로가기 버튼 - 절대 index.html로 못 가게 경로 고정 */
-        .back-link { margin-top: 30px; text-align: center; z-index: 100; width: 100%; }
-        .back-link a {
-            display: inline-block;
-            text-decoration: none; color: #8ea8c9; font-size: 13px;
-            letter-spacing: 2px; transition: 0.3s; padding: 10px 24px;
-            border: 2px solid rgba(255,255,255,0.1); border-radius: 25px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            font-weight: bold;
-        }
-        .back-link a:hover { 
-            color: #fff; 
-            background: rgba(255,255,255,0.2); 
-            box-shadow: 0 0 20px rgba(255, 45, 85, 0.5);
-            border-color: #ff2d55;
-        }
-
-        header { text-align: center; padding: clamp(40px, 8vh, 60px) 20px 30px; }
-        header h1 { font-weight: 700; letter-spacing: clamp(4px, 2vw, 8px); margin: 0; font-size: clamp(1.8rem, 5vw, 2.5rem); color: #fff; }
-        header p { color: #8ea8c9; font-size: 0.95rem; margin-top: 12px; opacity: 0.8; }
-
-        .container { width: 92%; max-width: 700px; margin-bottom: 60px; }
-
-        .guestbook-form {
-            display: flex; flex-direction: column; gap: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: clamp(20px, 4vw, 30px); border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            margin-bottom: 40px;
-        }
-        input, textarea {
-            padding: 16px; background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px; color: white; outline: none;
-            font-family: inherit; transition: 0.3s; font-size: 16px;
-        }
-        input:focus, textarea:focus { border-color: #ff2d55; background: rgba(0, 0, 0, 0.6); }
-
-        button#submitBtn {
-            padding: 16px; background-color: #ff2d55; color: #fff; border: none; border-radius: 14px;
-            cursor: pointer; font-weight: bold; font-size: 17px; transition: 0.3s;
-            box-shadow: 0 8px 20px rgba(255, 45, 85, 0.4);
-        }
-        button#submitBtn:hover { background-color: #fff; color: #ff2d55; transform: translateY(-3px); }
-
-        .message-item {
-            background: rgba(255, 255, 255, 0.03); padding: 22px; border-radius: 18px;
-            border-left: 5px solid #ff2d55; margin-bottom: 18px;
-            animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-        .msg-name { font-weight: bold; color: #fff; font-size: 16px; background: rgba(255,45,85,0.1); padding: 2px 8px; border-radius: 6px; }
-        .msg-date { font-size: 12px; color: #6e84a3; }
-        .msg-content { line-height: 1.7; font-size: 15.5px; color: #d1d9e6; white-space: pre-wrap; word-wrap: break-word; }
-
-        .pagination { display: flex; justify-content: center; gap: 12px; margin-top: 40px; }
-        .page-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: #fff; min-width: 44px; height: 44px; border-radius: 12px; cursor: pointer; transition: 0.3s;
-        }
-        .page-btn.active { background: #ff2d55; border-color: #ff2d55; }
-
-        @media (max-width: 480px) {
-            .container { width: 94%; }
-            .msg-header { flex-direction: column; align-items: flex-start; }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="back-link">
-        <a href="menu.html" onclick="location.replace('menu.html'); return false;">← BACK TO UNIVERSE</a>
-    </div>
-
-    <header>
-        <h1>GUESTBOOK</h1>
-        <p>지우 유니버스의 소중한 기록들</p>
-    </header>
-
-    <div class="container">
-        <div class="guestbook-form">
-            <input type="text" id="nameInput" placeholder="닉네임을 입력하세요" maxlength="15">
-            <textarea id="messageInput" rows="3" placeholder="지우님에게 따듯한 인사를 남겨주세요" maxlength="300"></textarea>
-            <button id="submitBtn">메시지 전송하기</button>
-        </div>
-        <div id="messagesList"></div>
-        <div class="pagination" id="pagination"></div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, query } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-
+    <script>
         const firebaseConfig = {
-            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
-            projectId: "jiwoo-fanpage"
+            apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
+            authDomain: "jiwoo-fanpage.firebaseapp.com",
+            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com", 
+            projectId: "jiwoo-fanpage",
+            storageBucket: "jiwoo-fanpage.firebasestorage.app",
+            messagingSenderId: "928634858988",
+            appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
         };
+        firebase.initializeApp(firebaseConfig);
+        
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const guestbookRef = ref(db, 'guestbook');
-
-        const ITEMS_PER_PAGE = 5; 
-        let currentPage = 1;
-        let allMessages = [];
-
-        document.getElementById('submitBtn').onclick = async () => {
-            const name = document.getElementById('nameInput').value.trim();
-            const message = document.getElementById('messageInput').value.trim();
-            if(!name || !message) return alert("이름과 메시지를 입력해 주세요!");
-
-            const newMessageRef = push(guestbookRef);
-            await set(newMessageRef, {
-                name: name,
-                message: message,
-                timestamp: Date.now(), 
-                date: new Date().toLocaleString('ko-KR', { 
-                    year: 'numeric', month: '2-digit', day: '2-digit', 
-                    hour: '2-digit', minute: '2-digit', hour12: true 
-                }) 
+        // [실시간 접속자 로직 생략 - 동일]
+        function trackOnlineUsers() {
+            const connectedRef = db.ref(".info/connected");
+            const onlineRef = db.ref("online_users").push();
+            connectedRef.on("value", (snap) => {
+                if (snap.val() === true) {
+                    onlineRef.set(true);
+                    onlineRef.onDisconnect().remove();
+                }
             });
-            document.getElementById('nameInput').value = "";
-            document.getElementById('messageInput').value = "";
+            db.ref("online_users").on("value", (snap) => {
+                const count = snap.numChildren() || 0;
+                document.getElementById('onlineCount').innerText = `${count}명 실시간 탐사 중`;
+            });
+        }
+
+        function updateTotalFans() {
+            db.ref('total_fan_count').on('value', (snapshot) => {
+                const count = snapshot.val() || 0;
+                document.getElementById('userCount').innerText = `${count.toLocaleString()}명 지우 유니버스 입성`;
+            });
+        }
+
+        // 🎯 엔터 키 이벤트 리스너 (반응성 강화)
+        function setupEnterKey() {
+            const loginIds = ['lEmail', 'lPw'];
+            loginIds.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+            });
+        }
+
+        window.onload = () => {
+            trackOnlineUsers();
+            updateTotalFans();
+            setupEnterKey();
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            if(user) document.getElementById('nickBadge').innerText = user;
         };
 
-        onValue(query(guestbookRef), (snapshot) => {
-            const data = snapshot.val();
-            allMessages = [];
-            if (data) {
-                Object.keys(data).forEach(key => allMessages.push(data[key]));
-                allMessages.sort((a, b) => b.timestamp - a.timestamp);
-            }
-            renderMessages();
-            renderPagination();
-        });
+        // 🎯 [경로 수정 핵심] 로그인 핸들러
+        function handleLogin() {
+            const email = document.getElementById('lEmail').value;
+            const pw = document.getElementById('lPw').value;
 
-        function renderMessages() {
-            const listDiv = document.getElementById('messagesList');
-            listDiv.innerHTML = "";
-            const start = (currentPage - 1) * ITEMS_PER_PAGE;
-            const paginatedItems = allMessages.slice(start, start + ITEMS_PER_PAGE);
-
-            if (paginatedItems.length === 0) {
-                listDiv.innerHTML = "<p style='text-align:center; color:#8ea8c9; padding:40px;'>기록된 메시지가 없습니다.</p>";
+            // 관리자 로그인 경로 확인
+            if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
+                alert("관리자님, 유니버스 컨트롤 타워로 이동합니다!");
+                location.replace("menu.html?user=" + encodeURIComponent("관리자")); // location.href 대신 replace 권장
                 return;
             }
 
-            paginatedItems.forEach(msg => {
-                const item = document.createElement('div');
-                item.className = 'message-item';
-                item.innerHTML = `
-                    <div class="msg-header">
-                        <span class="msg-name">${msg.name}</span>
-                        <span class="msg-date">${msg.date}</span>
-                    </div>
-                    <div class="msg-content">${msg.message}</div>
-                `;
-                listDiv.appendChild(item);
-            });
+            auth.signInWithEmailAndPassword(email, pw).then((userCredential) => {
+                const userEmail = userCredential.user.email.split('@')[0];
+                alert("지우 유니버스에 오신 것을 환영합니다!");
+                
+                // 🎯 여기서 확실하게 menu.html로 보내고 있는지 확인하세요!
+                location.replace(`menu.html?user=${encodeURIComponent(userEmail)}`);
+            }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
 
-        function renderPagination() {
-            const pagDiv = document.getElementById('pagination');
-            pagDiv.innerHTML = "";
-            const totalPages = Math.ceil(allMessages.length / ITEMS_PER_PAGE);
-            if (totalPages <= 1) return;
+        function handleSignup() {
+            const email = document.getElementById('sEmail').value;
+            const pw = document.getElementById('sPw').value;
+            auth.createUserWithEmailAndPassword(email, pw).then(() => {
+                db.ref('total_fan_count').transaction((currentCount) => (currentCount || 0) + 1);
+                alert("입성을 환영합니다! 로그인을 진행해 주세요."); 
+                location.reload();
+            }).catch((err) => alert(err.message));
+        }
 
-            for (let i = 1; i <= totalPages; i++) {
-                const btn = document.createElement('button');
-                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                btn.innerText = i;
-                btn.onclick = () => {
-                    currentPage = i;
-                    renderMessages();
-                    renderPagination();
-                    window.scrollTo({ top: 300, behavior: 'smooth' });
-                };
-                pagDiv.appendChild(btn);
-            }
+        function openAuth() { 
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+        function closeAuth() { 
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 400); 
         }
     </script>
+
+    <style>
+        /* [스타일 시트 동일 - 생략] */
+        body { margin: 0; padding: 0; background: #ffffff; height: 100vh; font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; }
+        .liquid-bg { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(142, 168, 204, 0.15) 0%, #ffffff 85%); z-index: 1; }
+        .main-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        .header-text { padding-top: 8vh; text-align: center; }
+        .univ-title { font-family: 'Arial Black', sans-serif; font-size: clamp(2.5rem, 10vw, 3.8rem); font-weight: 900; color: #1a1a1a; line-height: 0.95; letter-spacing: -2px; text-transform: uppercase; margin: 0; }
+        .coming-soon-label { font-size: clamp(0.9rem, 4vw, 1.2rem); color: #ff2d55; letter-spacing: 5px; margin-top: 15px; font-weight: 900; }
+        .hero-photo-zone { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; width: 100%; }
+        .main-img { max-height: 75vh; width: auto; max-width: 90%; object-fit: contain; animation: softPulse 6s infinite alternate ease-in-out; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); }
+        .footer-btn-zone { height: 15vh; width: 100%; display: flex; justify-content: center; align-items: center; }
+        .btn-stay { cursor: pointer; border: none; width: 85%; max-width: 320px; height: 60px; background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 5px; border-radius: 30px; text-transform: uppercase; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        #statusZone { position: fixed; right: 25px; top: 25px; display: flex; flex-direction: column; align-items: flex-end; z-index: 100; }
+        .nick-box { font-size: 0.65rem; border: 1px solid #1a1a1a; padding: 3px 8px; font-weight: bold; background: #fff; margin-bottom: 6px; }
+        .status-msg { font-size: 0.8rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 2px solid #ff2d55; }
+        .count-info { font-size: 0.7rem; color: #888; text-align: right; line-height: 1.5; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; z-index: 500; opacity: 0; transition: 0.4s; }
+        .modal-overlay.active { opacity: 1; }
+        .auth-card { width: 90%; max-width: 400px; padding: 40px 20px; background: #fff; border-radius: 30px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.15); border: 1px solid #eee; }
+        .auth-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem; box-sizing: border-box; background: #f9f9f9; }
+        .btn-submit { width: 100%; padding: 16px; background: #1a1a1a; color: #fff; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; }
+        @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
+    </style>
+</head>
+<body>
+    <div class="liquid-bg"></div>
+    <div class="main-container">
+        <div class="header-text">
+            <h1 class="univ-title">UNIVERSE<br>ARCHIVE</h1>
+            <h2 class="coming-soon-label">OFFICIAL OPEN</h2>
+        </div>
+        <div class="hero-photo-zone">
+            <img src="jiwoo_profile3.png" alt="Han Ji Woo" class="main-img">
+        </div>
+        <div class="footer-btn-zone">
+            <button class="btn-stay" onclick="openAuth()">ENTER UNIVERSE</button>
+        </div>
+    </div>
+
+    <div id="statusZone">
+        <div class="nick-box" id="nickBadge">VISITOR</div>
+        <div class="status-msg">중심 타워 가동 중</div>
+        <div class="count-info" id="userCount">연결 중...</div>
+        <div class="count-info" id="onlineCount">실시간 탐사 준비 중...</div>
+    </div>
+
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-card">
+            <div id="loginBox">
+                <h3 style="letter-spacing: 3px; margin-bottom: 25px;">LOGIN</h3>
+                <input type="email" id="lEmail" class="auth-input" placeholder="이메일 주소">
+                <input type="password" id="lPw" class="auth-input" placeholder="비밀번호">
+                <button class="btn-submit" onclick="handleLogin()">유니버스 접속</button>
+                <p style="margin-top:25px; font-size:0.85rem; color:#666;">
+                    처음이신가요? <span onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';" style="color:#ff2d55; cursor:pointer; font-weight:bold; text-decoration: underline;">멤버십 가입</span>
+                </p>
+            </div>
+            
+            <div id="signBox" style="display:none;">
+                <h3 style="letter-spacing: 3px; margin-bottom: 25px;">JOIN US</h3>
+                <input type="email" id="sEmail" class="auth-input" placeholder="이메일 주소">
+                <input type="password" id="sPw" class="auth-input" placeholder="비밀번호">
+                <button class="btn-submit" onclick="handleSignup()">멤버십 승인</button>
+                <p style="margin-top:25px; font-size:0.85rem; color:#666;">
+                    이미 계정이 있나요? <span onclick="document.getElementById('loginBox').style.display='block'; document.getElementById('signBox').style.display='none';" style="color:#ff2d55; cursor:pointer; font-weight:bold; text-decoration: underline;">로그인으로 이동</span>
+                </p>
+            </div>
+            <button style="margin-top:25px; border:none; background:none; cursor:pointer; color:#bbb; font-size: 0.8rem;" onclick="closeAuth()">[ 닫기 ]</button>
+        </div>
+    </div>
 </body>
 </html>
