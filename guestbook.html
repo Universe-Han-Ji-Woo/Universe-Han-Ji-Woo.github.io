@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universe | Guestbook</title>
+    <title>Universe | 방명록</title>
     
     <script src="config.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // 파이어베이스 초기화 (이미 등록된 설정 사용)
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             authDomain: "jiwoo-fanpage.firebaseapp.com",
@@ -21,126 +20,84 @@
             messagingSenderId: "928634858988",
             appId: "1:928634858988:web:34ae1adf6bab3ad654e4c9"
         };
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.database();
 
-        let currentUser = "";
+        let currentUser = "방문자"; // 기본값 설정
 
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            currentUser = urlParams.get('user');
+            const user = urlParams.get('user');
             
-            // 로그인 정보가 없으면 입구로 튕겨내기
-            if(!currentUser) {
-                UniverseNav.goToIndex();
-                return;
+            // 🎯 [핵심 수정] 유저 정보가 없어도 index.html로 보내지 않음!
+            if (user) {
+                currentUser = user;
             }
-            
-            document.getElementById('userBadge').innerText = currentUser;
+            document.getElementById('displayUser').innerText = currentUser;
             loadMessages();
         };
 
-        // 메시지 저장
-        function postMessage() {
-            const msgInput = document.getElementById('msgInput');
-            const message = msgInput.value.trim();
-            if(!message) return;
+        function saveMessage() {
+            const msg = document.getElementById('msgInput').value;
+            if (!msg) return alert("내용을 입력해주세요.");
 
             db.ref('guestbook').push({
                 user: currentUser,
-                text: message,
+                message: msg,
                 timestamp: Date.now()
+            }).then(() => {
+                document.getElementById('msgInput').value = '';
+                alert("기록이 완료되었습니다.");
+            }).catch((err) => {
+                console.error(err);
+                alert("기록 실패: DB 권한을 확인하세요.");
             });
-
-            msgInput.value = "";
         }
 
-        // 메시지 불러오기 (실시간)
         function loadMessages() {
-            db.ref('guestbook').limitToLast(50).on('value', (snapshot) => {
+            db.ref('guestbook').orderByChild('timestamp').limitToLast(50).on('value', (snapshot) => {
                 const list = document.getElementById('msgList');
-                list.innerHTML = "";
-                const data = snapshot.val();
-                if(!data) return;
-
-                Object.values(data).reverse().forEach(item => {
+                list.innerHTML = '';
+                snapshot.forEach((child) => {
+                    const data = child.val();
                     const div = document.createElement('div');
-                    div.className = 'msg-card';
-                    div.innerHTML = `
-                        <div class="msg-user">${item.user}</div>
-                        <div class="msg-text">${item.text}</div>
-                    `;
-                    list.appendChild(div);
+                    div.className = 'msg-item';
+                    div.innerHTML = `<strong>${data.user}</strong>: ${data.message}`;
+                    list.prepend(div);
                 });
             });
         }
     </script>
 
     <style>
-        body { 
-            margin: 0; padding: 0; background: #050a10; color: #fff;
-            font-family: 'Apple SD Gothic Neo', sans-serif; height: 100vh;
-            display: flex; flex-direction: column;
-        }
-        /* 상단 네비게이션 */
-        .nav-bar {
-            padding: 20px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);
-            backdrop-filter: blur(10px);
-        }
-        .btn-back { 
-            background: none; border: 1px solid #8ea8c9; color: #8ea8c9; 
-            padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold;
-        }
-        .user-info { font-size: 0.8rem; color: #8ea8c9; }
-
-        /* 입력 구역 */
-        .input-zone { padding: 20px; background: rgba(255,255,255,0.05); }
-        .input-box {
-            display: flex; gap: 10px; max-width: 600px; margin: 0 auto;
-        }
-        input {
-            flex: 1; padding: 12px; border-radius: 10px; border: none;
-            background: rgba(255,255,255,0.1); color: #fff; outline: none;
-        }
-        .btn-send {
-            background: #8ea8c9; color: #050a10; border: none; padding: 0 20px;
-            border-radius: 10px; font-weight: 900; cursor: pointer;
-        }
-
-        /* 메시지 리스트 */
-        .msg-list {
-            flex: 1; overflow-y: auto; padding: 20px;
-            display: flex; flex-direction: column; gap: 15px;
-        }
-        .msg-card {
-            background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px;
-            max-width: 500px; border-left: 3px solid #8ea8c9;
-        }
-        .msg-user { font-size: 0.75rem; color: #8ea8c9; font-weight: bold; margin-bottom: 5px; }
-        .msg-text { font-size: 0.95rem; line-height: 1.5; }
-
-        /* 스크롤바 디자인 */
-        .msg-list::-webkit-scrollbar { width: 5px; }
-        .msg-list::-webkit-scrollbar-thumb { background: rgba(142, 168, 204, 0.3); border-radius: 10px; }
+        body { background: #050a10; color: #fff; font-family: sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        h2 { text-align: center; color: #8ea8c9; }
+        .input-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 10px; border-radius: 5px; border: none; }
+        button { padding: 10px 20px; background: #8ea8c9; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .msg-list { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 15px; height: 400px; overflow-y: auto; }
+        .msg-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; }
+        strong { color: #ff2d55; margin-right: 5px; }
+        .back-btn { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; font-size: 0.8rem; }
     </style>
 </head>
 <body>
-
-    <div class="nav-bar">
-        <button class="btn-back" onclick="UniverseNav.goToMenu()">← BACK TO MENU</button>
-        <div class="user-info">대원: <span id="userBadge">---</span></div>
-    </div>
-
-    <div class="msg-list" id="msgList">
-        </div>
-
-    <div class="input-zone">
+    <div class="container">
+        <h2>GUEST BOOK</h2>
+        <p style="text-align:center; font-size: 0.8rem;">현재 접속: <span id="displayUser"></span></p>
+        
         <div class="input-box">
-            <input type="text" id="msgInput" placeholder="지우 유니버스에 메시지를 남기세요..." onkeypress="if(event.key==='Enter') postMessage()">
-            <button class="btn-send" onclick="postMessage()">전송</button>
+            <input type="text" id="msgInput" placeholder="응원 메시지를 남겨주세요!">
+            <button onclick="saveMessage()">기록</button>
         </div>
-    </div>
 
+        <div class="msg-list" id="msgList">
+            </div>
+
+        <a href="javascript:history.back()" class="back-btn">[ 돌아가기 ]</a>
+    </div>
 </body>
 </html>
