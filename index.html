@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Universe | 배우 한지우 팬페이지</title>
     
     <script src="config.js"></script>
@@ -26,6 +26,12 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
+        // 🎯 [사파리 대응] 모바일 실제 높이 계산 함수
+        function setVh() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
         function trackOnlineUsers() {
             const connectedRef = db.ref(".info/connected");
             const onlineRef = db.ref("online_users").push();
@@ -37,34 +43,36 @@
             });
             db.ref("online_users").on("value", (snap) => {
                 const count = snap.numChildren() || 0;
-                document.getElementById('onlineCount').innerText = `${count}명 실시간 탐사 중`;
+                const el = document.getElementById('onlineCount');
+                if(el) el.innerText = `${count}명 실시간 탐사 중`;
             });
         }
 
         function updateTotalFans() {
             db.ref('total_fan_count').on('value', (snapshot) => {
                 const count = snapshot.val() || 0;
-                document.getElementById('userCount').innerText = `${count.toLocaleString()}명 지우 유니버스 입성`;
+                const el = document.getElementById('userCount');
+                if(el) el.innerText = `${count.toLocaleString()}명 지우 유니버스 입성`;
             });
         }
 
         function setupEnterKey() {
             const loginInputs = ['lEmail', 'lPw'];
             loginInputs.forEach(id => {
-                document.getElementById(id).addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') handleLogin();
-                });
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
             });
 
             const signupInputs = ['sEmail', 'sPw'];
             signupInputs.forEach(id => {
-                document.getElementById(id).addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') handleSignup();
-                });
+                const el = document.getElementById(id);
+                if(el) el.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSignup(); });
             });
         }
 
         window.onload = () => {
+            setVh();
+            window.addEventListener('resize', setVh); // 화면 회전/크기 변경 대응
             trackOnlineUsers();
             updateTotalFans();
             setupEnterKey();
@@ -73,24 +81,19 @@
             if(user) document.getElementById('nickBadge').innerText = user;
         };
 
-        // 🎯 [핵심 수정] UniverseNav 시스템 적용
         function handleLogin() {
             const email = document.getElementById('lEmail').value;
             const pw = document.getElementById('lPw').value;
 
-            // 관리자 로그인
             if (email === "joar6563@naver.com" && pw === "jqhty836ud@%") {
                 alert("관리자님, 유니버스 컨트롤 타워로 이동합니다!");
                 UniverseNav.replaceToMenu("관리자");
                 return;
             }
 
-            // 일반 회원 로그인
             auth.signInWithEmailAndPassword(email, pw).then((userCredential) => {
                 const userEmail = userCredential.user.email.split('@')[0];
                 alert("지우 유니버스에 오신 것을 환영합니다!");
-                
-                // 🎯 config.js에 정의된 함수를 사용하여 메뉴로 이동
                 UniverseNav.replaceToMenu(userEmail);
             }).catch(() => alert("가입 정보가 없거나 비밀번호가 틀렸습니다."));
         }
@@ -118,9 +121,13 @@
     </script>
 
     <style>
+        :root { --vh: 1vh; } /* 기본값 */
+
         body { 
-            margin: 0; padding: 0; background: #ffffff; height: 100vh; 
-            font-family: 'Apple SD Gothic Neo', sans-serif; overflow: hidden; 
+            margin: 0; padding: 0; background: #ffffff; 
+            height: 100vh; height: calc(var(--vh, 1vh) * 100); /* 사파리 높이 대응 */
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
+            overflow: hidden; -webkit-text-size-adjust: none;
         }
         .liquid-bg { 
             position: absolute; width: 100%; height: 100%; 
@@ -128,75 +135,76 @@
             z-index: 1; 
         }
         .main-container { 
-            position: relative; width: 100%; height: 100vh; 
+            position: relative; width: 100%; height: 100%; 
             display: flex; flex-direction: column; align-items: center; z-index: 10; 
         }
-        .header-text { padding-top: 8vh; text-align: center; }
+        .header-text { padding-top: 6vh; text-align: center; width: 100%; }
         .univ-title { 
-            font-family: 'Arial Black', sans-serif; font-size: clamp(2.5rem, 10vw, 3.8rem); 
-            font-weight: 900; color: #1a1a1a; line-height: 0.95; 
-            letter-spacing: -2px; text-transform: uppercase; margin: 0; 
+            font-family: 'Arial Black', sans-serif; font-size: clamp(2rem, 9vw, 3.8rem); 
+            font-weight: 900; color: #1a1a1a; line-height: 1.0; 
+            letter-spacing: -1px; text-transform: uppercase; margin: 0; 
         }
         .coming-soon-label { 
-            font-size: clamp(0.9rem, 4vw, 1.2rem); 
-            color: #ff2d55; letter-spacing: 5px; margin-top: 15px; font-weight: 900; 
+            font-size: clamp(0.7rem, 3.5vw, 1.1rem); 
+            color: #ff2d55; letter-spacing: 3px; margin-top: 10px; font-weight: 900; 
         }
         .hero-photo-zone { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
             overflow: hidden; width: 100%;
         }
         .main-img { 
-            max-height: 75vh; width: auto; max-width: 90%; 
+            max-height: 65vh; width: auto; max-width: 95%; 
             object-fit: contain;
             animation: softPulse 6s infinite alternate ease-in-out; 
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); 
         }
-        .footer-btn-zone { height: 15vh; width: 100%; display: flex; justify-content: center; align-items: center; }
+        .footer-btn-zone { height: 12vh; width: 100%; display: flex; justify-content: center; align-items: center; padding-bottom: 20px; }
         .btn-stay { 
-            cursor: pointer; border: none; width: 85%; max-width: 320px; height: 60px; 
-            background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 5px; 
+            cursor: pointer; border: none; width: 80%; max-width: 300px; height: 55px; 
+            background: #1a1a1a; color: #fff; font-weight: 900; letter-spacing: 3px; 
             border-radius: 30px; text-transform: uppercase; transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); font-size: 0.9rem;
         }
-        .btn-stay:hover { transform: translateY(-3px); background: #000; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
 
         #statusZone { 
-            position: fixed; right: 25px; top: 25px; 
+            position: fixed; right: 20px; top: 20px; 
             display: flex; flex-direction: column; align-items: flex-end; z-index: 100;
         }
-        .nick-box { font-size: 0.65rem; border: 1px solid #1a1a1a; padding: 3px 8px; font-weight: bold; background: #fff; margin-bottom: 6px; }
-        .status-msg { font-size: 0.8rem; font-weight: bold; color: #1a1a1a; margin-bottom: 4px; border-bottom: 2px solid #ff2d55; }
-        .count-info { font-size: 0.7rem; color: #888; text-align: right; line-height: 1.5; }
+        .nick-box { font-size: 0.6rem; border: 1px solid #1a1a1a; padding: 2px 6px; font-weight: bold; background: #fff; margin-bottom: 4px; }
+        .status-msg { font-size: 0.75rem; font-weight: bold; color: #1a1a1a; margin-bottom: 2px; border-bottom: 2px solid #ff2d55; }
+        .count-info { font-size: 0.65rem; color: #888; text-align: right; line-height: 1.4; }
 
+        /* 📱 모바일 최적화 미디어 쿼리 */
         @media screen and (max-width: 600px) {
+            .header-text { padding-top: 5vh; }
+            .hero-photo-zone { padding: 10px 0; }
+            .main-img { max-height: 55vh; }
             #statusZone { right: 15px; top: 15px; }
-            .main-img { max-height: 60vh; }
-            .btn-stay { height: 55px; font-size: 0.9rem; }
-            .univ-title { line-height: 1.1; }
+            .auth-card { width: 85%; padding: 30px 15px; }
         }
 
         .modal-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); 
+            background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             display: none; align-items: center; justify-content: center; z-index: 500; 
             opacity: 0; transition: 0.4s; 
         }
         .modal-overlay.active { opacity: 1; }
         .auth-card { 
-            width: 90%; max-width: 400px; padding: 40px 20px; 
-            background: #fff; border-radius: 30px; text-align: center; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.15); border: 1px solid #eee;
+            width: 90%; max-width: 380px; padding: 35px 20px; 
+            background: #fff; border-radius: 25px; text-align: center; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 1px solid #eee;
         }
         .auth-input { 
-            width: 100%; padding: 15px; margin-bottom: 12px; 
-            border: 1px solid #eee; border-radius: 12px; font-size: 1rem; 
-            box-sizing: border-box; background: #f9f9f9;
+            width: 100%; padding: 14px; margin-bottom: 10px; 
+            border: 1px solid #eee; border-radius: 10px; font-size: 16px; /* 사파리 자동줌 방지용 16px */
+            box-sizing: border-box; background: #f9f9f9; outline: none;
         }
         .btn-submit { 
-            width: 100%; padding: 16px; background: #1a1a1a; color: #fff; 
-            border: none; border-radius: 12px; font-weight: 900; cursor: pointer; 
+            width: 100%; padding: 15px; background: #1a1a1a; color: #fff; 
+            border: none; border-radius: 10px; font-weight: 900; cursor: pointer; 
         }
-        @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.03); } }
+        @keyframes softPulse { from { transform: scale(1); } to { transform: scale(1.02); } }
     </style>
 </head>
 <body>
@@ -226,26 +234,26 @@
     <div class="modal-overlay" id="authModal">
         <div class="auth-card">
             <div id="loginBox">
-                <h3 style="letter-spacing: 3px; margin-bottom: 25px;">LOGIN</h3>
+                <h3 style="letter-spacing: 2px; margin-bottom: 20px;">LOGIN</h3>
                 <input type="email" id="lEmail" class="auth-input" placeholder="이메일 주소">
                 <input type="password" id="lPw" class="auth-input" placeholder="비밀번호">
                 <button class="btn-submit" onclick="handleLogin()">유니버스 접속</button>
-                <p style="margin-top:25px; font-size:0.85rem; color:#666;">
+                <p style="margin-top:20px; font-size:0.8rem; color:#666;">
                     처음이신가요? <span onclick="document.getElementById('loginBox').style.display='none'; document.getElementById('signBox').style.display='block';" style="color:#ff2d55; cursor:pointer; font-weight:bold; text-decoration: underline;">멤버십 가입</span>
                 </p>
             </div>
             
             <div id="signBox" style="display:none;">
-                <h3 style="letter-spacing: 3px; margin-bottom: 25px;">JOIN US</h3>
+                <h3 style="letter-spacing: 2px; margin-bottom: 20px;">JOIN US</h3>
                 <input type="email" id="sEmail" class="auth-input" placeholder="이메일 주소">
                 <input type="password" id="sPw" class="auth-input" placeholder="비밀번호">
                 <button class="btn-submit" onclick="handleSignup()">멤버십 승인</button>
-                <p style="margin-top:25px; font-size:0.85rem; color:#666;">
+                <p style="margin-top:20px; font-size:0.8rem; color:#666;">
                     이미 계정이 있나요? <span onclick="document.getElementById('loginBox').style.display='block'; document.getElementById('signBox').style.display='none';" style="color:#ff2d55; cursor:pointer; font-weight:bold; text-decoration: underline;">로그인으로 이동</span>
                 </p>
             </div>
             
-            <button style="margin-top:25px; border:none; background:none; cursor:pointer; color:#bbb; font-size: 0.8rem;" onclick="closeAuth()">[ 닫기 ]</button>
+            <button style="margin-top:20px; border:none; background:none; cursor:pointer; color:#bbb; font-size: 0.75rem;" onclick="closeAuth()">[ 닫기 ]</button>
         </div>
     </div>
 </body>
