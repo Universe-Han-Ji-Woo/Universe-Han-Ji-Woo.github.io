@@ -40,7 +40,7 @@
     <div class="board-container">
         <div class="board-header">
             <h2 style="font-weight: 400; letter-spacing: 2px;">FREE BOARD</h2>
-            <button type="button" class="write-btn" onclick="goToWrite()">글쓰기</button>
+            <button type="button" class="write-btn" id="btn-write" onclick="goToWrite()">글쓰기</button>
         </div>
         <table>
             <thead>
@@ -60,43 +60,50 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // 캡처해주신 Realtime Database 정보 반영
+        // 관리자님 캡처 기반 Realtime DB 설정 (apiKey는 관리자님 실제 키로 유지 필수!)
         const firebaseConfig = {
+            apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
-            projectId: "jiwoo-fanpage"
-            // ※ 여기에 관리자님의 실제 apiKey, appId 등을 추가해서 쓰시면 더 확실합니다.
+            projectId: "jiwoo-fanpage",
+            appId: "1:847248386851:web:46fbbbd21a41d39281dc02"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 실시간 데이터 가져오기 (posts_v2 기준)
-        const postsRef = ref(db, 'posts_v2');
+        // 🔥 관리자님! DB에서 'posts'인지 'posts_v2'인지 경로 확인이 필요하지만, 일단 공통 경로로 설정했습니다.
+        const postsRef = ref(db, 'posts'); 
+        
         onValue(postsRef, (snapshot) => {
             const data = snapshot.val();
             const boardContent = document.getElementById('boardContent');
             boardContent.innerHTML = "";
             
             if (data) {
-                const keys = Object.keys(data).reverse(); // 최신순
-                let no = keys.length;
+                // 객체를 배열로 변환하여 역순 정렬
+                const items = [];
+                for (let id in data) {
+                    items.push({ id, ...data[id] });
+                }
+                items.reverse(); 
 
-                keys.forEach((key) => {
-                    const post = data[key];
-                    const date = post.date || "-";
+                let no = items.length;
+                items.forEach((post) => {
                     const row = `
                         <tr>
                             <td>${no--}</td>
-                            <td class="title-cell" onclick="location.href='view.html?id=${key}&user=${encodeURIComponent(getUserName())}'">
+                            <td class="title-cell" onclick="location.href='view.html?id=${post.id}&user=${encodeURIComponent(getUserName())}'">
                                 <span class="category">[${post.category || '일반'}]</span> ${post.title}
                             </td>
                             <td>${post.author || post.writer || '익명'}</td>
-                            <td style="color:#8a94a6; font-size:13px;">${date}</td>
+                            <td style="color:#8a94a6; font-size:13px;">${post.date || '-'}</td>
                             <td>${post.views || 0}</td>
                         </tr>
                     `;
                     boardContent.innerHTML += row;
                 });
+            } else {
+                boardContent.innerHTML = "<tr><td colspan='5'>등록된 게시글이 없습니다.</td></tr>";
             }
         });
     </script>
@@ -106,8 +113,13 @@
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('user') || "Unknown";
         }
-        function goBack() { location.href = `menu.html?user=${encodeURIComponent(getUserName())}`; }
-        function goToWrite() { location.href = `write.html?user=${encodeURIComponent(getUserName())}`; }
+        function goBack() { 
+            location.href = `menu.html?user=${encodeURIComponent(getUserName())}`; 
+        }
+        function goToWrite() { 
+            const user = getUserName();
+            location.href = `write.html?user=${encodeURIComponent(user)}`; 
+        }
     </script>
 </body>
 </html>
