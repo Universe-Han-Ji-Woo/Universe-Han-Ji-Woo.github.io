@@ -5,17 +5,21 @@
     <title>유니버스 | 자유게시판</title>
     <style>
         :root { --main-red: #ff2d55; --bg-dark: #050a10; --text-gray: #8ea8c9; }
-        body { margin: 0; background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; }
+        body { margin: 0; background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; -webkit-font-smoothing: antialiased; }
         .universe-bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%); z-index: -1; }
         .container { max-width: 850px; margin: 0 auto; padding: 60px 20px; }
-        .board-header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--main-red); padding-bottom: 10px; margin-bottom: 20px; align-items: flex-end;}
+        
+        .board-header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--main-red); padding-bottom: 10px; margin-bottom: 20px; align-items: flex-end; }
         .btn { background: var(--main-red); color: #fff; border: none; padding: 10px 22px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn-sub { background: #333; color: #ccc; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
         .btn-delete { background: #422; color: #f88; border: 1px solid #633; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+        
         table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; table-layout: fixed; }
         th, td { padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; font-size: 0.85rem; }
+        th { color: var(--text-gray); font-weight: normal; background: rgba(255,255,255,0.05); }
         .td-title { text-align: left; cursor: pointer; padding-left: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.95rem; }
         .td-date { color: var(--text-gray); font-size: 0.8rem; }
+
         .content-box { display: none; background: rgba(0,0,0,0.4); padding: 40px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); }
         .view-header-flex { display: flex; justify-content: space-between; align-items: flex-start; }
         .view-title { font-size: 1.8rem; color: var(--main-red); font-weight: bold; margin: 0; }
@@ -30,7 +34,7 @@
         <div id="listPage">
             <div class="board-header"><h1>자유게시판</h1><button class="btn" onclick="openWrite()">글쓰기</button></div>
             <table>
-                <thead><tr><th width="50">#</th><th>제목</th><th width="90">작성자</th><th width="130">작성시간</th><th width="60">조회</th></tr></thead>
+                <thead><tr><th width="50">번호</th><th>제목</th><th width="100">작성자</th><th width="130">작성시간</th><th width="60">조회</th></tr></thead>
                 <tbody id="boardBody"></tbody>
             </table>
         </div>
@@ -59,15 +63,18 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxH47njPDrG2H2xmYjeCMKpDAT2gBMmZrrERmz6eWLO8tirIYj02_eGSj3WhHGlUnwMZQ/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxG8IheW8VBfWDfFqg-XR_djDoDFSyEpDXd8rczbe1oGgWhk3loc9jnvKaEMIGG0_Do/exec";
         let allPosts = [];
         let currentPostId = null;
         let isProcessing = false;
 
-        // 실시간 시간 표시 함수
+        // 시간 표시 로직 (정확한 실시간 변환)
         function formatTime(dateStr) {
+            if(!dateStr || dateStr === "-") return "-";
             const now = new Date();
             const past = new Date(dateStr);
+            if(isNaN(past)) return dateStr;
+
             const diff = Math.floor((now - past) / 1000);
             if (diff < 60) return "방금 전";
             if (diff < 3600) return Math.floor(diff / 60) + "분 전";
@@ -76,8 +83,24 @@
         }
 
         async function loadPosts() {
-            const res = await fetch(API_URL);
-            allPosts = await res.json();
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                // 데이터 필드 매칭 (서버에서 소문자로 오므로 안전하게 처리)
+                allPosts = data.map(p => ({
+                    id: p.id,
+                    title: p.title || "(제목 없음)",
+                    content: p.content || "",
+                    user: p.user || "관리자",
+                    date: p.date,
+                    likes: p.likes || 0,
+                    views: p.views || 0
+                }));
+                renderBoard();
+            } catch(e) { console.error("데이터 로드 중 오류 발생"); }
+        }
+
+        function renderBoard() {
             const tbody = document.getElementById('boardBody');
             tbody.innerHTML = allPosts.slice().reverse().map((p, i) => `
                 <tr>
@@ -104,7 +127,7 @@
         async function deletePost() {
             if(isProcessing || !confirm("정말 삭제하시겠습니까?")) return;
             isProcessing = true;
-            document.getElementById('delBtn').innerText = "삭제 처리 중...";
+            document.getElementById('delBtn').innerText = "삭제 중...";
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', id: currentPostId }) });
             location.reload();
         }
@@ -112,7 +135,7 @@
         async function submitPost() {
             const title = document.getElementById('postTitle').value.trim();
             const content = document.getElementById('postContent').value.trim();
-            if(!title || !content || isProcessing) return alert("내용을 채워주세요.");
+            if(!title || !content || isProcessing) return alert("내용을 입력해주세요.");
             isProcessing = true;
             document.getElementById('submitBtn').innerText = "등록 중...";
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'write', title, content, user: '관리자' }) });
