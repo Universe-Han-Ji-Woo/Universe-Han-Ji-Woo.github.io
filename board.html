@@ -2,253 +2,133 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>유니버스 | 자유게시판</title>
     <style>
         :root { --main-red: #ff2d55; --bg-dark: #050a10; --text-gray: #8ea8c9; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+        body { margin: 0; background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; }
         .universe-bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%); z-index: -1; }
-        .container { max-width: 850px; margin: 0 auto; padding: 60px 20px; position: relative; z-index: 10; }
-        
-        .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 2px solid var(--main-red); padding-bottom: 10px; }
-        .board-header h1 { margin: 0; font-size: 1.6rem; letter-spacing: -1px; }
-
-        .btn { background: var(--main-red); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
-        .btn-sub { background: #333; color: #ccc; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; }
-        
-        .view-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .btn-delete { background: #442222; color: #ff8888; border: 1px solid #663333; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
-        .btn-delete:hover { background: #662222; color: #fff; }
-
+        .container { max-width: 850px; margin: 0 auto; padding: 60px 20px; }
+        .board-header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--main-red); padding-bottom: 10px; margin-bottom: 20px; align-items: flex-end;}
+        .btn { background: var(--main-red); color: #fff; border: none; padding: 10px 22px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-sub { background: #333; color: #ccc; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        .btn-delete { background: #422; color: #f88; border: 1px solid #633; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
         table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; table-layout: fixed; }
-        th { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-gray); font-size: 0.85rem; background: rgba(255,255,255,0.05); }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); text-align: center; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .td-title { text-align: left; cursor: pointer; padding-left: 20px; font-size: 0.9rem; }
-        .td-title:hover { color: var(--main-red); text-decoration: underline; }
-
-        .content-box { display: none; background: rgba(255, 255, 255, 0.05); padding: 35px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        .view-title { font-size: 1.7rem; color: var(--main-red); font-weight: bold; margin: 0; }
-        .view-info { font-size: 0.9rem; color: var(--text-gray); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; margin-top: 10px; }
-        .view-body { min-height: 300px; line-height: 1.8; white-space: pre-wrap; font-size: 1.05rem; color: #eee; }
-
-        .bottom-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .btn-like { background: none; border: 1px solid var(--main-red); color: var(--main-red); padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-like.clicked { background: var(--main-red); color: white; }
-
-        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
-        .page-btn { background: none; border: 1px solid #333; color: var(--text-gray); padding: 5px 12px; cursor: pointer; border-radius: 4px; }
-        .page-btn.active { background: var(--main-red); color: white; border-color: var(--main-red); }
-        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 15px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; font-size: 1rem; }
-        .w-textarea { height: 400px; resize: none; }
+        th, td { padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; font-size: 0.85rem; }
+        .td-title { text-align: left; cursor: pointer; padding-left: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.95rem; }
+        .td-date { color: var(--text-gray); font-size: 0.8rem; }
+        .content-box { display: none; background: rgba(0,0,0,0.4); padding: 40px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px); }
+        .view-header-flex { display: flex; justify-content: space-between; align-items: flex-start; }
+        .view-title { font-size: 1.8rem; color: var(--main-red); font-weight: bold; margin: 0; }
+        .view-info { margin-top: 12px; font-size: 0.85rem; color: var(--text-gray); border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .view-body { min-height: 300px; line-height: 1.9; white-space: pre-wrap; margin: 30px 0; font-size: 1.05rem; color: #ddd; }
+        .bottom-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
     <div class="universe-bg"></div>
     <div class="container">
-        
         <div id="listPage">
-            <div class="board-header">
-                <h1>자유게시판</h1>
-                <button class="btn" onclick="openWrite()">글쓰기</button>
-            </div>
+            <div class="board-header"><h1>자유게시판</h1><button class="btn" onclick="openWrite()">글쓰기</button></div>
             <table>
-                <thead>
-                    <tr>
-                        <th width="60">번호</th>
-                        <th>제목</th>
-                        <th width="100">작성자</th>
-                        <th width="120">날짜</th>
-                        <th width="70">조회수</th>
-                    </tr>
-                </thead>
+                <thead><tr><th width="50">#</th><th>제목</th><th width="90">작성자</th><th width="130">작성시간</th><th width="60">조회</th></tr></thead>
                 <tbody id="boardBody"></tbody>
             </table>
-            <div id="pagination" class="pagination"></div>
         </div>
 
         <div id="viewPage" class="content-box">
             <div class="view-header-flex">
-                <div id="viewTitle" class="view-title"></div>
+                <div>
+                    <h1 id="viewTitle" class="view-title"></h1>
+                    <div id="viewInfo" class="view-info"></div>
+                </div>
                 <button id="delBtn" class="btn-delete" onclick="deletePost()">게시글 삭제</button>
             </div>
-            <div id="viewInfo" class="view-info"></div>
             <div id="viewBody" class="view-body"></div>
             <div class="bottom-actions">
-                <button id="likeBtn" class="btn-like" onclick="handleLike()">
-                    <span>❤️</span> 좋아요 <span id="likeCount">0</span>
-                </button>
-                <button class="btn-sub" onclick="closeView()">목록으로</button>
+                <button class="btn" id="likeBtn" onclick="handleLike()">❤️ 좋아요 <span id="likeCount">0</span></button>
+                <button class="btn-sub" onclick="goList()">목록으로</button>
             </div>
         </div>
 
         <div id="writePage" class="content-box">
-            <h2 style="margin-top:0; color:var(--main-red);">글 작성하기</h2>
-            <input type="text" id="postTitle" class="w-input" placeholder="제목을 입력하세요">
-            <textarea id="postContent" class="w-input w-textarea" placeholder="내용을 입력하세요"></textarea>
-            <div style="text-align: right;">
-                <button class="btn-sub" style="margin-right:10px;" onclick="closeWrite()">취소</button>
-                <button id="submitBtn" class="btn" onclick="submitPost()">등록 완료</button>
-            </div>
+            <h2 style="color:var(--main-red); margin-top:0;">게시글 작성</h2>
+            <input type="text" id="postTitle" style="width:100%; padding:15px; box-sizing:border-box; background:#000; border:1px solid #444; color:#fff; margin-bottom:15px; border-radius:5px;" placeholder="제목을 입력하세요">
+            <textarea id="postContent" style="width:100%; height:400px; padding:15px; box-sizing:border-box; background:#000; border:1px solid #444; color:#fff; resize:none; border-radius:5px;" placeholder="내용을 입력하세요"></textarea>
+            <div style="text-align:right; margin-top:20px;"><button class="btn-sub" onclick="goList()" style="margin-right:10px;">취소</button><button id="submitBtn" class="btn" onclick="submitPost()">등록 완료</button></div>
         </div>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwgMzQi8ib58Qkld2aUED-cnuaQQ9wWwd8Z1b-ym96o3hfKRP59yes3GnwgC-7LQEkk7w/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxH47njPDrG2H2xmYjeCMKpDAT2gBMmZrrERmz6eWLO8tirIYj02_eGSj3WhHGlUnwMZQ/exec";
         let allPosts = [];
-        let currentPage = 1;
-        let currentPostIdx = -1;
-        const postsPerPage = 12;
+        let currentPostId = null;
         let isProcessing = false;
 
+        // 실시간 시간 표시 함수
+        function formatTime(dateStr) {
+            const now = new Date();
+            const past = new Date(dateStr);
+            const diff = Math.floor((now - past) / 1000);
+            if (diff < 60) return "방금 전";
+            if (diff < 3600) return Math.floor(diff / 60) + "분 전";
+            if (diff < 86400) return Math.floor(diff / 3600) + "시간 전";
+            return past.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
         async function loadPosts() {
-            try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                allPosts = data.map(p => ({
-                    id: p.id || p.ID,
-                    title: p.title || p.Title || "(제목 없음)",
-                    content: p.content || p.Content || "",
-                    user: p.user || p.User || "관리자",
-                    date: p.date || p.Date,
-                    likes: Number(p.likes || p.Likes || 0),
-                    views: Number(p.views || p.Views || 0)
-                }));
-                renderBoard();
-            } catch(e) { console.error("데이터 로드 실패"); }
-        }
-
-        function renderBoard() {
+            const res = await fetch(API_URL);
+            allPosts = await res.json();
             const tbody = document.getElementById('boardBody');
-            tbody.innerHTML = "";
-            const start = (currentPage - 1) * postsPerPage;
-            const currentPosts = allPosts.slice().reverse().slice(start, start + postsPerPage);
-
-            tbody.innerHTML = currentPosts.map((p, i) => {
-                return `<tr>
-                    <td>${allPosts.length - (start + i)}</td>
-                    <td class="td-title" onclick="viewPostByID('${p.id}')">${p.title}</td>
+            tbody.innerHTML = allPosts.slice().reverse().map((p, i) => `
+                <tr>
+                    <td>${allPosts.length - i}</td>
+                    <td class="td-title" onclick="viewPost('${p.id}')">${p.title}</td>
                     <td>${p.user}</td>
-                    <td style="color:#777;">${formatTime(p.date, false)}</td>
+                    <td class="td-date">${formatTime(p.date)}</td>
                     <td>${p.views}</td>
-                </tr>`;
-            }).join('');
-            renderPagination();
+                </tr>`).join('');
         }
 
-        function viewPostByID(id) {
-            const idx = allPosts.findIndex(p => String(p.id) === String(id));
-            if(idx !== -1) viewPost(idx);
-        }
-
-        async function viewPost(idx) {
-            currentPostIdx = idx;
-            const p = allPosts[idx];
-            
-            // 단순 조회수 증가 (action만 포함)
-            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'view', id: p.id }) });
-            p.views += 1; 
-
+        function viewPost(id) {
+            const p = allPosts.find(x => String(x.id) === String(id));
+            currentPostId = id;
             document.getElementById('listPage').style.display = 'none';
             document.getElementById('viewPage').style.display = 'block';
             document.getElementById('viewTitle').innerText = p.title;
-            document.getElementById('viewInfo').innerText = `작성자: ${p.user} | ${formatTime(p.date, true)} | 조회수: ${p.views}`;
+            document.getElementById('viewInfo').innerText = `작성자: ${p.user} | ${new Date(p.date).toLocaleString()} | 조회수: ${p.views}`;
             document.getElementById('viewBody').innerText = p.content;
             document.getElementById('likeCount').innerText = p.likes;
-            document.getElementById('likeBtn').classList.remove('clicked');
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'view', id: id }) });
+        }
+
+        async function deletePost() {
+            if(isProcessing || !confirm("정말 삭제하시겠습니까?")) return;
+            isProcessing = true;
+            document.getElementById('delBtn').innerText = "삭제 처리 중...";
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', id: currentPostId }) });
+            location.reload();
+        }
+
+        async function submitPost() {
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+            if(!title || !content || isProcessing) return alert("내용을 채워주세요.");
+            isProcessing = true;
+            document.getElementById('submitBtn').innerText = "등록 중...";
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'write', title, content, user: '관리자' }) });
+            location.reload();
         }
 
         async function handleLike() {
             if(isProcessing) return;
-            const btn = document.getElementById('likeBtn');
-            if(btn.classList.contains('clicked')) return;
-            
-            const p = allPosts[currentPostIdx];
-            btn.classList.add('clicked');
             isProcessing = true;
-
-            try {
-                // 좋아요 요청 (action 명시)
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'like', id: p.id }) });
-                p.likes += 1;
-                document.getElementById('likeCount').innerText = p.likes;
-            } finally { isProcessing = false; }
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'like', id: currentPostId }) });
+            document.getElementById('likeCount').innerText = Number(document.getElementById('likeCount').innerText) + 1;
+            isProcessing = false;
         }
 
-        async function deletePost() {
-            if(isProcessing || !confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
-            
-            const p = allPosts[currentPostIdx];
-            const delBtn = document.getElementById('delBtn');
-            delBtn.innerText = "삭제 처리 중...";
-            isProcessing = true;
-
-            try {
-                // 삭제 요청 시 반드시 action: 'delete'만 포함 (제목/본문 절대 포함 금지)
-                await fetch(API_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ action: 'delete', id: p.id }) 
-                });
-                alert("삭제되었습니다.");
-                window.location.reload(); 
-            } catch(e) { 
-                alert("삭제 실패"); 
-                delBtn.innerText = "게시글 삭제";
-            } finally { isProcessing = false; }
-        }
-
-        async function submitPost() {
-            if(isProcessing) return;
-            const title = document.getElementById('postTitle').value.trim();
-            const content = document.getElementById('postContent').value.trim();
-            
-            if(!title || !content) return alert("제목과 내용을 모두 입력해 주세요.");
-
-            isProcessing = true;
-            document.getElementById('submitBtn').innerText = "등록 중...";
-
-            try {
-                // 글쓰기 요청에는 절대 'action' 필드를 넣지 않음 -> 서버가 새 글로 인식하게 함
-                await fetch(API_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ title: title, content: content, user: '관리자' }) 
-                });
-                window.location.reload();
-            } catch(e) {
-                alert("등록 실패");
-                document.getElementById('submitBtn').innerText = "등록 완료";
-            } finally { isProcessing = false; }
-        }
-
-        function formatTime(dateStr, showDetail) {
-            if(!dateStr) return "-";
-            const d = new Date(dateStr);
-            if(isNaN(d)) return dateStr;
-            return showDetail 
-                ? d.toLocaleString('ko-KR', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })
-                : d.toLocaleDateString('ko-KR');
-        }
-
-        function closeView() { 
-            document.getElementById('viewPage').style.display = 'none'; 
-            document.getElementById('listPage').style.display = 'block'; 
-            renderBoard();
-        }
-        
-        function openWrite() { document.getElementById('listPage').style.display = 'none'; document.getElementById('writePage').style.display = 'block'; }
-        function closeWrite() { 
-            document.getElementById('writePage').style.display = 'none'; 
-            document.getElementById('listPage').style.display = 'block'; 
-        }
-
-        function renderPagination() {
-            const totalPages = Math.ceil(allPosts.length / postsPerPage);
-            const container = document.getElementById('pagination');
-            container.innerHTML = "";
-            if(totalPages <= 1) return;
-            for(let i=1; i<=totalPages; i++) {
-                container.innerHTML += `<button class="page-btn ${i===currentPage?'active':''}" onclick="currentPage=${i};renderBoard();">${i}</button>`;
-            }
-        }
+        function openWrite() { document.getElementById('listPage').style.display='none'; document.getElementById('writePage').style.display='block'; }
+        function goList() { location.reload(); }
         window.onload = loadPosts;
     </script>
 </body>
