@@ -4,152 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UNIVERSE | 게시글 보기</title>
+    
+    <script src="config.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* 🌌 기본 배경 테마 유지 */
-        body { 
-            margin: 0; 
-            background-color: #0b111e; 
-            color: white; 
-            font-family: 'Noto Sans KR', sans-serif; 
-            line-height: 1.6;
-        }
-
-        /* 🛸 메인 컨테이너 반응형 설정 */
+        /* 🌌 기존 디자인 레이아웃 유지 */
+        body { margin: 0; background-color: #0b111e; color: white; font-family: 'Noto Sans KR', sans-serif; line-height: 1.6; }
         .view-container { 
-            max-width: 850px; 
-            margin: 30px auto; 
-            background: rgba(22, 29, 42, 0.8); 
-            backdrop-filter: blur(10px);
-            padding: 40px; 
-            border-radius: 20px; 
-            position: relative; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-            box-sizing: border-box;
+            max-width: 850px; margin: 30px auto; background: rgba(22, 29, 42, 0.8); 
+            backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; 
+            position: relative; border: 1px solid rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); box-sizing: border-box;
         }
 
-        /* 🛠️ 관리 버튼 (수정/삭제) */
-        .admin-btns { 
-            position: absolute; 
-            top: 40px; 
-            right: 40px; 
-            display: flex; 
-            gap: 8px; 
-        }
-        .btn-sm { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid #3d4655; 
-            color: #8a94a6; 
-            padding: 6px 12px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 12px; 
-            transition: 0.2s; 
-        }
+        .admin-btns { position: absolute; top: 40px; right: 40px; display: flex; gap: 8px; }
+        .btn-sm { background: rgba(255, 255, 255, 0.05); border: 1px solid #3d4655; color: #8a94a6; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; }
         .btn-sm:hover { border-color: #ff2d55; color: #ff2d55; background: rgba(255, 45, 85, 0.1); }
         .btn-del:hover { background: #ff2d55; color: white; border-color: #ff2d55; }
 
-        /* 📝 게시글 헤더 */
-        .post-header { 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
-            padding-bottom: 25px; 
-            margin-bottom: 30px; 
-            margin-top: 20px; /* 관리 버튼 공간 확보 */
-        }
-        .post-title { 
-            font-size: 30px; 
-            font-weight: 700; 
-            margin-bottom: 15px; 
-            color: #fff; 
-            line-height: 1.3; 
-            word-break: break-all;
-        }
-        .post-info { 
-            display: flex; 
-            flex-wrap: wrap; 
-            align-items: center; 
-            font-size: 14px; 
-            color: #8a94a6; 
-            gap: 10px;
-        }
+        .post-header { border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 25px; margin-bottom: 30px; margin-top: 20px; }
+        .post-title { font-size: 30px; font-weight: 700; margin-bottom: 15px; color: #fff; line-height: 1.3; word-break: break-all; }
+        .post-info { display: flex; flex-wrap: wrap; align-items: center; font-size: 14px; color: #8a94a6; gap: 10px; }
         .writer-badge { color: #ff2d55; font-weight: bold; }
 
-        /* 📖 본문 영역 */
-        .content-area { 
-            min-height: 300px; 
-            line-height: 1.8; 
-            font-size: 17px; 
-            color: #cbd5e0; 
-            white-space: pre-wrap; 
-            word-break: break-all; 
-        }
+        .content-area { min-height: 300px; line-height: 1.8; font-size: 17px; color: #cbd5e0; white-space: pre-wrap; word-break: break-all; }
 
-        /* 🚀 하단 푸터 및 버튼 */
-        .post-footer { 
-            border-top: 1px solid rgba(255, 255, 255, 0.05); 
-            padding-top: 30px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-top: 40px;
-        }
-        .like-btn { 
-            cursor: pointer; 
-            border: 1px solid rgba(255, 45, 85, 0.3); 
-            padding: 10px 22px; 
-            border-radius: 30px; 
-            background: rgba(255, 45, 85, 0.1); 
-            color: #ff2d55; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            font-weight: bold; 
-            transition: 0.3s; 
-        }
+        .post-footer { border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 30px; display: flex; justify-content: space-between; align-items: center; margin-top: 40px; }
+        .like-btn { cursor: pointer; border: 1px solid rgba(255, 45, 85, 0.3); padding: 10px 22px; border-radius: 30px; background: rgba(255, 45, 85, 0.1); color: #ff2d55; display: flex; align-items: center; gap: 8px; font-weight: bold; transition: 0.3s; }
         .like-btn:hover { background: #ff2d55; color: white; transform: scale(1.05); }
         
-        .list-btn { 
-            background: #3d4655; 
-            color: white; 
-            padding: 10px 25px; 
-            border-radius: 30px; 
-            border: none; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: 0.3s; 
-        }
+        .list-btn { background: #3d4655; color: white; padding: 10px 25px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .list-btn:hover { background: #fff; color: #0b111e; }
 
-        /* 📱 [반응형] 모바일 및 태블릿 최적화 */
         @media (max-width: 768px) {
-            .view-container { 
-                margin: 0; 
-                border-radius: 0; 
-                padding: 30px 20px; 
-                border: none;
-                min-height: 100vh;
-            }
-            .admin-btns { 
-                top: 20px; 
-                right: 20px; 
-            }
-            .post-title { 
-                font-size: 24px; 
-                margin-top: 30px;
-            }
-            .content-area { 
-                font-size: 16px; 
-            }
-            .post-footer {
-                flex-direction: column;
-                gap: 20px;
-            }
-            .like-btn, .list-btn {
-                width: 100%;
-                justify-content: center;
-                padding: 15px;
-            }
+            .view-container { margin: 0; border-radius: 0; padding: 30px 20px; border: none; min-height: 100vh; }
+            .admin-btns { top: 20px; right: 20px; }
+            .post-title { font-size: 24px; margin-top: 30px; }
+            .post-footer { flex-direction: column; gap: 20px; }
+            .like-btn, .list-btn { width: 100%; justify-content: center; padding: 15px; }
         }
     </style>
 </head>
@@ -173,7 +66,7 @@
 
         <div class="post-footer">
             <button class="like-btn" id="likeBtn">❤️ <span id="likeCount">0</span></button>
-            <button class="list-btn" id="goListBtn">목록으로 복귀</button>
+            <button class="list-btn" onclick="Universe.navigateTo('board')">목록으로 복귀</button>
         </div>
     </div>
 
@@ -181,17 +74,13 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, get, update, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        const firebaseConfig = {
-            databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
-            projectId: "jiwoo-fanpage"
-        };
-
+        // config.js의 설정값 사용
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
-        const user = urlParams.get('user') || "Unknown";
+        const currentUser = Universe.getUser();
         const postRef = ref(db, `posts_v2/${postId}`);
 
         if (postId) {
@@ -205,16 +94,28 @@
                     document.getElementById('postContent').innerText = data.content;
                     document.getElementById('postViews').innerText = (data.views || 0) + 1;
                     document.getElementById('likeCount').innerText = data.likes || 0;
+                    
+                    // 조회수 1 증가 (실시간 반영)
                     update(postRef, { views: (data.views || 0) + 1 });
+
+                    // 본인 확인 (수정/삭제 버튼 노출 여부 - 필요 시 사용)
+                    // if(data.writer !== currentUser && currentUser !== "관리자") {
+                    //     document.querySelector('.admin-btns').style.display = 'none';
+                    // }
+                } else {
+                    alert("삭제되었거나 존재하지 않는 게시글입니다.");
+                    Universe.navigateTo('board');
                 }
             });
         }
 
+        // 수정 버튼 클릭
         document.getElementById('editBtn').onclick = () => {
             if(!postId) return;
-            location.href = `edit.html?id=${postId}&user=${encodeURIComponent(user)}`;
+            location.href = `edit.html?id=${postId}&user=${encodeURIComponent(currentUser)}`;
         };
 
+        // 좋아요 버튼 클릭
         document.getElementById('likeBtn').onclick = async () => {
             const snap = await get(postRef);
             const currentLikes = (snap.val().likes || 0) + 1;
@@ -222,15 +123,13 @@
             document.getElementById('likeCount').innerText = currentLikes;
         };
 
+        // 삭제 버튼 클릭
         document.getElementById('deleteBtn').onclick = async () => {
             if (confirm("정말 삭제하시겠습니까?")) {
                 await remove(postRef);
-                location.href = `board.html?user=${encodeURIComponent(user)}`;
+                alert("삭제되었습니다.");
+                Universe.navigateTo('board');
             }
-        };
-
-        document.getElementById('goListBtn').onclick = () => {
-            location.href = `board.html?user=${encodeURIComponent(user)}`;
         };
     </script>
 </body>
