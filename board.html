@@ -6,7 +6,7 @@
     <title>UNIVERSE | 자유게시판</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* [기존 디자인 및 다크 모드 스타일 유지] */
+        /* [관리자님의 다크 모드 스타일 100% 유지] */
         body {
             margin: 0;
             padding: 0;
@@ -15,7 +15,7 @@
             font-family: 'Noto Sans KR', sans-serif;
         }
 
-        /* 🌌 지우 유니버스 전용 로고 길 (신규 추가) */
+        /* 🌌 컨트롤 타워(menu.html)로 연결되는 전용 로고 길 */
         .universe-path {
             width: 100%;
             padding: 30px 0 10px 0;
@@ -33,18 +33,18 @@
             cursor: pointer;
         }
 
-        /* 우주 성단과 궤도를 형상화한 로고 아이콘 (SVG) */
+        /* 컨트롤 타워의 에너지를 형상화한 로고 아이콘 */
         .logo-icon {
             width: 50px;
             height: 50px;
             fill: none;
-            stroke: #ff2d55; /* 관리자님의 시그니처 핑크 컬러 */
+            stroke: #ff2d55; 
             stroke-width: 1.2;
             transition: 0.5s;
             filter: drop-shadow(0 0 8px rgba(255, 45, 85, 0.4));
         }
 
-        /* 호버 시 별이 빛나며 회전하는 효과 */
+        /* 호버 시 컨트롤 타워로 복귀하는 빛의 효과 */
         .universe-logo:hover .logo-icon {
             transform: rotate(180deg) scale(1.1);
             stroke: #ffffff;
@@ -68,7 +68,7 @@
             opacity: 1;
         }
 
-        /* [기존 게시판 레이아웃] */
+        /* [게시판 레이아웃 유지] */
         .board-container {
             max-width: 900px;
             margin: 0 auto;
@@ -87,14 +87,10 @@
             color: white;
             padding: 8px 18px;
             border: none;
-            border-radius: 20px; /* 좀 더 둥근 세련된 느낌 */
+            border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-        }
-        .write-btn:hover {
-            background-color: #e6204a;
-            box-shadow: 0 0 10px rgba(255, 45, 85, 0.5);
         }
         table {
             width: 100%;
@@ -109,19 +105,18 @@
             border-bottom: 1px solid #242d3c;
         }
         th { color: #8a94a6; font-size: 14px; background-color: #1c2535; }
-        td { font-size: 15px; }
     </style>
 </head>
 <body>
 
     <div class="universe-path">
-        <a href="index.html" class="universe-logo">
+        <a id="backLink" href="#" class="universe-logo" onclick="goBack()"> 
             <svg class="logo-icon" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" stroke-dasharray="2 2" />
                 <circle cx="12" cy="12" r="4" fill="#ff2d55" />
                 <path d="M12 2L12 6M12 18L12 22M2 12L6 12M18 12L22 12" />
             </svg>
-            <span class="logo-text">Back to Universe</span>
+            <span class="logo-text">Back to Control Tower</span>
         </a>
     </div>
 
@@ -144,14 +139,26 @@
             <tbody id="boardContent">
                 <tr>
                     <td>1</td>
-                    <td style="text-align: left;">지우 유니버스에 오신 것을 환영합니다!</td>
+                    <td style="text-align: left;">지우 유니버스 컨트롤 타워 연결 성공</td>
                     <td>관리자</td>
                     <td>2026.03.12</td>
-                    <td>124</td>
+                    <td>1</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
+    <script>
+        // 컨트롤 타워로 돌아갈 때 사용자 이름을 유지하기 위한 스크립트
+        function goBack() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            if (user) {
+                location.href = `menu.html?user=${encodeURIComponent(user)}`;
+            } else {
+                location.href = "index.html";
+            }
+        }
+    </script>
 </body>
 </html>
