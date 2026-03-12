@@ -3,37 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universe | Free Board</title>
+    <title>유니버스 | 자유게시판</title>
     <style>
         :root { --main-red: #ff2d55; --bg-dark: #050a10; --text-gray: #8ea8c9; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
         .universe-bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #1a2a3a 0%, #050a10 80%); z-index: -1; }
+        
+        /* 화면 중앙 정렬 및 너비 조절 */
         .container { max-width: 850px; margin: 0 auto; padding: 60px 20px; position: relative; z-index: 10; }
         
         .board-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 2px solid var(--main-red); padding-bottom: 10px; }
-        .btn { background: var(--main-red); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-sub { background: #333; color: #ccc; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; }
+        .board-header h1 { margin: 0; font-size: 1.6rem; letter-spacing: -1px; }
 
+        .btn { background: var(--main-red); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .btn-sub { background: #333; color: #ccc; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+
+        /* 목록 테이블 */
         table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 8px; overflow: hidden; }
         th { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--text-gray); font-size: 0.85rem; background: rgba(255,255,255,0.05); }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); text-align: center; font-size: 0.85rem; }
-        .td-title { text-align: left; cursor: pointer; padding-left: 20px; font-size: 0.9rem; }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); text-align: center; font-size: 0.9rem; }
+        .td-title { text-align: left; cursor: pointer; padding-left: 20px; }
+        .td-title:hover { color: var(--main-red); text-decoration: underline; }
 
+        /* 본문 보기 및 글쓰기 박스 */
         .content-box { display: none; background: rgba(255, 255, 255, 0.05); padding: 35px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        .view-title { font-size: 1.6rem; margin-bottom: 10px; color: var(--main-red); font-weight: bold; }
-        .view-info { font-size: 0.85rem; color: var(--text-gray); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
-        .view-body { min-height: 250px; line-height: 1.7; white-space: pre-wrap; font-size: 1rem; color: #ddd; }
+        .view-title { font-size: 1.7rem; margin-bottom: 10px; color: var(--main-red); font-weight: bold; }
+        .view-info { font-size: 0.9rem; color: var(--text-gray); border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+        .view-body { min-height: 300px; line-height: 1.8; white-space: pre-wrap; font-size: 1.05rem; color: #eee; }
 
-        /* 좋아요 버튼 레이아웃 */
-        .like-container { display: flex; align-items: center; gap: 8px; margin-top: 30px; }
-        #likeBtn { display: none; background: none; border: 1px solid var(--main-red); color: var(--main-red); padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: bold; align-items: center; gap: 5px; }
-        #likeBtn.clicked { background: var(--main-red); color: white; }
+        /* [요청] 본문 왼쪽 하단 좋아요 버튼 */
+        .bottom-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .btn-like { background: none; border: 1px solid var(--main-red); color: var(--main-red); padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-like:hover { background: rgba(255, 45, 85, 0.1); }
+        .btn-like.clicked { background: var(--main-red); color: white; }
 
+        /* 글쓰기 입력창 */
+        .w-input { width: 100%; background: #fff; border: 1px solid #ddd; color: #333; padding: 15px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; font-size: 1rem; }
+        .w-textarea { height: 400px; resize: none; }
+
+        /* 페이징 */
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 25px; }
-        .page-btn { background: none; border: 1px solid #333; color: var(--text-gray); padding: 4px 10px; cursor: pointer; }
+        .page-btn { background: none; border: 1px solid #333; color: var(--text-gray); padding: 5px 12px; cursor: pointer; border-radius: 4px; }
         .page-btn.active { background: var(--main-red); color: white; border-color: var(--main-red); }
-        .w-input { width: 100%; background: #fff; color: #333; padding: 12px; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; border: 1px solid #ddd; }
-        .w-textarea { height: 350px; resize: none; }
     </style>
 </head>
 <body>
@@ -42,12 +53,18 @@
         
         <div id="listPage">
             <div class="board-header">
-                <h1>FREE BOARD</h1>
+                <h1>자유게시판</h1>
                 <button class="btn" onclick="openWrite()">글쓰기</button>
             </div>
             <table>
                 <thead>
-                    <tr><th width="50">NO</th><th>TITLE</th><th width="90">USER</th><th width="100">DATE</th><th width="60">VIEWS</th></tr>
+                    <tr>
+                        <th width="60">번호</th>
+                        <th>제목</th>
+                        <th width="100">작성자</th>
+                        <th width="110">날짜</th>
+                        <th width="70">조회수</th>
+                    </tr>
                 </thead>
                 <tbody id="boardBody"></tbody>
             </table>
@@ -59,39 +76,38 @@
             <div id="viewInfo" class="view-info"></div>
             <div id="viewBody" class="view-body"></div>
             
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                <div class="like-container">
-                    <button id="likeBtn" onclick="handleLike()">
-                        ❤️ 좋아요 <span id="likeCount">0</span>
-                    </button>
-                </div>
-                <button class="btn-sub" onclick="closeView()">목록으로</button>
+            <div class="bottom-actions">
+                <button id="likeBtn" class="btn-like" onclick="handleLike()">
+                    <span>❤️</span> 좋아요 <span id="likeCount">0</span>
+                </button>
+                <button class="btn-sub" onclick="closeView()">목록으로 돌아가기</button>
             </div>
         </div>
 
         <div id="writePage" class="content-box">
-            <h2 style="margin-top:0;">WRITE</h2>
-            <input type="text" id="postTitle" class="w-input" placeholder="제목">
+            <h2 style="margin-top:0; color:var(--main-red);">글 작성하기</h2>
+            <input type="text" id="postTitle" class="w-input" placeholder="제목을 입력하세요">
             <textarea id="postContent" class="w-input w-textarea" placeholder="내용을 입력하세요"></textarea>
             <div style="text-align: right;">
-                <button class="btn-sub" style="margin-right:8px;" onclick="closeWrite()">취소</button>
-                <button id="submitBtn" class="btn" onclick="submitPost()">등록</button>
+                <button class="btn-sub" style="margin-right:10px;" onclick="closeWrite()">취소</button>
+                <button id="submitBtn" class="btn" onclick="submitPost()">등록 완료</button>
             </div>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwgMzQi8ib58Qkld2aUED-cnuaQQ9wWwd8Z1b-ym96o3hfKRP59yes3GnwgC-7LQEkk7w/exec";
-        const CURRENT_USER = "관리자"; // 현재 로그인한 사용자 이름 (예시)
         let allPosts = [];
         let currentPage = 1;
         let currentPostIdx = -1;
         const postsPerPage = 12;
 
         async function loadPosts() {
-            const res = await fetch(API_URL);
-            allPosts = await res.json();
-            renderBoard();
+            try {
+                const res = await fetch(API_URL);
+                allPosts = await res.json();
+                renderBoard();
+            } catch(e) { console.error("데이터 로딩 실패"); }
         }
 
         function renderBoard() {
@@ -101,7 +117,7 @@
 
             tbody.innerHTML = currentPosts.map((p, i) => {
                 const title = p.Title || p.title || "제목 없음";
-                const user = p.User || p.user || "익명";
+                const user = p.User || p.user || "관리자";
                 const date = (p.Date || p.date || "").split('T')[0] || "-";
                 const views = p.Views || p.views || 0;
                 const realIndex = allPosts.length - 1 - (start + i);
@@ -110,7 +126,7 @@
                     <td>${allPosts.length - (start + i)}</td>
                     <td class="td-title" onclick="viewPost(${realIndex})">${title}</td>
                     <td>${user}</td>
-                    <td style="color:#666;">${date}</td>
+                    <td style="color:#777;">${date}</td>
                     <td>${views}</td>
                 </tr>`;
             }).join('');
@@ -120,34 +136,31 @@
         function viewPost(idx) {
             currentPostIdx = idx;
             const p = allPosts[idx];
-            const writer = p.User || p.user || "익명";
-            
             document.getElementById('listPage').style.display = 'none';
             document.getElementById('viewPage').style.display = 'block';
+            
             document.getElementById('viewTitle').innerText = p.Title || p.title;
-            document.getElementById('viewInfo').innerText = `BY ${writer} | ${p.Date || ''} | 조회수 ${p.Views || 0}`;
+            document.getElementById('viewInfo').innerText = `작성자: ${p.User || '관리자'} | 날짜: ${p.Date || '-'} | 조회수: ${p.Views || 0}`;
             document.getElementById('viewBody').innerText = p.Content || p.content;
             document.getElementById('likeCount').innerText = p.Likes || p.likes || 0;
-
-            // 핵심 기능: 작성자가 내가 아닐 때만 좋아요 버튼 표시
-            const likeBtn = document.getElementById('likeBtn');
-            if(writer !== CURRENT_USER) {
-                likeBtn.style.display = 'flex';
-                likeBtn.classList.remove('clicked');
-            } else {
-                likeBtn.style.display = 'none';
-            }
+            
+            document.getElementById('likeBtn').classList.remove('clicked');
         }
 
         async function handleLike() {
             const btn = document.getElementById('likeBtn');
-            if(btn.classList.contains('clicked')) return alert("이미 좋아요를 눌렀습니다.");
+            if(btn.classList.contains('clicked')) return alert("이미 좋아요를 누르셨습니다.");
+            
             const countSpan = document.getElementById('likeCount');
             countSpan.innerText = parseInt(countSpan.innerText) + 1;
             btn.classList.add('clicked');
+
             try {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'like', id: allPosts[currentPostIdx].ID || allPosts[currentPostIdx].id })});
-            } catch(e) {}
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'like', id: allPosts[currentPostIdx].ID || allPosts[currentPostIdx].id })
+                });
+            } catch(e) { console.log("좋아요 처리 중 오류 발생"); }
         }
 
         function closeView() { document.getElementById('viewPage').style.display = 'none'; document.getElementById('listPage').style.display = 'block'; }
@@ -157,8 +170,10 @@
         async function submitPost() {
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
-            if(!title || !content) return alert("빈칸을 채워주세요.");
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ title, content, tag: '수다', user: CURRENT_USER }) });
+            if(!title || !content) return alert("빈칸을 모두 채워주세요!");
+
+            document.getElementById('submitBtn').innerText = "등록 중...";
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ title, content, tag: '수다', user: '관리자' }) });
             location.reload();
         }
 
