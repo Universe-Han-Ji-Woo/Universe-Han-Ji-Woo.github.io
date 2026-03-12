@@ -11,27 +11,38 @@
         /* 🌌 깊은 우주 배경 */
         body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a253a 0%, #0b111e 70%); z-index: -1; opacity: 0.6; }
 
-        /* ♎ 천칭자리 우주정거장 관문 (성단 컨셉) */
+        /* ♎ 천칭자리 우주정거장 관문 (별자리 형태 컨셉) */
         .universe-path { width: 100%; padding: 50px 0 30px 0; display: flex; justify-content: center; align-items: center; }
         .constellation-tower { text-decoration: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: 0.5s; position: relative; }
         
-        /* 🚩 [수정] 단순 기호 제거 후 CSS로 구현한 세하얀 성단 아이콘 */
-        .libra-cluster { position: relative; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; transition: 0.5s; z-index: 2; }
+        /* 🚩 [수정 완료] 인터넷 참고: 세하얀 천칭자리 별자리 형태 구현 */
+        .libra-constellation { position: relative; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; transition: 0.5s; z-index: 2; }
 
-        /* 성단의 중심 빛 (세하얗고 투명하게) */
-        .cluster-core { position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8), 0 0 40px 10px rgba(255, 255, 255, 0.4); transition: 0.5s; }
+        /* 각 별자리 지점 (세하얀 별) */
+        .star { position: absolute; background: #fff; border-radius: 50%; box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.7); transition: 0.5s; }
 
-        /* 천칭자리 형태를 이루는 주변 별들 (Pseudo-elements 사용) */
-        .libra-cluster::before, .libra-cluster::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.9); border-radius: 50%; transition: 0.5s; }
+        /* 별자리 연결선 (투명한 세하얀 선) */
+        .line { position: absolute; background: rgba(255, 255, 255, 0.1); transition: 0.5s; }
 
-        /* 왼쪽 저울 접시 별 */
-        .libra-cluster::before { width: 4px; height: 4px; top: 20px; left: 5px; box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.6); }
+        /* 천칭자리 별 지점 및 연결선 배치 (인터넷 참고) */
+        /* 베타 라이브래 (가장 밝은 별, 꼭대기) */
+        .beta { width: 6px; height: 6px; top: 0; left: 32px; box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.9); }
+        /* 알파 라이브래 (두 번째 별) */
+        .alpha { width: 4px; height: 4px; top: 30px; left: 10px; }
+        /* 감마 라이브래 (세 번째 별) */
+        .gamma { width: 4px; height: 4px; top: 30px; left: 55px; }
+        /* 요타 라이브래 (네 번째 별, 하단) */
+        .iota { width: 3px; height: 3px; top: 60px; left: 32px; }
 
-        /* 오른쪽 저울 접시 별 */
-        .libra-cluster::after { width: 4px; height: 4px; top: 20px; right: 5px; box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.6); }
-
-        /* 천칭의 수평대 (세하얀 선) */
-        .libra-bar { position: absolute; top: 22px; width: 50px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8) 50%, transparent); transition: 0.5s; }
+        /* 별자리 연결선 배치 */
+        /* 베타 <-> 알파 */
+        .line-1 { width: 1px; height: 32px; top: 5px; left: 20px; transform: rotate(-35deg); }
+        /* 베타 <-> 감마 */
+        .line-2 { width: 1px; height: 32px; top: 5px; right: 20px; transform: rotate(35deg); }
+        /* 알파 <-> 요타 */
+        .line-3 { width: 1px; height: 32px; top: 35px; left: 20px; transform: rotate(35deg); }
+        /* 감마 <-> 요타 */
+        .line-4 { width: 1px; height: 32px; top: 35px; right: 20px; transform: rotate(-35deg); }
 
         /* '우주정거장으로 귀환' 문구 */
         .tower-guide { font-size: 10px; color: rgba(255, 255, 255, 0.4); letter-spacing: 2.5px; margin-top: 15px; font-weight: 300; transition: 0.5s; }
@@ -39,15 +50,14 @@
         /* 하단 텍스트 */
         .logo-text { font-size: 11px; color: rgba(255, 255, 255, 0.5); letter-spacing: 4px; margin-top: 5px; text-transform: uppercase; font-weight: 300; transition: 0.3s; }
 
-        /* ✨ 호버 애니메이션 (쏟아져 내릴 듯한 화이트 글로우) */
-        @keyframes clusterTwinkle { 
-            0%, 100% { box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.8), 0 0 40px 10px rgba(255, 255, 255, 0.4); transform: scale(1); } 
-            50% { box-shadow: 0 0 30px 8px rgba(255, 255, 255, 1), 0 0 60px 15px rgba(255, 255, 255, 0.6); transform: scale(1.1); } 
+        /* ✨ 호버 애니메이션 (세하얀 별자리 글로우) */
+        @keyframes constellationGlow { 
+            0%, 100% { box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.9), 0 0 10px 2px rgba(255, 255, 255, 0.7); transform: scale(1); } 
+            50% { box-shadow: 0 0 25px 6px rgba(255, 255, 255, 1), 0 0 20px 4px rgba(255, 255, 255, 0.8); transform: scale(1.05); } 
         }
         
-        .constellation-tower:hover .cluster-core { animation: clusterTwinkle 1s infinite ease-in-out; }
-        .constellation-tower:hover .libra-cluster::before, .constellation-tower:hover .libra-cluster::after { background: #fff; box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.9); }
-        .constellation-tower:hover .libra-bar { background: rgba(255, 255, 255, 1); }
+        .constellation-tower:hover .beta, .constellation-tower:hover .alpha, .constellation-tower:hover .gamma, .constellation-tower:hover .iota { animation: constellationGlow 1s infinite ease-in-out; background: #fff; }
+        .constellation-tower:hover .line { background: rgba(255, 255, 255, 0.3); }
         .constellation-tower:hover .tower-guide { color: #fff; text-shadow: 0 0 10px rgba(255, 255, 255, 1); }
         .constellation-tower:hover .logo-text { color: rgba(255, 255, 255, 0.9); }
 
@@ -70,9 +80,15 @@
 
     <div class="universe-path">
         <div class="constellation-tower" onclick="goBack()" title="우주정거장으로 이동"> 
-            <div class="libra-cluster">
-                <div class="cluster-core"></div>
-                <div class="libra-bar"></div>
+            <div class="libra-constellation">
+                <div class="star beta"></div>
+                <div class="star alpha"></div>
+                <div class="star gamma"></div>
+                <div class="star iota"></div>
+                <div class="line line-1"></div>
+                <div class="line line-2"></div>
+                <div class="line line-3"></div>
+                <div class="line line-4"></div>
             </div>
             <span class="tower-guide">우주정거장으로 귀환</span>
             <span class="logo-text">Space Station</span>
