@@ -17,7 +17,7 @@
             background: radial-gradient(circle at center, #1a253a 0%, #0b111e 80%);
         }
 
-        /* 🔙 상단 복귀 링크 (menu.html로 경로 수정) */
+        /* 🔙 상단 복귀 링크 (menu.html 연결 유지) */
         .back-link { margin-top: 30px; text-align: center; z-index: 10; }
         .back-link a {
             text-decoration: none; color: #8ea8c9; font-size: 13px;
@@ -38,7 +38,7 @@
 
         .container { width: 90%; max-width: 650px; margin-bottom: 50px; }
 
-        /* ✍️ 방명록 입력 폼 (글래스모피즘) */
+        /* ✍️ 방명록 입력 폼 */
         .guestbook-form {
             display: flex; flex-direction: column; gap: 15px;
             background: rgba(255, 255, 255, 0.05);
@@ -65,7 +65,7 @@
         }
         button:hover { background-color: #fff; color: #ff2d55; transform: translateY(-2px); }
 
-        /* 💬 메시지 리스트 스타일 */
+        /* 💬 메시지 아이템 */
         .message-item {
             background: rgba(255, 255, 255, 0.03);
             padding: 20px; border-radius: 15px;
@@ -87,12 +87,9 @@
         .page-btn.active { background: #ff2d55; border-color: #ff2d55; }
         .page-btn:hover:not(.active) { background: rgba(255,255,255,0.2); }
 
-        /* 📱 반응형 최적화 (전기종 대응) */
         @media (max-width: 768px) {
             header h1 { font-size: 1.8rem; letter-spacing: 5px; }
             .container { width: 95%; }
-            .guestbook-form { padding: 20px; }
-            input, textarea, button { font-size: 15px; }
         }
     </style>
 </head>
@@ -115,7 +112,6 @@
         </div>
 
         <div id="messagesList"></div>
-
         <div class="pagination" id="pagination"></div>
     </div>
 
@@ -136,7 +132,7 @@
         let currentPage = 1;
         let allMessages = [];
 
-        // ✍️ 메시지 작성
+        // ✍️ 메시지 작성 (전송 즉시 리스트 최상단 업데이트)
         document.getElementById('submitBtn').onclick = async () => {
             const name = document.getElementById('nameInput').value;
             const message = document.getElementById('messageInput').value;
@@ -144,11 +140,17 @@
             if(!name || !message) return alert("이름과 인사말을 모두 입력해주세요!");
 
             const newMessageRef = push(guestbookRef);
+            const now = new Date();
+            
             await set(newMessageRef, {
                 name: name,
                 message: message,
-                timestamp: Date.now(),
-                date: new Date().toLocaleString()
+                timestamp: Date.now(), // 정렬 기준용 (숫자)
+                date: now.toLocaleString('ko-KR', { 
+                    year: 'numeric', month: 'long', day: 'numeric', 
+                    hour: '2-digit', minute: '2-digit', second: '2-digit',
+                    hour12: true 
+                }) // 표시용 (오전/오후 포함)
             });
 
             document.getElementById('nameInput').value = "";
@@ -156,7 +158,7 @@
             alert("지우님에게 마음이 전달되었습니다!");
         };
 
-        // 🔄 실시간 데이터 로드
+        // 🔄 실시간 데이터 로드 및 정렬 검수
         onValue(query(guestbookRef), (snapshot) => {
             const data = snapshot.val();
             allMessages = [];
@@ -164,6 +166,7 @@
                 Object.keys(data).forEach(key => {
                     allMessages.push(data[key]);
                 });
+                // 🎯 정렬 기준을 명확하게 timestamp(숫자) 내림차순으로 설정
                 allMessages.sort((a, b) => b.timestamp - a.timestamp);
             }
             renderMessages();
