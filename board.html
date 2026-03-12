@@ -14,6 +14,10 @@
 
         .board-container { max-width: 950px; margin: 0 auto; padding: 20px; }
         .board-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff2d55; padding-bottom: 15px; margin-bottom: 30px; }
+        
+        /* 헤더 타이틀 폰트 두께 살짝 조정 */
+        .header-title { font-size: 24px; font-weight: 700; letter-spacing: 1px; color: #fff; margin: 0; }
+        
         .write-btn { background-color: #ff2d55; color: white; padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .write-btn:hover { background-color: #fff; color: #ff2d55; box-shadow: 0 0 20px #ff2d55; }
         
@@ -38,7 +42,7 @@
 
     <div class="board-container">
         <div class="board-header">
-            <h2 style="font-weight: 400; letter-spacing: 2px;">FREE BOARD</h2>
+            <h2 class="header-title">자유게시판</h2>
             <button class="write-btn" id="writeBtn">글쓰기</button>
         </div>
         <table>
@@ -59,7 +63,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getDatabase, ref, onValue, off } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // ✅ 구글 클라우드(Firestore) 완전 배제, 오직 Realtime DB만 사용
+        // ✅ 구글 클라우드(Firestore) 완전 배제
         const firebaseConfig = {
             apiKey: "AIzaSyCD0OaaN1E5uT950X5hkzCBdqT87JQRXrg",
             databaseURL: "https://jiwoo-fanpage-default-rtdb.firebaseio.com",
@@ -70,7 +74,6 @@
         const db = getDatabase(app);
         const postsRef = ref(db, 'posts_v2');
 
-        // ✅ 목록 로드 및 클릭 이벤트 보완
         onValue(postsRef, (snapshot) => {
             const boardContent = document.getElementById('boardContent');
             boardContent.innerHTML = "";
@@ -93,7 +96,6 @@
                         <td>${post.views || 0}</td>
                     `;
                     
-                    // ✅ 제목 클릭 시 view.html로 이동 (ID 파라미터 정확히 전달)
                     row.querySelector('.title-cell').onclick = () => {
                         const user = getUserName();
                         location.href = `view.html?id=${post.id}&user=${encodeURIComponent(user)}`;
@@ -106,7 +108,6 @@
             }
         });
 
-        // ✅ 글쓰기 버튼 활성화
         document.getElementById('writeBtn').onclick = () => {
             const user = getUserName();
             location.href = `write.html?user=${encodeURIComponent(user)}`;
