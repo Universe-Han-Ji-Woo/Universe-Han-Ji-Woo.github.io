@@ -40,144 +40,113 @@
         
         h2 { 
             text-align: center; 
-            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            font-size: clamp(1.5rem, 6vw, 2.2rem);
             letter-spacing: 5px; 
             font-weight: 900;
-            margin: 15px 0 5px 0;
+            margin: 20px 0 5px 0;
             text-shadow: 0 0 20px rgba(255, 45, 85, 0.3);
         }
 
         .user-info { 
             text-align: center; 
-            font-size: 0.75rem; 
+            font-size: 0.8rem; 
             color: #8ea8c9; 
             margin-bottom: 15px;
-            opacity: 0.6;
+            opacity: 0.8;
         }
 
-        /* ✍️ 입력 영역 */
         .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             background: var(--box-bg);
             padding: 15px;
             border-radius: 18px;
             border: 1px solid var(--border-light);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .input-row {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         input { 
-            padding: 10px 15px; 
-            border-radius: 10px; 
+            padding: 12px 15px; 
+            border-radius: 12px; 
             border: none; 
             background: rgba(255,255,255,0.06); 
             color: white; 
             outline: none;
-            font-size: 14px;
+            font-size: 16px;
         }
 
-        #nameInput { width: 80px; }
+        #nameInput { width: 100px; }
         #msgInput { flex: 1; }
 
         button { 
-            padding: 0 15px; 
+            padding: 0 20px; 
             background: var(--main-red); 
             border: none; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             cursor: pointer; 
             font-weight: bold; 
             color: #fff; 
-            font-size: 13px;
+            transition: 0.3s ease;
         }
-
-        /* 📋 게시판 리스트 영역 */
-        .board-header {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr 0.6fr; /* 비율 조정 */
-            padding: 12px 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px 12px 0 0;
-            font-size: 0.8rem;
-            color: #888;
-            text-align: center;
-            border-bottom: 1px solid var(--border-light);
-        }
+        button:active { transform: scale(0.95); }
 
         .msg-list { 
             flex: 1;
             overflow-y: auto; 
-            background: rgba(255,255,255,0.02);
-            border-radius: 0 0 12px 12px;
-            border: 1px solid var(--border-light);
-            border-top: none;
+            padding-right: 5px;
+            /* 리스트 상하단 부드러운 페이드 효과 */
+            mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
         }
         
-        .msg-list::-webkit-scrollbar { width: 2px; }
-        .msg-list::-webkit-scrollbar-thumb { background: var(--main-red); }
+        .msg-list::-webkit-scrollbar { width: 4px; }
+        .msg-list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
 
         .msg-item { 
-            display: grid;
-            grid-template-columns: 1.5fr 1fr 0.6fr;
-            padding: 15px 10px;
-            border-bottom: 1px solid var(--border-light);
-            align-items: center;
-            text-align: center;
-            transition: 0.3s;
+            background: var(--box-bg);
+            margin-bottom: 12px;
+            padding: 16px; 
+            border-radius: 18px;
+            border: 1px solid var(--border-light);
+            border-left: 4px solid var(--main-red);
+            animation: slideUp 0.4s ease-out forwards;
         }
-
-        /* 🚩 공지사항 스타일 (위로 독립) */
-        .notice-item {
-            background: rgba(255, 45, 85, 0.03);
+        
+        .user-name { 
+            display: block;
+            color: var(--main-red); 
+            font-weight: 900; 
+            font-size: 0.75rem; 
+            margin-bottom: 6px;
         }
+        .user-text { font-size: 0.95rem; line-height: 1.6; color: #eee; word-break: break-all; }
 
-        .badge-notice {
-            display: block; /* 줄바꿈 처리로 제목과 겹침 방지 */
-            color: var(--main-red);
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
+        .back-btn { text-align: center; padding: 15px 0; color: #555; text-decoration: none; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
 
-        .user-text { 
-            font-size: 0.85rem; 
-            color: #eee; 
-            text-align: left; 
-            padding-left: 10px;
-            word-break: break-all;
-            line-height: 1.4;
-        }
-
-        .user-name { font-size: 0.8rem; color: #aaa; }
-        .view-count { font-size: 0.8rem; color: #666; }
-
-        .back-btn { text-align: center; padding: 15px 0; color: #444; font-size: 0.75rem; cursor: pointer; letter-spacing: 2px; }
-
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>GUEST BOOK</h2>
-        <p class="user-info">STATION: <span id="displayUser">---</span></p>
+        <p class="user-info">SYSTEM CONNECTED: <span id="displayUser">---</span></p>
         
         <div class="input-area">
             <div class="input-row">
                 <input type="text" id="nameInput" placeholder="닉네임" autocomplete="off">
-                <input type="text" id="msgInput" placeholder="메시지 기록..." autocomplete="off">
+                <input type="text" id="msgInput" placeholder="우주 정거장에 메시지 기록..." autocomplete="off">
                 <button id="saveBtn">SEND</button>
             </div>
         </div>
 
-        <div class="board-header">
-            <div>제목</div>
-            <div>작성자</div>
-            <div>조회수</div>
-        </div>
-
         <div class="msg-list" id="msgList">
-            <p style="text-align:center; padding-top:50px; color:#444; font-size:0.8rem;">CONNECTING...</p>
+            <p style="text-align:center; padding-top:100px; color:#333; letter-spacing: 2px;">SYNCING UNIVERSE...</p>
         </div>
 
         <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
@@ -188,40 +157,54 @@
         import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
         from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+        // 기기 높이 최적화
         function setVh() {
-            document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
         }
         window.addEventListener('resize', setVh);
         setVh();
 
+        // 파이어베이스 초기화 (config.js의 firebaseConfig 사용)
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const guestbookRef = ref(db, 'guestbook');
 
+        // 사용자 정보 설정
         const currentUser = (typeof Universe !== 'undefined' && Universe.getUser) ? Universe.getUser() : "VISITOR";
         document.getElementById('displayUser').innerText = currentUser;
         document.getElementById('nameInput').value = currentUser;
 
+        // 메시지 저장 로직 (window 객체에 바인딩하여 버튼 클릭 대응)
         window.saveMessage = function() {
-            const name = document.getElementById('nameInput').value.trim();
-            const msg = document.getElementById('msgInput').value.trim();
+            const nameInput = document.getElementById('nameInput');
+            const msgInput = document.getElementById('msgInput');
+            
+            const name = nameInput.value.trim();
+            const msg = msgInput.value.trim();
 
-            if (!name || !msg) return;
+            if (!name) return alert("닉네임을 입력해주세요.");
+            if (!msg) return alert("메시지를 입력해주세요.");
 
             push(guestbookRef, {
                 name: name,
                 message: msg,
-                views: 0, // 조회수 초기값
-                timestamp: Date.now(),
-                isNotice: false
+                timestamp: Date.now()
             }).then(() => {
-                document.getElementById('msgInput').value = ''; 
+                msgInput.value = ''; 
+                msgInput.focus();
+            }).catch((err) => {
+                console.error("기록 실패:", err);
             });
         };
 
-        document.getElementById('msgInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveMessage(); });
+        // 이벤트 리스너 등록
+        document.getElementById('msgInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveMessage();
+        });
         document.getElementById('saveBtn').onclick = saveMessage;
 
+        // 3. 실시간 데이터 불러오기 (갤러리와 연동되지 않도록 고유 쿼리 유지)
         const recentMessagesQuery = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
         
         onValue(recentMessagesQuery, (snapshot) => {
@@ -230,26 +213,22 @@
             const data = snapshot.val();
             
             if (data) {
-                const items = Object.keys(data).map(key => ({...data[key], id: key}));
+                // 데이터를 배열로 변환 후 최신순 정렬
+                const items = Object.keys(data).map(key => data[key]);
                 items.sort((a, b) => b.timestamp - a.timestamp);
                 
                 items.forEach((item) => {
+                    const userName = item.name || "VISITOR";
                     const div = document.createElement('div');
-                    // 공지사항일 경우 전용 클래스 추가
-                    div.className = item.isNotice ? 'msg-item notice-item' : 'msg-item';
-                    
+                    div.className = 'msg-item';
                     div.innerHTML = `
-                        <div class="user-text">
-                            ${item.isNotice ? '<span class="badge-notice">공지</span>' : ''}
-                            ${item.message}
-                        </div>
-                        <div class="user-name">${item.name}</div>
-                        <div class="view-count">${item.views || 0}</div>
+                        <span class="user-name">${userName}</span>
+                        <div class="user-text">${item.message}</div>
                     `;
                     list.appendChild(div);
                 });
             } else {
-                list.innerHTML = "<p style='text-align:center; padding-top:50px; color:#222;'>NO DATA</p>";
+                list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
             }
         });
     </script>
