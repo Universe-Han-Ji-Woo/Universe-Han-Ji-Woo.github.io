@@ -21,19 +21,17 @@
             background: var(--bg-dark); 
             color: #fff; 
             font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
-            margin: 0; 
-            padding: 0;
-            overflow: hidden; /* 전체 스크롤 방지, 내부 리스트만 스크롤 */
+            margin: 0; padding: 0;
+            overflow: hidden;
             height: 100vh;
             height: calc(var(--vh, 1vh) * 100);
             display: flex;
             justify-content: center;
         }
 
-        /* 메인 컨테이너 - 모바일/태블릿/PC 통합 반응형 */
         .container { 
             width: 100%;
-            max-width: 600px; /* PC/태블릿에서도 가독성 좋은 폭 */
+            max-width: 600px;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -41,7 +39,6 @@
             box-sizing: border-box;
         }
         
-        /* 헤더 섹션 */
         h2 { 
             text-align: center; 
             font-size: clamp(1.5rem, 6vw, 2.2rem);
@@ -55,32 +52,42 @@
             text-align: center; 
             font-size: 0.8rem; 
             color: #8ea8c9; 
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             opacity: 0.8;
         }
 
-        /* 메시지 입력창 섹션 */
-        .input-box { 
-            display: flex; 
-            gap: 10px; 
+        /* ✍️ 입력 영역 보강 (닉네임 + 메시지) */
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             background: var(--box-bg);
-            padding: 12px;
+            padding: 15px;
             border-radius: 18px;
             border: 1px solid var(--border-light);
             margin-bottom: 20px;
         }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
         input { 
-            flex: 1; 
             padding: 12px 15px; 
             border-radius: 12px; 
             border: none; 
             background: rgba(255,255,255,0.06); 
             color: white; 
             outline: none;
-            font-size: 16px; /* 아이폰 자동 줌 방지 */
+            font-size: 16px;
         }
+
+        #nameInput { width: 100px; } /* 닉네임 칸은 짧게 */
+        #msgInput { flex: 1; } /* 메시지 칸은 길게 */
+
         button { 
-            padding: 0 22px; 
+            padding: 0 20px; 
             background: var(--main-red); 
             border: none; 
             border-radius: 12px; 
@@ -91,7 +98,7 @@
         }
         button:active { transform: scale(0.95); }
 
-        /* 📜 메시지 리스트 섹션 (반응형 높이 조절) */
+        /* 📜 리스트 영역 */
         .msg-list { 
             flex: 1;
             overflow-y: auto; 
@@ -99,8 +106,6 @@
             mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
         }
-        
-        /* 스크롤바 디자인 */
         .msg-list::-webkit-scrollbar { width: 4px; }
         .msg-list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
 
@@ -120,48 +125,27 @@
             font-weight: 900; 
             font-size: 0.75rem; 
             margin-bottom: 6px;
-            letter-spacing: 1px;
         }
-        .user-text {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #eee;
-            word-break: break-all;
-        }
+        .user-text { font-size: 0.95rem; line-height: 1.6; color: #eee; word-break: break-all; }
 
-        /* 하단 뒤로가기 */
-        .back-btn { 
-            text-align: center; 
-            padding: 15px 0;
-            color: #555; 
-            text-decoration: none; 
-            font-size: 0.8rem; 
-            cursor: pointer; 
-            letter-spacing: 2px;
-            transition: 0.3s;
-        }
-        .back-btn:hover { color: #8ea8c9; }
+        .back-btn { text-align: center; padding: 15px 0; color: #555; text-decoration: none; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 📱 태블릿/PC 대응 추가 스타일 */
-        @media (min-width: 768px) {
-            .container { padding: 40px; }
-            .msg-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
-        }
+        @media (min-width: 768px) { .container { padding: 40px; } }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>GUEST BOOK</h2>
-        <p class="user-info">CONNECTED: <span id="displayUser">---</span></p>
+        <p class="user-info">SYSTEM CONNECTED: <span id="displayUser">---</span></p>
         
-        <div class="input-box">
-            <input type="text" id="msgInput" placeholder="우주 정거장에 메시지 기록..." autocomplete="off">
-            <button id="saveBtn">SEND</button>
+        <div class="input-area">
+            <div class="input-row">
+                <input type="text" id="nameInput" placeholder="닉네임" autocomplete="off">
+                <input type="text" id="msgInput" placeholder="우주 정거장에 메시지 기록..." autocomplete="off">
+                <button id="saveBtn">SEND</button>
+            </div>
         </div>
 
         <div class="msg-list" id="msgList">
@@ -176,7 +160,6 @@
         import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
         from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // 사파리/모바일 높이 대응
         function setVh() {
             let vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -184,58 +167,55 @@
         window.addEventListener('resize', setVh);
         setVh();
 
-        // 파이어베이스 초기화 (config.js의 firebaseConfig 사용)
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const guestbookRef = ref(db, 'guestbook');
 
+        // 초기 로드 시 닉네임 입력칸에 현재 로그인된 ID를 기본으로 넣어줌 (수정 가능)
         const currentUser = Universe.getUser();
         document.getElementById('displayUser').innerText = currentUser;
+        document.getElementById('nameInput').value = currentUser;
 
-        // 메시지 저장 함수 (기존 로직 보강)
+        // 메시지 저장 함수
         window.saveMessage = function() {
+            const nameInput = document.getElementById('nameInput');
             const msgInput = document.getElementById('msgInput');
+            
+            const name = nameInput.value.trim();
             const msg = msgInput.value.trim();
 
-            if (!msg) return;
+            if (!name) return alert("닉네임을 입력해주세요.");
+            if (!msg) return alert("메시지를 입력해주세요.");
 
             push(guestbookRef, {
-                name: currentUser, // 'name' 필드로 기존 데이터와 호환성 유지
+                name: name, // 사용자가 직접 쓴 닉네임 저장
                 message: msg,
                 timestamp: Date.now()
             }).then(() => {
-                msgInput.value = '';
+                msgInput.value = ''; // 메시지만 비우기
                 msgInput.focus();
             }).catch((err) => {
                 console.error("기록 실패:", err);
-                alert("전송 에러가 발생했습니다.");
             });
         };
 
-        // 엔터키 지원
         document.getElementById('msgInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') saveMessage();
         });
 
         document.getElementById('saveBtn').onclick = saveMessage;
 
-        // 메시지 실시간 로드 (기존 필드 + 새 필드 완벽 대응)
         const recentMessagesQuery = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
         
         onValue(recentMessagesQuery, (snapshot) => {
             const list = document.getElementById('msgList');
             list.innerHTML = '';
-            
             const data = snapshot.val();
             if (data) {
                 const items = Object.keys(data).map(key => data[key]);
-                // 최신순 정렬
                 items.sort((a, b) => b.timestamp - a.timestamp);
-
                 items.forEach((item) => {
-                    // 🎯 undefined 방지 로직 (name 또는 user 필드 모두 체크)
                     const userName = item.name || item.user || "VISITOR";
-                    
                     const div = document.createElement('div');
                     div.className = 'msg-item';
                     div.innerHTML = `
