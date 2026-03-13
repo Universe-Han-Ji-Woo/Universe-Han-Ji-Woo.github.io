@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Universe | Free Floating Gallery</title>
+    <title>Universe | PhotoCard Gallery</title>
     
     <script src="config.js"></script>
 
@@ -17,98 +17,132 @@
         body { 
             background: var(--bg-dark); 
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(255, 45, 85, 0.05) 0%, transparent 80%),
-                url('https://www.transparenttextures.com/patterns/stardust.png'); /* 미세한 별가루 효과 */
+                radial-gradient(circle at 50% 50%, rgba(255, 45, 85, 0.08) 0%, transparent 80%),
+                url('https://www.transparenttextures.com/patterns/stardust.png');
             color: #fff; 
             font-family: 'Apple SD Gothic Neo', sans-serif; 
             margin: 0; padding: 0;
-            overflow: hidden; /* 우주는 끝이 없지만 화면 밖으로 넘치지 않게 */
             height: 100vh;
             height: calc(var(--vh, 1vh) * 100);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         h2 { 
-            position: fixed;
-            top: 30px; left: 0; width: 100%;
             text-align: center; 
             font-size: clamp(1.5rem, 6vw, 2.2rem);
-            letter-spacing: 10px; 
+            letter-spacing: 8px; 
             font-weight: 900;
-            text-shadow: 0 0 30px rgba(255, 45, 85, 0.5);
+            margin: 40px 0 20px 0;
+            text-shadow: 0 0 20px rgba(255, 45, 85, 0.4);
             z-index: 100;
-            pointer-events: none; /* 제목이 사진 클릭을 방해하지 않도록 */
         }
 
-        /* 🪐 우주 공간 (사진들이 노닐 곳) */
-        #universe-space {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            perspective: 1000px;
+        /* 🗂️ 포토카드 그리드 컨테이너 */
+        .gallery-container {
+            flex: 1;
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
         }
 
-        .gallery-item { 
-            position: absolute;
-            width: 120px; /* 모바일 기준 적당한 크기 */
-            height: 120px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.03);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            cursor: pointer;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-            z-index: 10;
+        .gallery-container::-webkit-scrollbar { width: 0px; } /* 스크롤바 숨김 */
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 모바일 2열 */
+            gap: 30px;
+            padding: 40px 10px 150px 10px;
         }
 
         @media (min-width: 768px) {
-            .gallery-item { width: 180px; height: 180px; }
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 50px; } /* 데스크탑 3열 */
         }
+
+        /* 🃏 포토카드 스타일 */
+        .gallery-item { 
+            aspect-ratio: 3 / 4; /* 포토카드 비율 */
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+            
+            /* 둥,,둥,, 떠다니는 기본 애니메이션 */
+            animation: cardFloat 5s ease-in-out infinite;
+        }
+
+        /* 카드마다 움직임이 겹치지 않도록 시간차 공격 */
+        .gallery-item:nth-child(2n) { animation-duration: 6s; animation-delay: -1s; }
+        .gallery-item:nth-child(3n) { animation-duration: 7s; animation-delay: -2.5s; }
+        .gallery-item:nth-child(4n) { animation-duration: 5.5s; animation-delay: -4s; }
 
         .gallery-item img {
             width: 100%; height: 100%;
             object-fit: cover;
-            opacity: 0.8;
-            transition: 0.5s;
+            transition: 0.6s cubic-bezier(0.2, 1, 0.3, 1);
         }
 
+        /* 마우스 올렸을 때 포토카드 강조 */
         .gallery-item:hover {
             border-color: var(--main-red);
-            z-index: 50;
+            box-shadow: 0 0 30px rgba(255, 45, 85, 0.3);
+            z-index: 10;
+            animation-play-state: paused; /* 호버 시에는 멈춤 */
         }
         .gallery-item:hover img {
-            opacity: 1;
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
 
-        /* 🔍 클릭 확대 모달 */
+        /* 🌊 둥실둥실 애니메이션 */
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(1deg); }
+            66% { transform: translateY(5px) rotate(-1deg); }
+        }
+
+        /* 🔍 확대 모달 */
         #photoModal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.9);
             display: none; justify-content: center; align-items: center;
             z-index: 2000; backdrop-filter: blur(15px);
         }
         #modalImg {
-            max-width: 90%; max-height: 85%; border-radius: 10px;
+            max-width: 90%; max-height: 85%; border-radius: 15px;
             transform: scale(0.8); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 50px rgba(255, 45, 85, 0.2);
         }
         #photoModal.active { display: flex; }
         #photoModal.active #modalImg { transform: scale(1); }
 
         .back-btn { 
-            position: fixed; bottom: 30px; left: 0; width: 100%;
-            text-align: center; color: #444; font-size: 0.8rem; 
-            cursor: pointer; letter-spacing: 3px; z-index: 100;
+            position: fixed; bottom: 30px; 
+            color: #555; font-size: 0.8rem; cursor: pointer; 
+            letter-spacing: 3px; z-index: 100;
+            transition: 0.3s;
         }
+        .back-btn:hover { color: var(--main-red); }
     </style>
 </head>
 <body>
 
     <h2>GALLERY</h2>
     
-    <div id="universe-space">
-        </div>
+    <div class="gallery-container">
+        <div class="gallery-grid" id="galleryGrid">
+            </div>
+    </div>
 
     <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
 
@@ -124,48 +158,23 @@
         setVh();
 
         const totalPhotos = 21;
-        const space = document.getElementById('universe-space');
+        const grid = document.getElementById('galleryGrid');
 
         for (let i = 1; i <= totalPhotos; i++) {
             const item = document.createElement('div');
             item.className = 'gallery-item';
-            
-            // 1. 랜덤 위치 계산 (너무 가장자리에 치우치지 않게)
-            const posX = Math.random() * 70 + 5; // 5% ~ 75% 사이
-            const posY = Math.random() * 70 + 10; // 10% ~ 80% 사이
-            
-            // 2. 랜덤 애니메이션 설정
-            const duration = Math.random() * 5 + 5; // 5초 ~ 10초 사이 속도
-            const delay = Math.random() * -10; // 시작 시점 분산
-            const rotate = Math.random() * 20 - 10; // 초기 회전값 (-10deg ~ 10deg)
-
-            item.style.left = `${posX}%`;
-            item.style.top = `${posY}%`;
-            item.style.transform = `rotate(${rotate}deg)`;
-            
-            // 개별 유영 애니메이션 부여
-            item.animate([
-                { transform: `translate(0, 0) rotate(${rotate}deg)` },
-                { transform: `translate(${Math.random()*40-20}px, ${Math.random()*40-20}px) rotate(${rotate + 5}deg)` },
-                { transform: `translate(0, 0) rotate(${rotate}deg)` }
-            ], {
-                duration: duration * 1000,
-                iterations: Infinity,
-                easing: 'ease-in-out',
-                delay: delay * 1000
-            });
-
             item.onclick = function() { openModal(this); };
             
             const img = document.createElement('img');
             img.src = `gallery_img/photo${i}.jpg`;
+            img.loading = "lazy";
             
             img.onerror = function() {
                 item.style.display = 'none';
             };
 
             item.appendChild(img);
-            space.appendChild(item);
+            grid.appendChild(item);
         }
 
         function openModal(el) {
