@@ -45,88 +45,142 @@
             font-weight: 900;
             margin: 20px 0 15px 0;
             text-shadow: 0 0 20px rgba(255, 45, 85, 0.3);
+            z-index: 10;
         }
 
-        /* 📸 사진 그리드 영역 */
+        /* 📸 사진 그리드 (각각 독립적으로 둥둥 떪) */
         .gallery-grid { 
             flex: 1;
             overflow-y: auto; 
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 모바일 2열 */
-            gap: 12px;
-            padding-bottom: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            padding: 30px 15px 100px 15px;
         }
 
-        /* 태블릿/PC 3열 */
         @media (min-width: 600px) {
-            .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 40px; }
         }
 
         .gallery-item { 
             background: var(--box-bg);
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
             border: 1px solid var(--border-light);
             aspect-ratio: 1 / 1;
             position: relative;
             cursor: pointer;
-            transition: 0.3s;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            
+            /* ✨ 개별 둥둥 애니메이션 */
+            animation: floatIndividual 5s ease-in-out infinite;
         }
+
+        /* 각 아이템마다 움직임의 박자를 다르게 설정 */
+        .gallery-item:nth-child(3n) { animation-duration: 7s; animation-delay: -1s; }
+        .gallery-item:nth-child(3n+1) { animation-duration: 6s; animation-delay: -2s; }
+        .gallery-item:nth-child(3n+2) { animation-duration: 8s; animation-delay: -3s; }
 
         .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: transform 0.5s ease;
+            transition: transform 0.4s ease;
         }
 
-        .gallery-item:hover img { transform: scale(1.1); }
+        .gallery-item:hover { border-color: var(--main-red); }
 
-        .img-info {
-            position: absolute;
-            bottom: 0; width: 100%;
-            padding: 8px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
-            font-size: 0.65rem;
-            color: #ccc;
-            text-align: center;
+        /* 🚀 무중력 애니메이션 (더 불규칙하게) */
+        @keyframes floatIndividual {
+            0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+            33% { transform: translateY(-15px) translateX(5px) rotate(1deg); }
+            66% { transform: translateY(-5px) translateX(-5px) rotate(-1deg); }
+            100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
         }
 
-        .gallery-grid::-webkit-scrollbar { width: 4px; }
-        .gallery-grid::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
+        /* 🔍 확대 모달 디자인 */
+        #photoModal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none; /* 기본은 숨김 */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: zoom-out;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
 
-        .back-btn { text-align: center; padding: 20px 0; color: #555; text-decoration: none; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
+        #modalImg {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(255, 45, 85, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #photoModal.active { display: flex; }
+        #photoModal.active #modalImg { transform: scale(1); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .back-btn { text-align: center; padding: 20px 0; color: #555; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; z-index: 10; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>GALLERY</h2>
         
-        <div class="gallery-grid" id="galleryGrid">
-            <div class="gallery-item"><img src="gallery_img/photo1.jpg"><div class="img-info">NEBULA SEED 01</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo2.jpg"><div class="img-info">NEBULA SEED 02</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo3.jpg"><div class="img-info">NEBULA SEED 03</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo4.jpg"><div class="img-info">NEBULA SEED 04</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo5.jpg"><div class="img-info">NEBULA SEED 05</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo6.jpg"><div class="img-info">NEBULA SEED 06</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo7.jpg"><div class="img-info">NEBULA SEED 07</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo8.jpg"><div class="img-info">NEBULA SEED 08</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo9.jpg"><div class="img-info">NEBULA SEED 09</div></div>
-            <div class="gallery-item"><img src="gallery_img/photo10.jpg"><div class="img-info">NEBULA SEED 10</div></div>
-            </div>
+        <div class="gallery-grid">
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo1.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo2.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo3.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo4.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo5.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo6.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo7.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo8.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo9.jpg"></div>
+            <div class="gallery-item" onclick="openModal(this)"><img src="gallery_img/photo10.jpg"></div>
+        </div>
 
         <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
     </div>
 
+    <div id="photoModal" onclick="closeModal()">
+        <img id="modalImg" src="">
+    </div>
+
     <script>
-        // 기기별 높이 대응
+        // 기기 높이 대응
         function setVh() {
             let vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
         }
         window.addEventListener('resize', setVh);
         setVh();
+
+        // 🔍 사진 확대 기능
+        function openModal(element) {
+            const modal = document.getElementById('photoModal');
+            const modalImg = document.getElementById('modalImg');
+            const clickedImgSrc = element.querySelector('img').src;
+
+            modalImg.src = clickedImgSrc;
+            modal.classList.add('active');
+        }
+
+        // 닫기 기능
+        function closeModal() {
+            const modal = document.getElementById('photoModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('modalImg').src = "";
+            }, 300);
+        }
     </script>
 </body>
 </html>
