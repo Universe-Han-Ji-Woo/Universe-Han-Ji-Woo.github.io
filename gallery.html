@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Universe | 방명록</title>
+    <title>Universe | Gallery</title>
     
     <script src="config.js"></script>
 
     <style>
-        /* 🌌 전 기종 대응 반응형 유니버스 디자인 */
         :root {
             --main-red: #ff2d55;
             --bg-dark: #050a10;
@@ -20,20 +19,18 @@
         body { 
             background: var(--bg-dark); 
             color: #fff; 
-            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
-            margin: 0; 
-            padding: 0;
-            overflow: hidden; /* 전체 스크롤 방지, 내부 리스트만 스크롤 */
+            font-family: 'Apple SD Gothic Neo', sans-serif; 
+            margin: 0; padding: 0;
+            overflow: hidden;
             height: 100vh;
             height: calc(var(--vh, 1vh) * 100);
             display: flex;
             justify-content: center;
         }
 
-        /* 메인 컨테이너 - 모바일/태블릿/PC 통합 반응형 */
         .container { 
             width: 100%;
-            max-width: 600px; /* PC/태블릿에서도 가독성 좋은 폭 */
+            max-width: 800px;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -41,213 +38,95 @@
             box-sizing: border-box;
         }
         
-        /* 헤더 섹션 */
         h2 { 
             text-align: center; 
             font-size: clamp(1.5rem, 6vw, 2.2rem);
             letter-spacing: 5px; 
             font-weight: 900;
-            margin: 20px 0 5px 0;
+            margin: 20px 0 15px 0;
             text-shadow: 0 0 20px rgba(255, 45, 85, 0.3);
         }
 
-        .user-info { 
-            text-align: center; 
-            font-size: 0.8rem; 
-            color: #8ea8c9; 
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
-
-        /* 메시지 입력창 섹션 */
-        .input-box { 
-            display: flex; 
-            gap: 10px; 
-            background: var(--box-bg);
-            padding: 12px;
-            border-radius: 18px;
-            border: 1px solid var(--border-light);
-            margin-bottom: 20px;
-        }
-        input { 
-            flex: 1; 
-            padding: 12px 15px; 
-            border-radius: 12px; 
-            border: none; 
-            background: rgba(255,255,255,0.06); 
-            color: white; 
-            outline: none;
-            font-size: 16px; /* 아이폰 자동 줌 방지 */
-        }
-        button { 
-            padding: 0 22px; 
-            background: var(--main-red); 
-            border: none; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            color: #fff; 
-            transition: 0.3s ease;
-        }
-        button:active { transform: scale(0.95); }
-
-        /* 📜 메시지 리스트 섹션 (반응형 높이 조절) */
-        .msg-list { 
+        /* 📸 사진 그리드 영역 */
+        .gallery-grid { 
             flex: 1;
             overflow-y: auto; 
-            padding-right: 5px;
-            mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
-            -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 모바일 2열 */
+            gap: 12px;
+            padding-bottom: 30px;
         }
-        
-        /* 스크롤바 디자인 */
-        .msg-list::-webkit-scrollbar { width: 4px; }
-        .msg-list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
 
-        .msg-item { 
+        /* 태블릿/PC 3열 */
+        @media (min-width: 600px) {
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        }
+
+        .gallery-item { 
             background: var(--box-bg);
-            margin-bottom: 12px;
-            padding: 16px; 
-            border-radius: 18px;
+            border-radius: 12px;
+            overflow: hidden;
             border: 1px solid var(--border-light);
-            border-left: 4px solid var(--main-red);
-            animation: slideUp 0.4s ease-out forwards;
-        }
-        
-        .user-name { 
-            display: block;
-            color: var(--main-red); 
-            font-weight: 900; 
-            font-size: 0.75rem; 
-            margin-bottom: 6px;
-            letter-spacing: 1px;
-        }
-        .user-text {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #eee;
-            word-break: break-all;
-        }
-
-        /* 하단 뒤로가기 */
-        .back-btn { 
-            text-align: center; 
-            padding: 15px 0;
-            color: #555; 
-            text-decoration: none; 
-            font-size: 0.8rem; 
-            cursor: pointer; 
-            letter-spacing: 2px;
+            aspect-ratio: 1 / 1;
+            position: relative;
+            cursor: pointer;
             transition: 0.3s;
         }
-        .back-btn:hover { color: #8ea8c9; }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
         }
 
-        /* 📱 태블릿/PC 대응 추가 스타일 */
-        @media (min-width: 768px) {
-            .container { padding: 40px; }
-            .msg-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
+        .gallery-item:hover img { transform: scale(1.1); }
+
+        .img-info {
+            position: absolute;
+            bottom: 0; width: 100%;
+            padding: 8px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            font-size: 0.65rem;
+            color: #ccc;
+            text-align: center;
         }
+
+        .gallery-grid::-webkit-scrollbar { width: 4px; }
+        .gallery-grid::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
+
+        .back-btn { text-align: center; padding: 20px 0; color: #555; text-decoration: none; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>GUEST BOOK</h2>
-        <p class="user-info">CONNECTED: <span id="displayUser">---</span></p>
+        <h2>GALLERY</h2>
         
-        <div class="input-box">
-            <input type="text" id="msgInput" placeholder="우주 정거장에 메시지 기록..." autocomplete="off">
-            <button id="saveBtn">SEND</button>
-        </div>
-
-        <div class="msg-list" id="msgList">
-            <p style="text-align:center; padding-top:100px; color:#333; letter-spacing: 2px;">SYNCING UNIVERSE...</p>
-        </div>
+        <div class="gallery-grid" id="galleryGrid">
+            <div class="gallery-item"><img src="gallery_img/photo1.jpg"><div class="img-info">NEBULA SEED 01</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo2.jpg"><div class="img-info">NEBULA SEED 02</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo3.jpg"><div class="img-info">NEBULA SEED 03</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo4.jpg"><div class="img-info">NEBULA SEED 04</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo5.jpg"><div class="img-info">NEBULA SEED 05</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo6.jpg"><div class="img-info">NEBULA SEED 06</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo7.jpg"><div class="img-info">NEBULA SEED 07</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo8.jpg"><div class="img-info">NEBULA SEED 08</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo9.jpg"><div class="img-info">NEBULA SEED 09</div></div>
+            <div class="gallery-item"><img src="gallery_img/photo10.jpg"><div class="img-info">NEBULA SEED 10</div></div>
+            </div>
 
         <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
-        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-
-        // 사파리/모바일 높이 대응
+    <script>
+        // 기기별 높이 대응
         function setVh() {
             let vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
         }
         window.addEventListener('resize', setVh);
         setVh();
-
-        // 파이어베이스 초기화 (config.js의 firebaseConfig 사용)
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const guestbookRef = ref(db, 'guestbook');
-
-        const currentUser = Universe.getUser();
-        document.getElementById('displayUser').innerText = currentUser;
-
-        // 메시지 저장 함수 (기존 로직 보강)
-        window.saveMessage = function() {
-            const msgInput = document.getElementById('msgInput');
-            const msg = msgInput.value.trim();
-
-            if (!msg) return;
-
-            push(guestbookRef, {
-                name: currentUser, // 'name' 필드로 기존 데이터와 호환성 유지
-                message: msg,
-                timestamp: Date.now()
-            }).then(() => {
-                msgInput.value = '';
-                msgInput.focus();
-            }).catch((err) => {
-                console.error("기록 실패:", err);
-                alert("전송 에러가 발생했습니다.");
-            });
-        };
-
-        // 엔터키 지원
-        document.getElementById('msgInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') saveMessage();
-        });
-
-        document.getElementById('saveBtn').onclick = saveMessage;
-
-        // 메시지 실시간 로드 (기존 필드 + 새 필드 완벽 대응)
-        const recentMessagesQuery = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
-        
-        onValue(recentMessagesQuery, (snapshot) => {
-            const list = document.getElementById('msgList');
-            list.innerHTML = '';
-            
-            const data = snapshot.val();
-            if (data) {
-                const items = Object.keys(data).map(key => data[key]);
-                // 최신순 정렬
-                items.sort((a, b) => b.timestamp - a.timestamp);
-
-                items.forEach((item) => {
-                    // 🎯 undefined 방지 로직 (name 또는 user 필드 모두 체크)
-                    const userName = item.name || item.user || "VISITOR";
-                    
-                    const div = document.createElement('div');
-                    div.className = 'msg-item';
-                    div.innerHTML = `
-                        <span class="user-name">${userName}</span>
-                        <div class="user-text">${item.message}</div>
-                    `;
-                    list.appendChild(div);
-                });
-            } else {
-                list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
-            }
-        });
     </script>
 </body>
 </html>
