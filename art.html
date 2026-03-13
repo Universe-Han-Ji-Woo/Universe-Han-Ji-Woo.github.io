@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>UNIVERSE | 작품 저장소</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* 다른 페이지와 절대 겹치지 않도록 전체 경로에 ID 적용 */
+        #art-id-only.art-body-class {
+            margin: 0; padding: 0; background: #0b111e; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Noto Sans KR', sans-serif; overflow: hidden; position: relative;
+        }
+
+        #art-id-only .nebula-effect {
+            position: absolute; width: 300px; height: 300px;
+            background: radial-gradient(circle, #ff2d55 0%, transparent 70%);
+            filter: blur(60px); opacity: 0.1; animation: artPulse 4s infinite alternate;
+        }
+
+        #art-id-only .art-wrap { text-align: center; z-index: 10; padding: 20px; color: #fff; }
+        
+        #art-id-only .art-main-h { font-size: 26px; letter-spacing: 4px; margin-bottom: 10px; font-weight: 700; }
+        #art-id-only .art-sub-p { font-size: 15px; color: rgba(255,255,255,0.5); line-height: 1.6; font-weight: 300; }
+        
+        #art-id-only .art-line {
+            width: 100px; height: 1px; background: rgba(255,45,85,0.5);
+            margin: 30px auto; position: relative;
+        }
+
+        #art-id-only .btn-back {
+            display: inline-block; padding: 10px 30px; border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; text-decoration: none; border-radius: 30px; font-size: 13px; transition: 0.3s;
+        }
+        #art-id-only .btn-back:hover { background: #ff2d55; border-color: #ff2d55; }
+
+        @keyframes artPulse { from { transform: scale(1); opacity: 0.1; } to { transform: scale(1.5); opacity: 0.2; } }
+        
+        /* 모바일 반응형 */
+        @media screen and (max-width: 768px) {
+            #art-id-only .art-main-h { font-size: 20px; }
+            #art-id-only .art-sub-p { font-size: 14px; }
+        }
+    </style>
+</head>
+<body id="art-id-only" class="art-body-class">
+    <div class="nebula-effect"></div>
+    <div class="art-wrap">
+        <h1 class="art-main-h">ART STORAGE</h1>
+        <p class="art-sub-p">준비 중인 페이지입니다.<br>아름다운 작품들로 곧 채워질 예정입니다.</p>
+        <div class="art-line"></div>
+        <a href="index.html" class="btn-back">STATION RETURN</a>
+    </div>
+</body>
+</html>
