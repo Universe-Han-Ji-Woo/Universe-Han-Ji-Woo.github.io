@@ -48,7 +48,6 @@
             z-index: 10;
         }
 
-        /* 📸 사진 그리드 (각각 독립적으로 둥둥 떪) */
         .gallery-grid { 
             flex: 1;
             overflow-y: auto; 
@@ -62,6 +61,7 @@
             .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 40px; }
         }
 
+        /* 🪐 독립 유영 애니메이션 */
         .gallery-item { 
             background: var(--box-bg);
             border-radius: 15px;
@@ -71,14 +71,11 @@
             position: relative;
             cursor: pointer;
             box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            
-            /* ✨ 개별 둥둥 애니메이션 */
-            animation: floatIndividual 5s ease-in-out infinite;
+            animation: floatIndividual 6s ease-in-out infinite;
         }
 
-        /* 각 아이템마다 움직임의 박자를 다르게 설정 */
         .gallery-item:nth-child(3n) { animation-duration: 7s; animation-delay: -1s; }
-        .gallery-item:nth-child(3n+1) { animation-duration: 6s; animation-delay: -2s; }
+        .gallery-item:nth-child(3n+1) { animation-duration: 5s; animation-delay: -2s; }
         .gallery-item:nth-child(3n+2) { animation-duration: 8s; animation-delay: -3s; }
 
         .gallery-item img {
@@ -86,48 +83,41 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: transform 0.4s ease;
+            transition: 0.4s ease;
         }
 
-        .gallery-item:hover { border-color: var(--main-red); }
+        .gallery-item:hover { border-color: var(--main-red); z-index: 5; }
+        .gallery-item:hover img { transform: scale(1.1); }
 
-        /* 🚀 무중력 애니메이션 (더 불규칙하게) */
         @keyframes floatIndividual {
-            0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
-            33% { transform: translateY(-15px) translateX(5px) rotate(1deg); }
-            66% { transform: translateY(-5px) translateX(-5px) rotate(-1deg); }
-            100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
         }
 
-        /* 🔍 확대 모달 디자인 */
+        /* 🔍 클릭 확대 모달 */
         #photoModal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.95);
-            display: none; /* 기본은 숨김 */
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            cursor: zoom-out;
             backdrop-filter: blur(10px);
-            animation: fadeIn 0.3s ease;
         }
 
         #modalImg {
             max-width: 90%;
             max-height: 80%;
             border-radius: 10px;
-            box-shadow: 0 0 50px rgba(255, 45, 85, 0.2);
             transform: scale(0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         #photoModal.active { display: flex; }
         #photoModal.active #modalImg { transform: scale(1); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .back-btn { text-align: center; padding: 20px 0; color: #555; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; z-index: 10; }
+        .back-btn { text-align: center; padding: 20px 0; color: #555; text-decoration: none; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
     </style>
 </head>
 <body>
@@ -155,31 +145,23 @@
     </div>
 
     <script>
-        // 기기 높이 대응
+        // 화면 높이 설정
         function setVh() {
-            let vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
+            document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
         }
         window.addEventListener('resize', setVh);
         setVh();
 
-        // 🔍 사진 확대 기능
-        function openModal(element) {
+        // 사진 확대/축소
+        function openModal(el) {
             const modal = document.getElementById('photoModal');
             const modalImg = document.getElementById('modalImg');
-            const clickedImgSrc = element.querySelector('img').src;
-
-            modalImg.src = clickedImgSrc;
+            modalImg.src = el.querySelector('img').src;
             modal.classList.add('active');
         }
 
-        // 닫기 기능
         function closeModal() {
-            const modal = document.getElementById('photoModal');
-            modal.classList.remove('active');
-            setTimeout(() => {
-                document.getElementById('modalImg').src = "";
-            }, 300);
+            document.getElementById('photoModal').classList.remove('active');
         }
     </script>
 </body>
