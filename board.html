@@ -50,30 +50,35 @@
         .category { color: var(--main-red); font-weight: bold; margin-right: 5px; font-size: 12px; }
         .title-text:hover { text-decoration: underline; color: var(--main-red); }
 
-        /* 📱 모바일 반응형 핵심 수정 구역 */
+        /* 📱 모바일 반응형 최종 수정 구역 */
         @media screen and (max-width: 768px) {
             .board-container { padding: 0 10px 30px; }
             .header-title { font-size: 18px; }
-            .col-no, .col-date { display: none; } /* 번호와 날짜를 숨김 */
-            .col-views { display: table-cell; width: 50px; } /* 조회수를 다시 보이게 설정 */
-            .col-writer { width: 90px; }
+            .col-no, .col-date { display: none; } 
+            .col-views { display: table-cell; width: 45px; font-size: 11px; } 
+            .col-writer { width: 75px; font-size: 12px; }
             
-            th, td { padding: 12px 5px; font-size: 13px; }
-            .title-cell { padding-left: 10px; }
+            th, td { padding: 10px 5px; }
+            .title-cell { padding: 12px 10px; }
             
-            /* 공지 글자가 제목 안으로 들어가지 않게 줄바꿈 처리 */
+            /* '공지' 태그를 제목 위로 완벽히 격리 */
             .category { 
-                display: block; 
-                font-size: 10px; 
-                margin-bottom: 4px; 
-                line-height: 1;
+                display: inline-block; /* 세로 공간 확보를 위해 블록화 */
+                font-size: 9px; 
+                margin-bottom: 5px; 
+                padding: 1px 4px;
+                border: 0.5px solid rgba(255, 45, 85, 0.3);
+                border-radius: 4px;
+                line-height: 1.2;
             }
             .title-text {
-                display: block;
+                display: block; /* 줄바꿈 강제 실행 */
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                font-size: 14px;
+                font-size: 13px;
+                color: #fff;
+                opacity: 0.9;
             }
         }
 
