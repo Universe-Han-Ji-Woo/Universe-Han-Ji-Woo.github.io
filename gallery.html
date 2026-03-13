@@ -2,187 +2,252 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Universe | Galaxy Gallery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Universe | 방명록</title>
+    
+    <script src="config.js"></script>
+
     <style>
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #050a10; color: #fff;
-            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-            overflow-x: hidden;
+        /* 🌌 전 기종 대응 반응형 유니버스 디자인 */
+        :root {
+            --main-red: #ff2d55;
+            --bg-dark: #050a10;
+            --box-bg: rgba(255, 255, 255, 0.03);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --vh: 1vh;
         }
 
-        /* 🌌 배경 설정 */
-        .gallery-bg {
-            position: fixed; width: 100%; height: 100%;
-            background: radial-gradient(circle at 20% 30%, #1a1a2e 0%, #050a10 70%),
-                        radial-gradient(circle at 80% 70%, #16213e 0%, #050a10 70%);
-            z-index: -1;
+        body { 
+            background: var(--bg-dark); 
+            color: #fff; 
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            overflow: hidden; /* 전체 스크롤 방지, 내부 리스트만 스크롤 */
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
+            display: flex;
+            justify-content: center;
         }
 
-        /* 🚀 상단 헤더 */
-        .header {
-            padding: 60px 20px 40px; text-align: center;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .header h1 { font-family: 'Arial Black', sans-serif; letter-spacing: 10px; margin: 0; font-size: 1.8rem; }
-        .header p { color: #8ea8c9; font-size: 0.8rem; margin-top: 10px; letter-spacing: 2px; }
-
-        /* 🔙 뒤로가기 버튼 반응형 */
-        .back-btn {
-            position: fixed; top: 20px; left: 20px;
-            padding: 8px 16px; border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px; cursor: pointer; color: #fff; font-size: 0.75rem;
-            background: rgba(0,0,0,0.5); z-index: 100; transition: 0.3s;
-            backdrop-filter: blur(5px);
-        }
-        .back-btn:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
-
-        /* 🖼️ 사진 컨테이너 (그리드 레이아웃 적용) */
-        .nebula-container {
-            position: relative; width: 100%; 
-            max-width: 1400px; margin: 0 auto;
-            padding: 40px 20px; box-sizing: border-box;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
-            justify-items: center;
-        }
-
-        /* ✨ 사진 카드 스타일 */
-        .photo-star {
-            position: relative; width: 100%; max-width: 320px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 12px; border-radius: 10px;
+        /* 메인 컨테이너 - 모바일/태블릿/PC 통합 반응형 */
+        .container { 
+            width: 100%;
+            max-width: 600px; /* PC/태블릿에서도 가독성 좋은 폭 */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
             box-sizing: border-box;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* 헤더 섹션 */
+        h2 { 
+            text-align: center; 
+            font-size: clamp(1.5rem, 6vw, 2.2rem);
+            letter-spacing: 5px; 
+            font-weight: 900;
+            margin: 20px 0 5px 0;
+            text-shadow: 0 0 20px rgba(255, 45, 85, 0.3);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(1deg); }
+        .user-info { 
+            text-align: center; 
+            font-size: 0.8rem; 
+            color: #8ea8c9; 
+            margin-bottom: 20px;
+            opacity: 0.8;
         }
 
-        .photo-star img { width: 100%; border-radius: 6px; display: block; filter: grayscale(20%); transition: 0.5s; }
-        .photo-star:hover {
-            z-index: 50;
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.5);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            animation-play-state: paused;
-            transform: scale(1.05) translateY(-5px); 
+        /* 메시지 입력창 섹션 */
+        .input-box { 
+            display: flex; 
+            gap: 10px; 
+            background: var(--box-bg);
+            padding: 12px;
+            border-radius: 18px;
+            border: 1px solid var(--border-light);
+            margin-bottom: 20px;
         }
-        .photo-star:hover img { filter: grayscale(0%); }
+        input { 
+            flex: 1; 
+            padding: 12px 15px; 
+            border-radius: 12px; 
+            border: none; 
+            background: rgba(255,255,255,0.06); 
+            color: white; 
+            outline: none;
+            font-size: 16px; /* 아이폰 자동 줌 방지 */
+        }
+        button { 
+            padding: 0 22px; 
+            background: var(--main-red); 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: #fff; 
+            transition: 0.3s ease;
+        }
+        button:active { transform: scale(0.95); }
 
-        .photo-caption { font-size: 0.75rem; margin-top: 12px; text-align: center; color: #8ea8c9; letter-spacing: 1px; font-weight: bold; }
+        /* 📜 메시지 리스트 섹션 (반응형 높이 조절) */
+        .msg-list { 
+            flex: 1;
+            overflow-y: auto; 
+            padding-right: 5px;
+            mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+        }
+        
+        /* 스크롤바 디자인 */
+        .msg-list::-webkit-scrollbar { width: 4px; }
+        .msg-list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
 
-        /* 📱 [모바일 전용] 미디어 쿼리 */
-        @media (max-width: 768px) {
-            .header { padding: 80px 20px 30px; }
-            .header h1 { font-size: 1.4rem; letter-spacing: 5px; }
-            .header p { font-size: 0.7rem; }
-            
-            .nebula-container { 
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* 모바일은 2열 배치가 기본 */
-                gap: 15px;
-                padding: 20px 15px;
-            }
-            
-            .photo-star { padding: 8px; border-radius: 8px; }
-            .photo-caption { font-size: 0.6rem; margin-top: 8px; }
-            
-            .back-btn { top: 15px; left: 15px; font-size: 0.65rem; padding: 6px 12px; }
+        .msg-item { 
+            background: var(--box-bg);
+            margin-bottom: 12px;
+            padding: 16px; 
+            border-radius: 18px;
+            border: 1px solid var(--border-light);
+            border-left: 4px solid var(--main-red);
+            animation: slideUp 0.4s ease-out forwards;
+        }
+        
+        .user-name { 
+            display: block;
+            color: var(--main-red); 
+            font-weight: 900; 
+            font-size: 0.75rem; 
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        .user-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #eee;
+            word-break: break-all;
         }
 
-        /* 📱 아주 작은 화면 대응 */
-        @media (max-width: 360px) {
-            .nebula-container { grid-template-columns: 1fr; } /* 초소형 기기는 1열 */
+        /* 하단 뒤로가기 */
+        .back-btn { 
+            text-align: center; 
+            padding: 15px 0;
+            color: #555; 
+            text-decoration: none; 
+            font-size: 0.8rem; 
+            cursor: pointer; 
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+        .back-btn:hover { color: #8ea8c9; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 🔍 팝업(모달) 스타일 */
-        #photoModal {
-            display: none;
-            position: fixed; z-index: 1000;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(8px);
-            justify-content: center; align-items: center;
-            cursor: zoom-out;
+        /* 📱 태블릿/PC 대응 추가 스타일 */
+        @media (min-width: 768px) {
+            .container { padding: 40px; }
+            .msg-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
         }
-        #modalImg {
-            max-width: 95%; max-height: 90%;
-            border-radius: 5px; box-shadow: 0 0 50px rgba(255,255,255,0.2);
-            transform: scale(0.9); transition: 0.3s ease;
-        }
-        #photoModal.show #modalImg { transform: scale(1); }
     </style>
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const user = urlParams.get('user');
-
-        function goBack() {
-            if(user) location.href = `menu.html?user=${encodeURIComponent(user)}`;
-            else location.href = "index.html";
-        }
-
-        function openModal(src) {
-            const modal = document.getElementById("photoModal");
-            const modalImg = document.getElementById("modalImg");
-            modal.style.display = "flex";
-            setTimeout(() => modal.classList.add("show"), 10);
-            modalImg.src = src;
-        }
-
-        function closeModal() {
-            const modal = document.getElementById("photoModal");
-            modal.classList.remove("show");
-            setTimeout(() => modal.style.display = "none", 300);
-        }
-
-        window.onload = () => {
-            if (!user) { location.href = "index.html"; }
-        };
-    </script>
 </head>
 <body>
-    <div class="gallery-bg"></div>
-    <div class="back-btn" onclick="goBack()">← HUB</div>
+    <div class="container">
+        <h2>GUEST BOOK</h2>
+        <p class="user-info">CONNECTED: <span id="displayUser">---</span></p>
+        
+        <div class="input-box">
+            <input type="text" id="msgInput" placeholder="우주 정거장에 메시지 기록..." autocomplete="off">
+            <button id="saveBtn">SEND</button>
+        </div>
 
-    <div class="header">
-        <h1>GALAXY GALLERY</h1>
-        <p>성운 속에 흩어진 찬란한 순간들</p>
+        <div class="msg-list" id="msgList">
+            <p style="text-align:center; padding-top:100px; color:#333; letter-spacing: 2px;">SYNCING UNIVERSE...</p>
+        </div>
+
+        <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
     </div>
 
-    <div class="nebula-container">
-        <div class="photo-star"><img src="gallery_img/photo1.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 01</div></div>
-        <div class="photo-star"><img src="gallery_img/photo2.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 02</div></div>
-        <div class="photo-star"><img src="gallery_img/photo3.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 03</div></div>
-        <div class="photo-star"><img src="gallery_img/photo4.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 04</div></div>
-        <div class="photo-star"><img src="gallery_img/photo5.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 05</div></div>
-        <div class="photo-star"><img src="gallery_img/photo6.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 06</div></div>
-        <div class="photo-star"><img src="gallery_img/photo7.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 07</div></div>
-        <div class="photo-star"><img src="gallery_img/photo8.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 08</div></div>
-        <div class="photo-star"><img src="gallery_img/photo9.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 09</div></div>
-        <div class="photo-star"><img src="gallery_img/photo10.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 10</div></div>
-        <div class="photo-star"><img src="gallery_img/photo11.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 11</div></div>
-        <div class="photo-star"><img src="gallery_img/photo12.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 12</div></div>
-        <div class="photo-star"><img src="gallery_img/photo13.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 13</div></div>
-        <div class="photo-star"><img src="gallery_img/photo14.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 14</div></div>
-        <div class="photo-star"><img src="gallery_img/photo15.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 15</div></div>
-        <div class="photo-star"><img src="gallery_img/photo16.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 16</div></div>
-        <div class="photo-star"><img src="gallery_img/photo17.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 17</div></div>
-        <div class="photo-star"><img src="gallery_img/photo18.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 18</div></div>
-        <div class="photo-star"><img src="gallery_img/photo19.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 19</div></div>
-        <div class="photo-star"><img src="gallery_img/photo20.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 20</div></div>
-        <div class="photo-star"><img src="gallery_img/photo21.jpg" onclick="openModal(this.src)"><div class="photo-caption">NEBULA SEED 21</div></div>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-    <div id="photoModal" onclick="closeModal()">
-        <img id="modalImg" src="" alt="확대 이미지">
-    </div>
+        // 사파리/모바일 높이 대응
+        function setVh() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        window.addEventListener('resize', setVh);
+        setVh();
+
+        // 파이어베이스 초기화 (config.js의 firebaseConfig 사용)
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const guestbookRef = ref(db, 'guestbook');
+
+        const currentUser = Universe.getUser();
+        document.getElementById('displayUser').innerText = currentUser;
+
+        // 메시지 저장 함수 (기존 로직 보강)
+        window.saveMessage = function() {
+            const msgInput = document.getElementById('msgInput');
+            const msg = msgInput.value.trim();
+
+            if (!msg) return;
+
+            push(guestbookRef, {
+                name: currentUser, // 'name' 필드로 기존 데이터와 호환성 유지
+                message: msg,
+                timestamp: Date.now()
+            }).then(() => {
+                msgInput.value = '';
+                msgInput.focus();
+            }).catch((err) => {
+                console.error("기록 실패:", err);
+                alert("전송 에러가 발생했습니다.");
+            });
+        };
+
+        // 엔터키 지원
+        document.getElementById('msgInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveMessage();
+        });
+
+        document.getElementById('saveBtn').onclick = saveMessage;
+
+        // 메시지 실시간 로드 (기존 필드 + 새 필드 완벽 대응)
+        const recentMessagesQuery = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
+        
+        onValue(recentMessagesQuery, (snapshot) => {
+            const list = document.getElementById('msgList');
+            list.innerHTML = '';
+            
+            const data = snapshot.val();
+            if (data) {
+                const items = Object.keys(data).map(key => data[key]);
+                // 최신순 정렬
+                items.sort((a, b) => b.timestamp - a.timestamp);
+
+                items.forEach((item) => {
+                    // 🎯 undefined 방지 로직 (name 또는 user 필드 모두 체크)
+                    const userName = item.name || item.user || "VISITOR";
+                    
+                    const div = document.createElement('div');
+                    div.className = 'msg-item';
+                    div.innerHTML = `
+                        <span class="user-name">${userName}</span>
+                        <div class="user-text">${item.message}</div>
+                    `;
+                    list.appendChild(div);
+                });
+            } else {
+                list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
+            }
+        });
+    </script>
 </body>
 </html>
