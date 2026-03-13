@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Universe | 방명록</title>
+    <title>Universe | Gallery</title>
     
     <script src="config.js"></script>
 
     <style>
-        /* 🌌 전 기종 대응 반응형 유니버스 디자인 */
         :root {
             --main-red: #ff2d55;
             --bg-dark: #050a10;
@@ -20,7 +19,7 @@
         body { 
             background: var(--bg-dark); 
             color: #fff; 
-            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
+            font-family: 'Apple SD Gothic Neo', sans-serif; 
             margin: 0; padding: 0;
             overflow: hidden;
             height: 100vh;
@@ -31,7 +30,7 @@
 
         .container { 
             width: 100%;
-            max-width: 600px;
+            max-width: 800px; /* 갤러리는 조금 더 넓게 */
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -44,112 +43,73 @@
             font-size: clamp(1.5rem, 6vw, 2.2rem);
             letter-spacing: 5px; 
             font-weight: 900;
-            margin: 20px 0 5px 0;
+            margin: 20px 0 15px 0;
             text-shadow: 0 0 20px rgba(255, 45, 85, 0.3);
         }
 
-        .user-info { 
-            text-align: center; 
-            font-size: 0.8rem; 
-            color: #8ea8c9; 
-            margin-bottom: 15px;
-            opacity: 0.8;
-        }
-
-        /* ✍️ 입력 영역 보강 (닉네임 + 메시지) */
-        .input-area {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: var(--box-bg);
-            padding: 15px;
-            border-radius: 18px;
-            border: 1px solid var(--border-light);
-            margin-bottom: 20px;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        input { 
-            padding: 12px 15px; 
-            border-radius: 12px; 
-            border: none; 
-            background: rgba(255,255,255,0.06); 
-            color: white; 
-            outline: none;
-            font-size: 16px;
-        }
-
-        #nameInput { width: 100px; } /* 닉네임 칸은 짧게 */
-        #msgInput { flex: 1; } /* 메시지 칸은 길게 */
-
-        button { 
-            padding: 0 20px; 
-            background: var(--main-red); 
-            border: none; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            color: #fff; 
-            transition: 0.3s ease;
-        }
-        button:active { transform: scale(0.95); }
-
-        /* 📜 리스트 영역 */
-        .msg-list { 
+        /* 📸 사진 그리드 영역 */
+        .gallery-grid { 
             flex: 1;
             overflow-y: auto; 
-            padding-right: 5px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 기본 2열 */
+            gap: 15px;
+            padding-bottom: 20px;
             mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
         }
-        .msg-list::-webkit-scrollbar { width: 4px; }
-        .msg-list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
 
-        .msg-item { 
+        /* 태블릿/PC에서는 3열로 */
+        @media (min-width: 600px) {
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .gallery-item { 
             background: var(--box-bg);
-            margin-bottom: 12px;
-            padding: 16px; 
-            border-radius: 18px;
+            border-radius: 15px;
+            overflow: hidden;
             border: 1px solid var(--border-light);
-            border-left: 4px solid var(--main-red);
-            animation: slideUp 0.4s ease-out forwards;
+            aspect-ratio: 1 / 1; /* 정정사각형 유지 */
+            position: relative;
+            animation: fadeIn 0.5s ease-out forwards;
         }
-        
-        .user-name { 
-            display: block;
-            color: var(--main-red); 
-            font-weight: 900; 
-            font-size: 0.75rem; 
-            margin-bottom: 6px;
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
         }
-        .user-text { font-size: 0.95rem; line-height: 1.6; color: #eee; word-break: break-all; }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .img-info {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            font-size: 0.7rem;
+            color: #eee;
+        }
+
+        /* 스크롤바 */
+        .gallery-grid::-webkit-scrollbar { width: 4px; }
+        .gallery-grid::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
 
         .back-btn { text-align: center; padding: 15px 0; color: #555; text-decoration: none; font-size: 0.8rem; cursor: pointer; letter-spacing: 2px; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        @media (min-width: 768px) { .container { padding: 40px; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>GUEST BOOK</h2>
-        <p class="user-info">SYSTEM CONNECTED: <span id="displayUser">---</span></p>
+        <h2>GALLERY</h2>
         
-        <div class="input-area">
-            <div class="input-row">
-                <input type="text" id="nameInput" placeholder="닉네임" autocomplete="off">
-                <input type="text" id="msgInput" placeholder="우주 정거장에 메시지 기록..." autocomplete="off">
-                <button id="saveBtn">SEND</button>
-            </div>
-        </div>
-
-        <div class="msg-list" id="msgList">
-            <p style="text-align:center; padding-top:100px; color:#333; letter-spacing: 2px;">SYNCING UNIVERSE...</p>
+        <div class="gallery-grid" id="galleryGrid">
+            <p style="text-align:center; grid-column: 1/-1; padding-top:100px; color:#333;">LOADING UNIVERSE...</p>
         </div>
 
         <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
@@ -157,9 +117,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } 
+        import { getDatabase, ref, onValue, query, orderByChild } 
         from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+        // 기기별 높이 최적화
         function setVh() {
             let vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -169,63 +130,35 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const guestbookRef = ref(db, 'guestbook');
+        const galleryRef = ref(db, 'gallery'); // 갤러리 전용 경로
 
-        // 초기 로드 시 닉네임 입력칸에 현재 로그인된 ID를 기본으로 넣어줌 (수정 가능)
-        const currentUser = Universe.getUser();
-        document.getElementById('displayUser').innerText = currentUser;
-        document.getElementById('nameInput').value = currentUser;
-
-        // 메시지 저장 함수
-        window.saveMessage = function() {
-            const nameInput = document.getElementById('nameInput');
-            const msgInput = document.getElementById('msgInput');
+        // 📸 갤러리 데이터 실시간 로드
+        onValue(galleryRef, (snapshot) => {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
             
-            const name = nameInput.value.trim();
-            const msg = msgInput.value.trim();
-
-            if (!name) return alert("닉네임을 입력해주세요.");
-            if (!msg) return alert("메시지를 입력해주세요.");
-
-            push(guestbookRef, {
-                name: name, // 사용자가 직접 쓴 닉네임 저장
-                message: msg,
-                timestamp: Date.now()
-            }).then(() => {
-                msgInput.value = ''; // 메시지만 비우기
-                msgInput.focus();
-            }).catch((err) => {
-                console.error("기록 실패:", err);
-            });
-        };
-
-        document.getElementById('msgInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') saveMessage();
-        });
-
-        document.getElementById('saveBtn').onclick = saveMessage;
-
-        const recentMessagesQuery = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
-        
-        onValue(recentMessagesQuery, (snapshot) => {
-            const list = document.getElementById('msgList');
-            list.innerHTML = '';
             const data = snapshot.val();
             if (data) {
                 const items = Object.keys(data).map(key => data[key]);
-                items.sort((a, b) => b.timestamp - a.timestamp);
+                // 최신순 정렬 (timestamp가 있다면)
+                items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
                 items.forEach((item) => {
-                    const userName = item.name || item.user || "VISITOR";
                     const div = document.createElement('div');
-                    div.className = 'msg-item';
+                    div.className = 'gallery-item';
+                    
+                    // 이미지 경로(url)가 있는지 확인 후 출력
+                    const imgUrl = item.url || item.image || "";
+                    const title = item.title || "Universe Art";
+
                     div.innerHTML = `
-                        <span class="user-name">${userName}</span>
-                        <div class="user-text">${item.message}</div>
+                        <img src="${imgUrl}" alt="Gallery Image" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
+                        <div class="img-info">${title}</div>
                     `;
-                    list.appendChild(div);
+                    grid.appendChild(div);
                 });
             } else {
-                list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
+                grid.innerHTML = "<p style='text-align:center; grid-column: 1/-1; padding-top:100px; color:#222;'>NO PHOTOS YET</p>";
             }
         });
     </script>
