@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>UNIVERSE | 기록 보관소</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        #archive-id-only.archive-body-class {
+            margin: 0; padding: 0; background: #05080f; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Noto Sans KR', sans-serif; overflow: hidden;
+        }
+
+        #archive-id-only .archive-card {
+            border: 1px solid rgba(255,45,85,0.2); background: rgba(11, 17, 30, 0.8);
+            padding: 40px 30px; text-align: center; color: #fff; max-width: 400px; width: 80%;
+        }
+
+        #archive-id-only .status-code {
+            color: #ff2d55; font-family: monospace; font-size: 12px; margin-bottom: 15px; display: block;
+        }
+
+        #archive-id-only .archive-h { font-size: 22px; letter-spacing: 5px; margin: 0 0 15px 0; }
+        #archive-id-only .archive-p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 30px; }
+
+        #archive-id-only .btn-go {
+            border: 1px solid #ff2d55; color: #ff2d55; text-decoration: none;
+            padding: 8px 25px; font-size: 12px; font-weight: bold; transition: 0.3s;
+        }
+        #archive-id-only .btn-go:hover { background: #ff2d55; color: #fff; }
+
+        @media screen and (max-width: 768px) {
+            #archive-id-only .archive-card { width: 85%; padding: 30px 20px; }
+            #archive-id-only .archive-h { font-size: 18px; }
+        }
+    </style>
+</head>
+<body id="archive-id-only" class="archive-body-class">
+    <div class="archive-card">
+        <span class="status-code">SYSTEM_STATUS: PREPARING...</span>
+        <h1 class="archive-h">기록 보관소</h1>
+        <p class="archive-p">소중한 기록들을 동기화하고 있습니다.<br>잠시만 기다려 주시기 바랍니다.</p>
+        <a href="index.html" class="btn-go">RETURN HOME</a>
+    </div>
+</body>
+</html>
