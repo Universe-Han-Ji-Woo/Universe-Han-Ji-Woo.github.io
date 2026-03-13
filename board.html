@@ -47,38 +47,39 @@
         .col-views { width: 70px; }
 
         .title-cell { text-align: left; padding-left: 20px; cursor: pointer; }
-        .category { color: var(--main-red); font-weight: bold; margin-right: 5px; font-size: 12px; }
+        
+        /* 기본 제목 레이아웃 (Flex 사용) */
+        .title-wrapper { display: flex; align-items: center; gap: 6px; width: 100%; }
+        .category { color: var(--main-red); font-weight: bold; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+        .title-text { 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            flex-grow: 1; min-width: 0; 
+        }
         .title-text:hover { text-decoration: underline; color: var(--main-red); }
 
-        /* 📱 모바일 반응형 최종 수정 구역 */
+        /* 📱 모바일 반응형 최적화 */
         @media screen and (max-width: 768px) {
             .board-container { padding: 0 10px 30px; }
             .header-title { font-size: 18px; }
             .col-no, .col-date { display: none; } 
-            .col-views { display: table-cell; width: 45px; font-size: 11px; } 
-            .col-writer { width: 75px; font-size: 12px; }
+            .col-views { display: table-cell; width: 40px; font-size: 11px; } 
+            .col-writer { width: 70px; font-size: 12px; }
             
-            th, td { padding: 10px 5px; }
-            .title-cell { padding: 12px 10px; }
+            th, td { padding: 12px 5px; }
+            .title-cell { padding: 12px 8px; }
             
-            /* '공지' 태그를 제목 위로 완벽히 격리 */
+            /* 모바일에서도 한 줄로 유지하되 간격 조정 */
+            .title-wrapper { align-items: center; }
             .category { 
-                display: inline-block; /* 세로 공간 확보를 위해 블록화 */
-                font-size: 9px; 
-                margin-bottom: 5px; 
+                font-size: 10px; 
                 padding: 1px 4px;
-                border: 0.5px solid rgba(255, 45, 85, 0.3);
-                border-radius: 4px;
-                line-height: 1.2;
+                border: 0.5px solid rgba(255, 45, 85, 0.4);
+                border-radius: 3px;
+                background: rgba(255, 45, 85, 0.05);
             }
             .title-text {
-                display: block; /* 줄바꿈 강제 실행 */
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
                 font-size: 13px;
-                color: #fff;
-                opacity: 0.9;
+                color: #e0e0e0;
             }
         }
 
@@ -156,8 +157,10 @@
                     row.innerHTML = `
                         <td class="col-no">${no--}</td>
                         <td class="title-cell">
-                            <span class="category">${post.category || '일반'}</span>
-                            <span class="title-text">${post.title || '제목 없음'}</span>
+                            <div class="title-wrapper">
+                                <span class="category">${post.category || '일반'}</span>
+                                <span class="title-text">${post.title || '제목 없음'}</span>
+                            </div>
                         </td>
                         <td class="col-writer">${post.writer || '익명'}</td>
                         <td class="col-date date-text">${(post.date || '').split(' ')[0]}</td>
