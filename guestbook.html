@@ -61,6 +61,7 @@
             border-radius: 12px; cursor: pointer; font-weight: bold; color: #fff; font-size: 13px;
         }
 
+        /* 스크롤바 숨김 처리 유지 */
         .msg-list { 
             flex: 1; overflow-y: auto; padding-right: 5px;
             -webkit-overflow-scrolling: touch;
@@ -68,8 +69,7 @@
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
         }
         
-        .msg-list::-webkit-scrollbar { width: 3px; }
-        .msg-list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
+        .msg-list::-webkit-scrollbar { display: none; width: 0; } /* 스크롤바 완전 숨김 */
 
         .msg-item { 
             background: var(--box-bg); margin-bottom: 12px; padding: 15px; 
@@ -97,9 +97,7 @@
             font-size: 10px !important;
             cursor: pointer !important;
             z-index: 10 !important;
-            -webkit-tap-highlight-color: transparent;
         }
-        .del-btn:active { background: var(--main-red) !important; color: #fff !important; }
 
         .back-btn { text-align: center; padding: 15px 0; color: #444; text-decoration: none; font-size: 0.75rem; cursor: pointer; letter-spacing: 2px; }
 
@@ -133,6 +131,7 @@
         window.addEventListener('resize', setVh);
         setVh();
 
+        // 고유 ID 확인
         if (!localStorage.getItem('guest_uuid')) {
             localStorage.setItem('guest_uuid', btoa(Date.now() + Math.random()).substring(0, 12));
         }
@@ -149,7 +148,6 @@
         // 관리자 상태 감지
         onAuthStateChanged(auth, (user) => {
             isAdminNow = (user && user.email === ADMIN_EMAIL);
-            loadMessages(); // 상태 바뀔 때마다 다시 그림
         });
 
         const currentUser = (typeof Universe !== 'undefined' && Universe.getUser) ? Universe.getUser() : "VISITOR";
@@ -172,47 +170,42 @@
             });
         };
 
-        // 삭제 로직: 관리자거나 본인 글이면 즉시 삭제
-        window.deleteMsg = function(key, writerUid) {
-            if (isAdminNow || writerUid === myUuid) {
-                remove(ref(db, `guestbook/${key}`));
-            } else {
-                alert("본인만 삭제 가능합니다.");
-            }
+        // 삭제 로직 (전역 등록)
+        window.deleteMsg = function(key) {
+            remove(ref(db, `guestbook/${key}`)).catch(e => console.error(e));
         };
 
         document.getElementById('msgInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveMessage(); });
         document.getElementById('saveBtn').onclick = saveMessage;
 
-        function loadMessages() {
-            const q = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
-            onValue(q, (snapshot) => {
-                const list = document.getElementById('msgList');
-                list.innerHTML = '';
-                const data = snapshot.val();
-                if (data) {
-                    const sortedKeys = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
-                    sortedKeys.forEach((key) => {
-                        const item = data[key];
-                        
-                        // 관리자면 무조건 보이고, 일반인은 본인 글(UUID 일치)만 보임
-                        const showBtn = (isAdminNow || item.uid === myUuid);
-                        const delBtnHtml = showBtn ? `<div class="del-btn" onclick="deleteMsg('${key}', '${item.uid || ''}')">✕</div>` : '';
-                        
-                        const div = document.createElement('div');
-                        div.className = 'msg-item';
-                        div.innerHTML = `
-                            <span class="user-name">${item.name || "VISITOR"}</span>
-                            <div class="user-text">${item.message}</div>
-                            ${delBtnHtml}
-                        `;
-                        list.appendChild(div);
-                    });
-                } else {
-                    list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
-                }
-            });
-        }
+        // 메시지 불러오기 (리스너 하나로 통합하여 스크롤/삭제 버튼 처리)
+        const q = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
+        onValue(q, (snapshot) => {
+            const list = document.getElementById('msgList');
+            list.innerHTML = '';
+            const data = snapshot.val();
+            if (data) {
+                const sortedKeys = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
+                sortedKeys.forEach((key) => {
+                    const item = data[key];
+                    
+                    // 본인이거나 관리자일 때만 삭제 버튼 HTML 생성
+                    const canDelete = (isAdminNow || item.uid === myUuid);
+                    const delBtnHtml = canDelete ? `<div class="del-btn" onclick="deleteMsg('${key}')">✕</div>` : '';
+                    
+                    const div = document.createElement('div');
+                    div.className = 'msg-item';
+                    div.innerHTML = `
+                        <span class="user-name">${item.name || "VISITOR"}</span>
+                        <div class="user-text">${item.message}</div>
+                        ${delBtnHtml}
+                    `;
+                    list.appendChild(div);
+                });
+            } else {
+                list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
+            }
+        });
     </script>
 </body>
 </html>
