@@ -16,14 +16,10 @@
             --vh: 1vh;
         }
 
-        /* [반응형 최적화] 전 기기 스크롤 바 방지 및 높이 고정 */
         html, body { 
-            background: var(--bg-dark); 
-            color: #fff; 
+            background: var(--bg-dark); color: #fff; 
             font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; 
-            margin: 0; padding: 0;
-            overflow: hidden !important; 
-            height: 100vh;
+            margin: 0; padding: 0; overflow: hidden !important; 
             height: calc(var(--vh, 1vh) * 100);
             -webkit-text-size-adjust: none;
         }
@@ -32,8 +28,7 @@
 
         .container { 
             width: 100%; max-width: 600px; height: 100%;
-            display: flex; flex-direction: column; 
-            padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: column; padding: 20px; box-sizing: border-box;
             position: relative;
         }
         
@@ -45,7 +40,6 @@
 
         .user-info { text-align: center; font-size: 0.75rem; color: #8ea8c9; margin-bottom: 10px; opacity: 0.8; }
 
-        /* 입력 영역 반응형 조정 */
         .input-area {
             display: flex; flex-direction: column; gap: 10px; background: var(--box-bg);
             padding: 12px; border-radius: 18px; border: 1px solid var(--border-light); margin-bottom: 15px;
@@ -56,7 +50,7 @@
 
         input { 
             padding: 12px; border-radius: 12px; border: none; 
-            background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 16px; /* 아이폰 자동줌 방지 16px */
+            background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 16px;
         }
 
         #nameInput { width: 80px; flex-shrink: 0; }
@@ -65,13 +59,11 @@
         button#saveBtn { 
             padding: 0 15px; background: var(--main-red); border: none; 
             border-radius: 12px; cursor: pointer; font-weight: bold; color: #fff; font-size: 13px;
-            flex-shrink: 0;
         }
 
-        /* [리스트 영역] 모바일/PC 개별 스크롤 */
         .msg-list { 
             flex: 1; overflow-y: auto; padding-right: 5px;
-            -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+            -webkit-overflow-scrolling: touch;
             mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
         }
@@ -89,40 +81,29 @@
         .user-name { display: block; color: var(--main-red); font-weight: 900; font-size: 0.7rem; margin-bottom: 4px; }
         .user-text { font-size: 0.9rem; line-height: 1.5; color: #eee; word-break: break-all; padding-right: 35px; }
 
-        /* [강조] 삭제 버튼 - 모든 기기에서 선명하게 보이도록 수정 */
         .del-btn {
             position: absolute !important;
             top: 10px !important;
             right: 10px !important;
             width: 24px !important;
             height: 24px !important;
-            background-color: var(--main-red) !important;
-            color: #fff !important;
-            border-radius: 8px !important;
+            background-color: rgba(255, 45, 85, 0.2) !important;
+            border: 1px solid var(--main-red) !important;
+            color: var(--main-red) !important;
+            border-radius: 6px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            font-size: 12px !important;
-            font-weight: bold !important;
+            font-size: 10px !important;
             cursor: pointer !important;
-            z-index: 1000 !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 10 !important;
             -webkit-tap-highlight-color: transparent;
         }
+        .del-btn:active { background: var(--main-red) !important; color: #fff !important; }
 
-        .back-btn { 
-            text-align: center; padding: 15px 0; color: #444; 
-            text-decoration: none; font-size: 0.75rem; cursor: pointer; 
-            letter-spacing: 2px; flex-shrink: 0;
-        }
+        .back-btn { text-align: center; padding: 15px 0; color: #444; text-decoration: none; font-size: 0.75rem; cursor: pointer; letter-spacing: 2px; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 태블릿/PC 반응형 추가 조정 */
-        @media (min-width: 768px) {
-            .container { max-width: 700px; padding: 40px; }
-            h2 { font-size: 2.2rem; }
-        }
     </style>
 </head>
 <body>
@@ -132,16 +113,13 @@
         
         <div class="input-area">
             <div class="input-row">
-                <input type="text" id="nameInput" placeholder="닉네임" autocomplete="off">
+                <input type="text" id="nameInput" placeholder="닉네임">
                 <input type="text" id="msgInput" placeholder="메시지 기록..." autocomplete="off">
                 <button id="saveBtn">SEND</button>
             </div>
         </div>
 
-        <div class="msg-list" id="msgList">
-            <p style="text-align:center; padding-top:100px; color:#333; letter-spacing: 2px;">SYNCING UNIVERSE...</p>
-        </div>
-
+        <div class="msg-list" id="msgList"></div>
         <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
     </div>
 
@@ -151,27 +129,27 @@
         from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-        // 기기별 높이(VH) 보정
-        function setVh() {
-            document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-        }
+        function setVh() { document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
         window.addEventListener('resize', setVh);
-        window.addEventListener('orientationchange', setVh);
         setVh();
+
+        if (!localStorage.getItem('guest_uuid')) {
+            localStorage.setItem('guest_uuid', btoa(Date.now() + Math.random()).substring(0, 12));
+        }
+        const myUuid = localStorage.getItem('guest_uuid');
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
         const guestbookRef = ref(db, 'guestbook');
-
+        
         const ADMIN_EMAIL = "joar6563@naver.com";
         let isAdminNow = false;
 
-        // [핵심 수정] 인증 상태 변화 감지 즉시 리스트 재렌더링
+        // 관리자 상태 감지
         onAuthStateChanged(auth, (user) => {
             isAdminNow = (user && user.email === ADMIN_EMAIL);
-            console.log("Admin Status:", isAdminNow); // 디버깅용
-            loadMessages(); 
+            loadMessages(); // 상태 바뀔 때마다 다시 그림
         });
 
         const currentUser = (typeof Universe !== 'undefined' && Universe.getUser) ? Universe.getUser() : "VISITOR";
@@ -186,17 +164,20 @@
             push(guestbookRef, { 
                 name: nameInput.value.trim(), 
                 message: msgInput.value.trim(), 
-                timestamp: Date.now() 
+                timestamp: Date.now(),
+                uid: myUuid
             }).then(() => { 
                 msgInput.value = ''; 
                 if(!(/iPhone|iPad|iPod/i.test(navigator.userAgent))) msgInput.focus();
             });
         };
 
-        window.deleteMsg = function(key) {
-            if (!isAdminNow) return;
-            if (confirm("이 기록을 영구히 소멸시키겠습니까?")) {
-                remove(ref(db, `guestbook/${key}`)).catch(e => console.error(e));
+        // 삭제 로직: 관리자거나 본인 글이면 즉시 삭제
+        window.deleteMsg = function(key, writerUid) {
+            if (isAdminNow || writerUid === myUuid) {
+                remove(ref(db, `guestbook/${key}`));
+            } else {
+                alert("본인만 삭제 가능합니다.");
             }
         };
 
@@ -209,17 +190,17 @@
                 const list = document.getElementById('msgList');
                 list.innerHTML = '';
                 const data = snapshot.val();
-                
                 if (data) {
                     const sortedKeys = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
                     sortedKeys.forEach((key) => {
                         const item = data[key];
+                        
+                        // 관리자면 무조건 보이고, 일반인은 본인 글(UUID 일치)만 보임
+                        const showBtn = (isAdminNow || item.uid === myUuid);
+                        const delBtnHtml = showBtn ? `<div class="del-btn" onclick="deleteMsg('${key}', '${item.uid || ''}')">✕</div>` : '';
+                        
                         const div = document.createElement('div');
                         div.className = 'msg-item';
-                        
-                        // 관리자 로그인 시에만 삭제 버튼 생성
-                        const delBtnHtml = isAdminNow ? `<div class="del-btn" onclick="deleteMsg('${key}')">✕</div>` : '';
-                        
                         div.innerHTML = `
                             <span class="user-name">${item.name || "VISITOR"}</span>
                             <div class="user-text">${item.message}</div>
