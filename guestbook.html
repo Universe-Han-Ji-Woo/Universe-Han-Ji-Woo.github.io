@@ -1,9 +1,99 @@
-<script type="module">
-    // ... 상단 import 부분 동일 ...
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Universe | Guest Book</title>
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --main-red: #ff2d55;
+            --bg-dark: #050a10;
+            --box-bg: rgba(255, 255, 255, 0.03);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --vh: 1vh;
+        }
+        html, body { background: var(--bg-dark); color: #fff; font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; overflow: hidden !important; height: calc(var(--vh, 1vh) * 100); }
+        body { display: flex; justify-content: center; align-items: flex-start; }
+        .container { width: 100%; max-width: 600px; height: 100%; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; position: relative; }
+        h2 { text-align: center; font-size: clamp(1.2rem, 5vw, 1.8rem); letter-spacing: 5px; font-weight: 900; margin: 15px 0 5px 0; text-shadow: 0 0 20px rgba(255, 45, 85, 0.3); }
+        .user-info { text-align: center; font-size: 0.75rem; color: #8ea8c9; margin-bottom: 10px; opacity: 0.8; }
+        .input-area { display: flex; flex-direction: column; gap: 10px; background: var(--box-bg); padding: 12px; border-radius: 18px; border: 1px solid var(--border-light); margin-bottom: 15px; flex-shrink: 0; }
+        .input-row { display: flex; gap: 8px; }
+        input { padding: 12px; border-radius: 12px; border: none; background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 16px; }
+        #nameInput { width: 80px; flex-shrink: 0; }
+        #msgInput { flex: 1; min-width: 0; }
+        button#saveBtn { padding: 0 15px; background: var(--main-red); border: none; border-radius: 12px; cursor: pointer; font-weight: bold; color: #fff; font-size: 13px; }
+        .msg-list { flex: 1; overflow-y: auto; padding-right: 5px; -webkit-overflow-scrolling: touch; }
+        .msg-list::-webkit-scrollbar { display: none; width: 0; } 
+        .msg-item { background: var(--box-bg); margin-bottom: 12px; padding: 15px; border-radius: 16px; border: 1px solid var(--border-light); border-left: 3px solid var(--main-red); animation: slideUp 0.4s ease-out forwards; position: relative; overflow: visible; }
+        .user-name { display: block; color: var(--main-red); font-weight: 900; font-size: 0.7rem; margin-bottom: 4px; }
+        .user-text { font-size: 0.9rem; line-height: 1.5; color: #eee; word-break: break-all; padding-right: 35px; }
+        .del-btn { position: absolute !important; top: 10px !important; right: 10px !important; width: 24px !important; height: 24px !important; background-color: rgba(255, 45, 85, 0.2) !important; border: 1px solid var(--main-red) !important; color: var(--main-red) !important; border-radius: 6px !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 10px !important; cursor: pointer !important; z-index: 99 !important; }
+        .back-btn { text-align: center; padding: 15px 0; color: #444; text-decoration: none; font-size: 0.75rem; cursor: pointer; letter-spacing: 2px; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>GUEST BOOK</h2>
+        <p class="user-info">CONNECTED: <span id="displayUser">---</span></p>
+        <div class="input-area">
+            <div class="input-row">
+                <input type="text" id="nameInput" placeholder="닉네임">
+                <input type="text" id="msgInput" placeholder="메시지 기록..." autocomplete="off">
+                <button id="saveBtn">SEND</button>
+            </div>
+        </div>
+        <div class="msg-list" id="msgList"></div>
+        <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
+    </div>
 
-    // (중략) ... Firebase 초기화 및 설정 부분 동일 ...
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast, remove } 
+        from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-    function startListening() {
+        function setVh() { document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
+        window.addEventListener('resize', setVh); setVh();
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const guestbookRef = ref(db, 'guestbook');
+        
+        // 현재 사용자 정보 로드
+        const currentUser = (typeof Universe !== 'undefined' && Universe.getUser) ? Universe.getUser() : "VISITOR";
+        document.getElementById('displayUser').innerText = currentUser;
+        document.getElementById('nameInput').value = currentUser;
+
+        window.saveMessage = function() {
+            const nameInput = document.getElementById('nameInput');
+            const msgInput = document.getElementById('msgInput');
+            if (!nameInput.value.trim() || !msgInput.value.trim()) return;
+            
+            push(guestbookRef, { 
+                name: nameInput.value.trim(), 
+                message: msgInput.value.trim(), 
+                timestamp: Date.now()
+                // uid 저장은 복구 후를 위해 생략하지 않음
+            }).then(() => { 
+                msgInput.value = ''; 
+                if(!(/iPhone|iPad|iPod/i.test(navigator.userAgent))) msgInput.focus();
+            });
+        };
+
+        window.deleteMsg = function(key) {
+            if(confirm("이 글을 삭제하시겠습니까?")) {
+                remove(ref(db, `guestbook/${key}`));
+            }
+        };
+
+        document.getElementById('msgInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveMessage(); });
+        document.getElementById('saveBtn').onclick = saveMessage;
+
+        // 메시지 리스너 실행
         const q = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
         onValue(q, (snapshot) => {
             const list = document.getElementById('msgList');
@@ -14,8 +104,7 @@
                 sortedKeys.forEach((key) => {
                     const item = data[key];
                     
-                    // [긴급 수정] 권한 체크를 하지 않고 무조건 true로 설정하여 
-                    // 모든 글(기존 글 포함)에 삭제 버튼이 보이게 합니다.
+                    // [긴급 삭제 모드] 모든 글에 삭제 버튼이 보이도록 true 설정
                     const canDelete = true; 
 
                     const div = document.createElement('div');
@@ -31,5 +120,6 @@
                 list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
             }
         });
-    }
-</script>
+    </script>
+</body>
+</html>
