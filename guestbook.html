@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Universe | Guest Book</title>
-    
     <script src="config.js"></script>
 
     <style>
@@ -25,51 +24,18 @@
         }
 
         body { display: flex; justify-content: center; align-items: flex-start; }
-
-        .container { 
-            width: 100%; max-width: 600px; height: 100%;
-            display: flex; flex-direction: column; padding: 20px; box-sizing: border-box;
-            position: relative;
-        }
-        
-        h2 { 
-            text-align: center; font-size: clamp(1.2rem, 5vw, 1.8rem);
-            letter-spacing: 5px; font-weight: 900; margin: 15px 0 5px 0;
-            text-shadow: 0 0 20px rgba(255, 45, 85, 0.3);
-        }
-
+        .container { width: 100%; max-width: 600px; height: 100%; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; position: relative; }
+        h2 { text-align: center; font-size: clamp(1.2rem, 5vw, 1.8rem); letter-spacing: 5px; font-weight: 900; margin: 15px 0 5px 0; text-shadow: 0 0 20px rgba(255, 45, 85, 0.3); }
         .user-info { text-align: center; font-size: 0.75rem; color: #8ea8c9; margin-bottom: 10px; opacity: 0.8; }
-
-        .input-area {
-            display: flex; flex-direction: column; gap: 10px; background: var(--box-bg);
-            padding: 12px; border-radius: 18px; border: 1px solid var(--border-light); margin-bottom: 15px;
-            flex-shrink: 0;
-        }
-
+        .input-area { display: flex; flex-direction: column; gap: 10px; background: var(--box-bg); padding: 12px; border-radius: 18px; border: 1px solid var(--border-light); margin-bottom: 15px; flex-shrink: 0; }
         .input-row { display: flex; gap: 8px; }
-
-        input { 
-            padding: 12px; border-radius: 12px; border: none; 
-            background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 16px;
-        }
-
+        input { padding: 12px; border-radius: 12px; border: none; background: rgba(255,255,255,0.08); color: white; outline: none; font-size: 16px; }
         #nameInput { width: 80px; flex-shrink: 0; }
         #msgInput { flex: 1; min-width: 0; }
+        button#saveBtn { padding: 0 15px; background: var(--main-red); border: none; border-radius: 12px; cursor: pointer; font-weight: bold; color: #fff; font-size: 13px; }
 
-        button#saveBtn { 
-            padding: 0 15px; background: var(--main-red); border: none; 
-            border-radius: 12px; cursor: pointer; font-weight: bold; color: #fff; font-size: 13px;
-        }
-
-        /* 스크롤바 숨김 처리 유지 */
-        .msg-list { 
-            flex: 1; overflow-y: auto; padding-right: 5px;
-            -webkit-overflow-scrolling: touch;
-            mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
-            -webkit-mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
-        }
-        
-        .msg-list::-webkit-scrollbar { display: none; width: 0; } /* 스크롤바 완전 숨김 */
+        .msg-list { flex: 1; overflow-y: auto; padding-right: 5px; -webkit-overflow-scrolling: touch; }
+        .msg-list::-webkit-scrollbar { display: none; width: 0; } 
 
         .msg-item { 
             background: var(--box-bg); margin-bottom: 12px; padding: 15px; 
@@ -81,6 +47,7 @@
         .user-name { display: block; color: var(--main-red); font-weight: 900; font-size: 0.7rem; margin-bottom: 4px; }
         .user-text { font-size: 0.9rem; line-height: 1.5; color: #eee; word-break: break-all; padding-right: 35px; }
 
+        /* 삭제 버튼 스타일 강제 적용 */
         .del-btn {
             position: absolute !important;
             top: 10px !important;
@@ -96,11 +63,10 @@
             justify-content: center !important;
             font-size: 10px !important;
             cursor: pointer !important;
-            z-index: 10 !important;
+            z-index: 99 !important;
         }
 
         .back-btn { text-align: center; padding: 15px 0; color: #444; text-decoration: none; font-size: 0.75rem; cursor: pointer; letter-spacing: 2px; }
-
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -108,7 +74,6 @@
     <div class="container">
         <h2>GUEST BOOK</h2>
         <p class="user-info">CONNECTED: <span id="displayUser">---</span></p>
-        
         <div class="input-area">
             <div class="input-row">
                 <input type="text" id="nameInput" placeholder="닉네임">
@@ -116,7 +81,6 @@
                 <button id="saveBtn">SEND</button>
             </div>
         </div>
-
         <div class="msg-list" id="msgList"></div>
         <div class="back-btn" onclick="Universe.navigateTo('MENU')">[ RETURN TO TOWER ]</div>
     </div>
@@ -128,10 +92,8 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         function setVh() { document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
-        window.addEventListener('resize', setVh);
-        setVh();
+        window.addEventListener('resize', setVh); setVh();
 
-        // 고유 ID 확인
         if (!localStorage.getItem('guest_uuid')) {
             localStorage.setItem('guest_uuid', btoa(Date.now() + Math.random()).substring(0, 12));
         }
@@ -145,9 +107,10 @@
         const ADMIN_EMAIL = "joar6563@naver.com";
         let isAdminNow = false;
 
-        // 관리자 상태 감지
+        // [변경] 관리자 인증 완료 후 메시지를 불러오도록 순서 보장
         onAuthStateChanged(auth, (user) => {
             isAdminNow = (user && user.email === ADMIN_EMAIL);
+            startListening(); // 인증 체크 후 리스너 시작
         });
 
         const currentUser = (typeof Universe !== 'undefined' && Universe.getUser) ? Universe.getUser() : "VISITOR";
@@ -163,49 +126,50 @@
                 name: nameInput.value.trim(), 
                 message: msgInput.value.trim(), 
                 timestamp: Date.now(),
-                uid: myUuid
+                uid: myUuid // UUID 저장 확인
             }).then(() => { 
                 msgInput.value = ''; 
                 if(!(/iPhone|iPad|iPod/i.test(navigator.userAgent))) msgInput.focus();
             });
         };
 
-        // 삭제 로직 (전역 등록)
         window.deleteMsg = function(key) {
-            remove(ref(db, `guestbook/${key}`)).catch(e => console.error(e));
+            remove(ref(db, `guestbook/${key}`));
         };
 
         document.getElementById('msgInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveMessage(); });
         document.getElementById('saveBtn').onclick = saveMessage;
 
-        // 메시지 불러오기 (리스너 하나로 통합하여 스크롤/삭제 버튼 처리)
-        const q = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
-        onValue(q, (snapshot) => {
-            const list = document.getElementById('msgList');
-            list.innerHTML = '';
-            const data = snapshot.val();
-            if (data) {
-                const sortedKeys = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
-                sortedKeys.forEach((key) => {
-                    const item = data[key];
-                    
-                    // 본인이거나 관리자일 때만 삭제 버튼 HTML 생성
-                    const canDelete = (isAdminNow || item.uid === myUuid);
-                    const delBtnHtml = canDelete ? `<div class="del-btn" onclick="deleteMsg('${key}')">✕</div>` : '';
-                    
-                    const div = document.createElement('div');
-                    div.className = 'msg-item';
-                    div.innerHTML = `
-                        <span class="user-name">${item.name || "VISITOR"}</span>
-                        <div class="user-text">${item.message}</div>
-                        ${delBtnHtml}
-                    `;
-                    list.appendChild(div);
-                });
-            } else {
-                list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
-            }
-        });
+        // [변경] 리스너 함수화
+        function startListening() {
+            const q = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
+            onValue(q, (snapshot) => {
+                const list = document.getElementById('msgList');
+                list.innerHTML = '';
+                const data = snapshot.val();
+                if (data) {
+                    const sortedKeys = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
+                    sortedKeys.forEach((key) => {
+                        const item = data[key];
+                        
+                        // 관리자이거나, 저장된 uid가 현재 브라우저의 myUuid와 일치하는지 확실히 체크
+                        const isAuthor = (item.uid && item.uid === myUuid);
+                        const canDelete = isAdminNow || isAuthor;
+
+                        const div = document.createElement('div');
+                        div.className = 'msg-item';
+                        div.innerHTML = `
+                            <span class="user-name">${item.name || "VISITOR"}</span>
+                            <div class="user-text">${item.message}</div>
+                            ${canDelete ? `<div class="del-btn" onclick="deleteMsg('${key}')">✕</div>` : ''}
+                        `;
+                        list.appendChild(div);
+                    });
+                } else {
+                    list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
+                }
+            });
+        }
     </script>
 </body>
 </html>
