@@ -58,15 +58,30 @@
         function setVh() { document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
         window.addEventListener('resize', setVh); setVh();
 
+        // 1. 본인 확인용 고유 ID 생성/로드
+        if (!localStorage.getItem('guest_uuid')) {
+            localStorage.setItem('guest_uuid', btoa(Date.now() + Math.random()).substring(0, 12));
+        }
+        const myUuid = localStorage.getItem('guest_uuid');
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
         const guestbookRef = ref(db, 'guestbook');
         
-        // 현재 사용자 정보 로드
+        const ADMIN_EMAIL = "joar6563@naver.com";
+        let isAdminNow = false;
+
+        // 2. 현재 사용자 정보 로드
         const currentUser = (typeof Universe !== 'undefined' && Universe.getUser) ? Universe.getUser() : "VISITOR";
         document.getElementById('displayUser').innerText = currentUser;
         document.getElementById('nameInput').value = currentUser;
+
+        // 3. 인증 상태 확인 및 데이터 수신 시작
+        onAuthStateChanged(auth, (user) => {
+            isAdminNow = (user && user.email === ADMIN_EMAIL);
+            startListening();
+        });
 
         window.saveMessage = function() {
             const nameInput = document.getElementById('nameInput');
@@ -76,8 +91,8 @@
             push(guestbookRef, { 
                 name: nameInput.value.trim(), 
                 message: msgInput.value.trim(), 
-                timestamp: Date.now()
-                // uid 저장은 복구 후를 위해 생략하지 않음
+                timestamp: Date.now(),
+                uid: myUuid // 작성자의 고유 ID 저장
             }).then(() => { 
                 msgInput.value = ''; 
                 if(!(/iPhone|iPad|iPod/i.test(navigator.userAgent))) msgInput.focus();
@@ -85,7 +100,7 @@
         };
 
         window.deleteMsg = function(key) {
-            if(confirm("이 글을 삭제하시겠습니까?")) {
+            if(confirm("이 메시지를 삭제할까요?")) {
                 remove(ref(db, `guestbook/${key}`));
             }
         };
@@ -93,33 +108,34 @@
         document.getElementById('msgInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') saveMessage(); });
         document.getElementById('saveBtn').onclick = saveMessage;
 
-        // 메시지 리스너 실행
-        const q = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
-        onValue(q, (snapshot) => {
-            const list = document.getElementById('msgList');
-            list.innerHTML = '';
-            const data = snapshot.val();
-            if (data) {
-                const sortedKeys = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
-                sortedKeys.forEach((key) => {
-                    const item = data[key];
-                    
-                    // [긴급 삭제 모드] 모든 글에 삭제 버튼이 보이도록 true 설정
-                    const canDelete = true; 
+        function startListening() {
+            const q = query(guestbookRef, orderByChild('timestamp'), limitToLast(50));
+            onValue(q, (snapshot) => {
+                const list = document.getElementById('msgList');
+                list.innerHTML = '';
+                const data = snapshot.val();
+                if (data) {
+                    const sortedKeys = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
+                    sortedKeys.forEach((key) => {
+                        const item = data[key];
+                        
+                        // [보안 복구] 관리자이거나, 저장된 uid가 현재 브라우저의 myUuid와 일치할 때만 삭제 버튼 노출
+                        const canDelete = isAdminNow || (item.uid && item.uid === myUuid);
 
-                    const div = document.createElement('div');
-                    div.className = 'msg-item';
-                    div.innerHTML = `
-                        <span class="user-name">${item.name || "VISITOR"}</span>
-                        <div class="user-text">${item.message}</div>
-                        ${canDelete ? `<div class="del-btn" onclick="deleteMsg('${key}')">✕</div>` : ''}
-                    `;
-                    list.appendChild(div);
-                });
-            } else {
-                list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
-            }
-        });
+                        const div = document.createElement('div');
+                        div.className = 'msg-item';
+                        div.innerHTML = `
+                            <span class="user-name">${item.name || "VISITOR"}</span>
+                            <div class="user-text">${item.message}</div>
+                            ${canDelete ? `<div class="del-btn" onclick="deleteMsg('${key}')">✕</div>` : ''}
+                        `;
+                        list.appendChild(div);
+                    });
+                } else {
+                    list.innerHTML = "<p style='text-align:center; padding-top:100px; color:#222;'>NO DATA</p>";
+                }
+            });
+        }
     </script>
 </body>
 </html>
